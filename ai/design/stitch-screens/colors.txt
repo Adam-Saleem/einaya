@@ -1,0 +1,20 @@
+Based on the Clinical Precision design system used for the MedPrecision SaaS project, here is the color palette:
+
+Core Brand Colors
+Primary (Brand Color): #0066FF (MedPrecision Blue) – Used for primary actions, buttons, links, and active states.
+Primary Foreground: #FFFFFF – Used for text or icons placed on top of the primary color.
+Secondary: #4ADE80 (Clinical Green) – Used for supportive actions and healthcare-specific accents.
+Surface & Layout
+Background (Light Mode): #F9F9FF – A soft, cool-tinted white for main page backgrounds.
+Background (Dark Mode): #0F172A – A deep slate-navy for dark mode environments.
+Card / Surface: #FFFFFF – Pure white for elevated cards and content containers.
+Border: #E2E8F0 – Used for subtle divisions, card outlines, and table strokes.
+Text & Accents
+Muted (Subtle Backgrounds): #F1F5F9 – Used for ghost buttons, hover states, or subtle section backgrounds.
+Muted Foreground: #64748B – Used for secondary labels, helper text, and placeholders.
+Accent (Highlights): #DBEAFE – A light blue wash used for selection highlights and active background chips.
+Functional Status
+Success: #22C55E – Used for "Confirmed" statuses and successful actions.
+Destructive: #EF4444 – Used for "Cancelled" statuses, delete actions, and critical errors.
+Warning: #F59E0B – Used for "Pending" states, alerts, and items requiring attention.
+This palette is designed to look professional, trustworthy, and minimal, similar to high-end SaaS platforms like Stripe.

@@ -1,0 +1,21 @@
+Based on the Clinical Precision design system, here are the typographic specifications used throughout the MedPrecision SaaS platform:
+
+Font Families
+Sans (UI): Manrope – A modern, geometric sans-serif that balances clinical professionalism with SaaS-style approachability.
+Arabic-friendly (RTL): IBM Plex Sans Arabic – This is the recommended companion for Manrope to maintain the same technical and modern feel in RTL layouts.
+Typography Scale
+Base size: 14px (0.875rem) – Used for standard body text and UI labels to maximize information density while maintaining legibility.
+Heading Scale:
+H1: 36px (2.25rem) – Primary page titles (e.g., Dashboard Overview).
+H2: 24px (1.5rem) – Section headers and card titles.
+H3: 18px (1.125rem) – Subsection headers.
+H4: 16px (1rem) – Small labels or group headers.
+Hierarchy & Rhythm
+Line height: 1.5 (21px for base text) – Provides optimal breathing room for medical records and long-form data.
+Letter spacing: -0.02em for headings – Tightened slightly for a more "premium" and intentional look in larger sizes.
+Font Weights:
+400 (Regular): Body copy, descriptions, and secondary data.
+500 (Medium): Button text, navigation items, and table headers.
+600 (Semi-bold): Sub-titles and emphasized labels.
+700 (Bold): Page headings and primary brand elements.
+These settings ensure that the interface remains readable under "clinical" conditions while maintaining a sleek, modern aesthetic.

@@ -1,0 +1,88 @@
+web application/stitch/projects/2664081858069159423/screens/6e5107d34d58452e9b0f71684ee5fa97
+# MedPrecision SaaS: Design Specification & AI Developer Prompt
+
+This document provides a comprehensive technical specification for the MedPrecision Medical Clinic Management System. Use this prompt to guide an AI developer or LLM in building the frontend and UI components.
+
+## 1. Project Overview
+**Product Name:** MedPrecision SaaS
+**Industry:** Healthcare / Clinic Management
+**Style:** Modern SaaS (Stripe-inspired), Professional, Clinical, Clean.
+**Architecture:** Multi-tenant platform with subdomain routing (`clinicname.domain.com`).
+**Roles:** Super Admin, Clinic Admin, Secretary, Patient.
+
+---
+
+## 2. Design System: "Clinical Precision"
+
+### Color Palette
+- **Primary:** `#0066FF` (MedPrecision Blue) - Brand color, primary buttons, active states.
+- **Secondary:** `#4ADE80` (Clinical Green) - Success states, healthcare accents.
+- **Surface/BG:**
+  - Page Background (Light): `#F9F9FF`
+  - Page Background (Dark): `#0F172A`
+  - Card/Surface: `#FFFFFF`
+- **Functional:**
+  - Success: `#22C55E`
+  - Destructive: `#EF4444`
+  - Warning: `#F59E0B`
+- **Neutral/Borders:**
+  - Border: `#E2E8F0`
+  - Muted Foreground: `#64748B` (Secondary text)
+  - Muted Background: `#F1F5F9` (Hover states)
+
+### Typography (Manrope)
+- **Base Size:** `14px` (0.875rem) for high data density.
+- **Heading Scale:**
+  - H1: `36px` | Bold | -0.02em tracking
+  - H2: `24px` | Semi-bold | -0.02em tracking
+  - H3: `18px` | Semi-bold
+- **Line Height:** `1.5` (21px for base text).
+- **Weights:** Regular (400), Medium (500), Semi-bold (600), Bold (700).
+- **RTL Support:** Use `IBM Plex Sans Arabic` for Arabic localization.
+
+### Layout & Spacing
+- **Sidebar:** `260px` (Expanded) / `80px` (Collapsed).
+- **Header:** `64px` (fixed).
+- **Border Radius:** `8px` (Standard for cards, inputs, buttons).
+- **Padding:** `24px` (Standard card padding), `32px` (Section gaps).
+- **Shadows:** Soft, multi-layered (Tailwind `shadow-sm` and `shadow`).
+- **Icons:** Lucide-style, `1.5px` stroke weight, `20px` default size.
+
+---
+
+## 3. Component Architecture
+- **Navigation:** Fixed sidebar with active state highlights (Left border accent + Blue-50 background).
+- **Data Tables:** Clean rows, 1px horizontal dividers, hover highlight, status chips for "Status" columns.
+- **Forms:** Label on top, `44px` height for inputs and buttons, subtle focus ring in Primary color.
+- **Cards:** White background, 1px Border (`#E2E8F0`), soft shadow.
+
+---
+
+## 4. Feature Roadmap for Development
+
+### Phase 1: Authentication & Onboarding
+- Multi-step clinic registration form.
+- Subdomain verification and auto-provisioning logic.
+- Role-based login (Super Admin vs Clinic staff).
+
+### Phase 2: Administrative Dashboards
+- **Super Admin:** Platform health monitoring, subscription management, revenue analytics.
+- **Clinic Admin:** Staff management, clinic branding settings, daily schedule overview.
+
+### Phase 3: Operations (Secretary & Patient)
+- **Secretary Panel:** Rapid patient registration, queue management, calendar-based appointment booking.
+- **Patient Module:** Visit timeline, digital prescriptions, lab result uploads.
+
+---
+
+## 5. Technical Stack Recommendations
+- **Framework:** React or Next.js (App Router).
+- **Styling:** Tailwind CSS (configured with the custom Clinical Precision tokens).
+- **Components:** Shadcn/UI (modified with the custom border-radius and color palette).
+- **Icons:** Lucide-React.
+- **State Management:** TanStack Query (React Query) for medical data fetching.
+
+---
+
+## 6. Global Prompt for AI Coding Assistant
+> "Build a professional Medical SaaS dashboard for a platform called 'MedPrecision'. The UI should follow a 'Clinical Precision' aesthetic: primary color #0066FF, light cool-blue backgrounds (#F9F9FF), white cards with 8px border-radius, and 1px #E2E8F0 borders. Use 'Manrope' for typography with a 14px base size. Implement a fixed 260px sidebar navigation on the left and a 64px top header. The interface should feel spacious, trustworthy, and similar to a high-end SaaS product like Stripe. Focus on clear data density for medical records using soft shadows and subtle chips for status indicators."

@@ -1,0 +1,17 @@
+Based on the Clinical Precision design system and the layouts generated for MedPrecision, here are the core spacing and structural specifications:
+
+Navigation & Layout Shell
+Sidebar Width: 260px when expanded. For the collapsed state (seen in denser views), it condenses to 80px to house only primary icons.
+Header Height: 64px (h-16). This provides a consistent vertical anchor for global search and profile actions.
+Gap Between Sections: 24px (6 units) or 32px (8 units) depending on the content hierarchy. Primary modules use 32px of breathing room to maintain a "premium SaaS" feel.
+Component Dimensions
+Card Padding: 24px (p-6) is the standard internal padding for content containers and data cards.
+Button Heights:
+Small (sm): 32px – Used for inline table actions or secondary filters.
+Medium (md): 44px – The default height for primary UI actions.
+Large (lg): 56px – Used for high-emphasis actions on landing pages or empty states.
+Input Height: 44px – Matches the medium button height to ensure a consistent horizontal rhythm in forms.
+Roundness & Borders
+Border Radius: 8px (Rounded Eight) – Applied consistently across cards, buttons, and inputs to create a modern, approachable, yet professional look.
+Border Weight: 1px – Used for all UI strokes (cards, inputs, dividers) in a light slate or gray to keep the interface feeling "light."
+These constraints ensure that even as the platform grows, the density and visual rhythm remain consistent with the established MedPrecision brand.

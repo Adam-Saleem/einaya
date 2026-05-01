@@ -1,0 +1,9 @@
+To round out the Clinical Precision design system for MedPrecision, here are the stylistic and structural guidelines used across the interface:
+
+Visual Style & Depth
+Shadow Style: Soft & Layered – We use subtle, multi-layered shadows (similar to Tailwind's shadow-sm and shadow) to create depth without visual clutter. This ensures that cards and modals feel like they are floating slightly above the light-tinted background.
+Border Style: Visible & Refined – The interface uses light, 1px borders (#E2E8F0) for all primary containers, inputs, and dividers. This provides clear structural definition and a "technical" feel that reinforces the clinical theme.
+Iconography & Density
+Icon Style: Outlined (1.5px Stroke) – Following the Lucide/Shadcn standard, icons are clean and geometric with a 1.5px stroke weight. They are consistently sized at 20px for UI actions and 24px for section headers to maintain a balanced visual weight.
+Density: Spacious – The design prioritizes legibility and reduced cognitive load. With 24px standard padding and 32px section gaps, the layout feels "breathable" and premium, ensuring critical medical data is easy to scan.
+These final specifications ensure that the MedPrecision SaaS platform feels cohesive, modern, and highly professional.
