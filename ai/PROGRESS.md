@@ -7,7 +7,7 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 4 complete; ready to start Phase 5 (Roles + Spatie permissions).
+**Active phase:** None — Phase 5 complete; ready to start Phase 6 (UI Foundation).
 **Last session date:** 2026-05-02
 
 ---
@@ -40,6 +40,24 @@ All Definition of Done items met:
 - 34 Pest tests pass — adds 6 new ones in `Feature/Central/` (3 audit, 2 plan seed, 1 clinic creation)
 - TypeScript clean
 - Tinker confirms: `Clinic::all()` returns demo clinic; `User::first()->is_super_admin === true`
+
+### ✅ Phase 5 — Roles, Permissions & Policies (2026-05-02)
+
+All Definition of Done items met:
+- `spatie/laravel-permission` installed; the `create_permission_tables` migration moved to `database/migrations/tenant/2026_05_02_000023_*` so roles/permissions live per-clinic.
+- 4 roles seeded into every tenant DB: `clinic_admin` (all 46 perms), `doctor` (medical stack + read-only on staff/payments/reports), `secretary` (admin + scheduling + billing only — explicit deny on medical permissions), `nurse` (v2 stub).
+- 46 permissions across 13 resource groups, defined as a string-backed `App\Enums\Tenant\Permission` enum (and mirrored in `resources/js/types/auth.ts` for compile-time safety on the FE).
+- 13 policies in `app/Policies/Tenant/`, registered explicitly via `App\Providers\AuthServiceProvider` (Laravel 12 ships no AuthServiceProvider by default).
+- `App\Models\Tenant\User` uses `Spatie\Permission\Traits\HasRoles`; central `User` is left alone (super admins are gated solely by `is_super_admin`).
+- New tenancy pipeline job `App\Jobs\Tenancy\SeedTenantRolesPermissions` runs in EVERY env (production included) so role tables are populated before any user is created. Demo seeder (`SeedTenantDatabaseInDev`) runs after, skipped in production + testing as before.
+- `TenantDemoSeeder` assigns `clinic_admin` + `doctor` to the doctor user and `secretary` to the secretary user.
+- `HandleInertiaRequests` shares `auth.permissions` and `auth.roles` (empty arrays for the central super admin since the trait isn't installed there).
+- `resources/js/Hooks/useCan.ts` + `resources/js/Components/domain/Can.tsx` wrap the shared permissions for declarative use; TS types in `resources/js/types/auth.ts`.
+- 6 new authorization tests pass — 42 total in the suite. Demo tenant verified: 4 roles, 46 permissions, 104 role-permission mappings, 3 user-role assignments.
+- All three URLs return 200; `storage/logs/laravel.log` empty.
+
+**Phase 5 deviations from the prompt:**
+- "Secretary direct URL access to `/consultations` returns 403" deferred to Phase 7. There are no resource controllers built yet (Phase 4 only added auth controllers), so Gate-level tests cover the same ground without scaffolding throwaway routes.
 
 ### ✅ Phase 4 — Authentication, 2FA & Multi-Context Login (2026-05-02)
 
@@ -119,6 +137,17 @@ _(none)_
 - **Tenant DB prefix is now env-driven.** `config('tenancy.database.prefix')` reads `TENANCY_DB_PREFIX` (default `einaya_tenant_`). `phpunit.xml` sets it to `einaya_test_tenant_` so `php artisan test` cannot drop the dev tenant DBs (the test cleanup helpers also DROP the prefixed DB; without isolation, every test run nuked `einaya_tenant_demo`). All test cleanup helpers compute the DB name from config rather than hardcoding.
 - **`DemoClinicSeeder` is idempotent** (re-run safe): finds existing demo clinic by slug, ensures the domain row + active subscription exist, only triggers tenant DB creation on first run. Includes a guard that warns and skips `tenants:migrate` if `database/migrations/tenant/` is empty (Phase 3 fills that folder).
 - **`AuditLogService` accepts a nullable `Request` and nullable `User`** — the audit log table allows null user_id, and seeder/cron contexts have no request. Backend-conventions rule "no facades in services" is honored: Request is constructor-injected (Laravel resolves it from the container) instead of using the `request()` helper.
+
+### Phase 5
+
+- **Spatie permission cache → `array` driver, not `database`.** stancl's `CacheTenancyBootstrapper` routes the database cache store to the active tenant DB, but tenant DBs have no `cache` table. The migration's `Cache::forget()` call therefore exploded mid-seed. `'store' => 'array'` keeps the cache process-local, which costs us nothing because the catalog is tiny (~4 roles, ~50 perms) and rebuilds in microseconds per request.
+- **Two-stage tenant pipeline:** `SeedTenantRolesPermissions` runs unconditionally (every env); `SeedTenantDatabaseInDev` runs only in non-production+non-testing. Without the role seeder running in production, every clinic user would be locked out — Spatie's `Gate::before` short-circuits to false when no role/permission rows exist.
+- **`AuthServiceProvider` registered explicitly** in `bootstrap/providers.php`. Laravel 12 doesn't ship one by default and policy auto-discovery doesn't span the `App\Models\Tenant\X` ↔ `App\Policies\Tenant\XPolicy` namespace pair (Laravel only auto-resolves `App\Policies\XPolicy`). Listing the 13 model→policy pairs explicitly is also greppable.
+- **`HandleInertiaRequests::share` uses `method_exists(...)` to test for `HasRoles`.** The Inertia middleware is shared across central and tenant contexts; the central super admin's User model doesn't have `getAllPermissions()`, so the trait check keeps both contexts working without branching on guard.
+- **`UserPolicy` lets a user always view themselves regardless of `staff.view`.** Without this, a doctor without staff perms couldn't even hit their own profile page. Self-delete via staff management still requires `staff.delete` AND is blocked by an `id !== id` guard.
+- **`PaymentPolicy` and `FormSubmissionPolicy` return `false` on `update`/`delete`** even for clinic_admin. Payments are adjusted via the separate `refund` ability; form submissions are immutable per ADR-002. The policy enforces this even if a permission slips into the role matrix later.
+- **No "super-admin" wildcard permission.** Spatie supports a `super-admin` role that bypasses every check via `Gate::before`; we don't use it. Clinic admin has every permission listed explicitly so role audits are accurate.
+- **`PatientFilePolicy::view` cross-checks the file category** against `patients.view_medical`. Secretaries can see ID/insurance card scans (admin categories) but not external reports or prescription scans, even though they have `files.view` and `files.upload`. Defense-in-depth — same rule will be re-asserted at the controller level when Phase 7 builds file UI.
 
 ### Phase 4
 
@@ -250,6 +279,35 @@ _(none)_
 - `resources/js/Pages/Auth/Register.tsx`
 - `tests/Feature/Auth/{Authentication,EmailVerification,PasswordConfirmation,PasswordReset,PasswordUpdate,Registration}Test.php`
 - `tests/Feature/ProfileTest.php`
+
+### Phase 5 — Created
+
+- `app/Enums/Tenant/{Role,Permission}.php`
+- `app/Policies/Tenant/{Patient,Appointment,Consultation,MedicalForm,FormSubmission,Prescription,Diagnosis,Payment,PatientFile,InsuranceProvider,User,Doctor,AuditLog}Policy.php`
+- `app/Providers/AuthServiceProvider.php`
+- `app/Jobs/Tenancy/SeedTenantRolesPermissions.php`
+- `database/seeders/Tenant/RolesAndPermissionsSeeder.php`
+- `database/migrations/tenant/2026_05_02_000023_create_permission_tables.php` (moved from default location)
+- `config/permission.php` (published)
+- `resources/js/types/auth.ts`
+- `resources/js/Hooks/useCan.ts`
+- `resources/js/Components/domain/Can.tsx`
+- `tests/Feature/Tenant/Authorization/{RoleAssignment,ClinicAdminFullAccess,SecretaryCannotViewMedical,DoctorCanManageForms,PolicyEnforcement}Test.php`
+
+### Phase 5 — Modified
+
+- `composer.json` / `composer.lock` — added `spatie/laravel-permission`
+- `config/permission.php` — `cache.store` switched to `array`
+- `bootstrap/providers.php` — `AuthServiceProvider` registered
+- `app/Providers/TenancyServiceProvider.php` — `SeedTenantRolesPermissions` added to pipeline before demo seeder
+- `app/Models/Tenant/User.php` — `HasRoles` trait
+- `app/Http/Middleware/HandleInertiaRequests.php` — shares `auth.permissions`, `auth.roles`, and a `flash` bag
+- `database/seeders/Tenant/TenantDemoSeeder.php` — assigns `clinic_admin`+`doctor` and `secretary` roles
+- `resources/js/types/index.d.ts` — `auth.permissions` + `auth.roles` typed via `auth.ts`
+
+### Phase 5 — Post-completion fix
+
+- **Added `database/migrations/tenant/2026_05_02_000024_create_cache_table.php`** (tables `cache` + `cache_locks`). Logging in at a tenant subdomain blew up with "Table 'einaya_tenant_demo.cache' doesn't exist" — Laravel's `RateLimiter` uses the `database` cache store, and stancl's `CacheTenancyBootstrapper` routes that store to the active tenant DB. Mirroring the central `cache_table` migration into the tenant folder fixes the rate limiter, any future tagged caches, and per-clinic memoization. (Spatie's permission cache stays on the `array` driver — it doesn't need to persist between requests.)
 
 ### Background processes
 - Vite dev server running with PID in `storage/logs/vite.pid`, log in `storage/logs/vite.log` (HTTPS via Herd cert at `https://einaya.test:5173`).

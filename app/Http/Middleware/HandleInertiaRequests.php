@@ -29,10 +29,27 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                // Tenant\User has Spatie's HasRoles trait; Central\User does
+                // not. method_exists() keeps this middleware context-agnostic
+                // — the central super admin just gets empty arrays.
+                'permissions' => $user !== null && method_exists($user, 'getAllPermissions')
+                    ? $user->getAllPermissions()->pluck('name')->values()->all()
+                    : [],
+                'roles' => $user !== null && method_exists($user, 'getRoleNames')
+                    ? $user->getRoleNames()->values()->all()
+                    : [],
+            ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+                'status' => $request->session()->get('status'),
             ],
         ];
     }

@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "pragmarx/google2fa-laravel": "^3.0",
+        "spatie/laravel-permission": "^7.4",
         "stancl/tenancy": "^3.10",
         "tightenco/ziggy": "^2.0"
     },

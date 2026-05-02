@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Jobs\Tenancy\SeedTenantDatabaseInDev;
+use App\Jobs\Tenancy\SeedTenantRolesPermissions;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -28,8 +29,12 @@ class TenancyServiceProvider extends ServiceProvider
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
                     Jobs\MigrateDatabase::class,
-                    // Custom: seed the tenant DB with demo data — non-production only.
-                    // Skipped in production via env check inside the job itself.
+                    // Roles + permissions seeder runs in every environment —
+                    // without it, spatie's Gate::before short-circuit denies
+                    // everything and clinics are unusable.
+                    SeedTenantRolesPermissions::class,
+                    // Demo data seeder — non-production only (skipped in
+                    // testing as well, by env check inside the job itself).
                     SeedTenantDatabaseInDev::class,
                 ])->send(function (Events\TenantCreated $event) {
                     return $event->tenant;

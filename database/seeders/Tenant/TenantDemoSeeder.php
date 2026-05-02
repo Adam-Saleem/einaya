@@ -9,6 +9,7 @@ use App\Enums\Tenant\FormQuestionType;
 use App\Enums\Tenant\FormType;
 use App\Enums\Tenant\PaymentMethod;
 use App\Enums\Tenant\PaymentStatus;
+use App\Enums\Tenant\Role as RoleEnum;
 use App\Models\Tenant\Appointment;
 use App\Models\Tenant\Consultation;
 use App\Models\Tenant\Diagnosis;
@@ -78,6 +79,11 @@ class TenantDemoSeeder extends Seeder
                 'email_verified_at' => now(),
             ],
         );
+
+        // Assign roles. syncRoles() is idempotent so re-runs don't pile up
+        // duplicate role pivots.
+        $admin->syncRoles([RoleEnum::ClinicAdmin->value, RoleEnum::Doctor->value]);
+        $secretary->syncRoles([RoleEnum::Secretary->value]);
 
         return [$admin, $secretary];
     }

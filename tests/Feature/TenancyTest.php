@@ -47,7 +47,9 @@ it('does not initialize tenancy on the marketing root domain', function () {
 });
 
 it('does not initialize tenancy on the super admin domain', function () {
-    $this->get('http://app.einaya.test/')->assertOk();
+    // Central dashboard requires auth — Phase 4 redirects guests to /login.
+    // The login page itself confirms central context is reachable.
+    $this->get('http://app.einaya.test/login')->assertOk();
 
     expect(tenancy()->initialized)->toBeFalse();
 });

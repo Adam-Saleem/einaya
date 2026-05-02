@@ -14,13 +14,16 @@ use Tests\TestCase;
 |
 */
 
-// Breeze-installed tests + central tests that don't touch tenant DDL.
+// Tests that touch only the central DB use RefreshDatabase.
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in(
-        'Feature/Auth',
-        'Feature/ProfileTest.php',
         'Feature/ExampleTest.php',
+        'Feature/Auth/CentralLoginTest.php',
+        'Feature/Auth/TwoFactorSetupTest.php',
+        'Feature/Auth/TwoFactorChallengeTest.php',
+        'Feature/Auth/LoginThrottlingTest.php',
+        'Feature/Auth/PasswordRequirementsTest.php',
         'Feature/Central/SubscriptionPlanTest.php',
         'Feature/Central/AuditLogTest.php',
     );
@@ -33,6 +36,8 @@ pest()->extend(TestCase::class)
         'Feature/TenancyTest.php',
         'Feature/Central/ClinicCreationTest.php',
         'Feature/Tenant',
+        'Feature/Auth/TenantLoginTest.php',
+        'Feature/Auth/WrongContextTest.php',
     );
 
 /*
