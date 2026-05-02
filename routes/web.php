@@ -1,10 +1,20 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Marketing root — only the bare central root domains, not subdomains.
+/*
+|--------------------------------------------------------------------------
+| Marketing root
+|--------------------------------------------------------------------------
+|
+| Restricted to the bare central root domains so this route does not
+| collide with routes/tenant.php's `/`. Auth + profile routes live in
+| context-scoped files (routes/central.php, routes/tenant.php).
+|
+*/
 foreach (['einaya.ps', 'einaya.test', 'localhost', '127.0.0.1'] as $domain) {
     Route::domain($domain)->group(function () {
         Route::get('/', function () {
@@ -12,15 +22,3 @@ foreach (['einaya.ps', 'einaya.test', 'localhost', '127.0.0.1'] as $domain) {
         })->name('marketing.home');
     });
 }
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-require __DIR__.'/auth.php';

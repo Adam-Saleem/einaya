@@ -7,7 +7,7 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 3 complete; ready to start Phase 4 (Auth + Roles + 2FA).
+**Active phase:** None — Phase 4 complete; ready to start Phase 5 (Roles + Spatie permissions).
 **Last session date:** 2026-05-02
 
 ---
@@ -40,6 +40,22 @@ All Definition of Done items met:
 - 34 Pest tests pass — adds 6 new ones in `Feature/Central/` (3 audit, 2 plan seed, 1 clinic creation)
 - TypeScript clean
 - Tinker confirms: `Clinic::all()` returns demo clinic; `User::first()->is_super_admin === true`
+
+### ✅ Phase 4 — Authentication, 2FA & Multi-Context Login (2026-05-02)
+
+All Definition of Done items met:
+- Two auth guards configured: `web` (tenant) → `App\Models\Tenant\User`, `web_central` → `App\Models\Central\User`. Two password brokers, two providers. The `central` middleware swaps `auth.defaults.guard` to `web_central` for the request lifetime so shared controllers stay context-agnostic.
+- Routes registered twice (once per context) via a closure in `routes/auth.php` — names prefixed with `central.` / `tenant.`. No `/register` route in either context (no self-signup in v1).
+- Login flow:
+  - Email + password → `LoginRequest` (5 attempts/min throttle on email+IP)
+  - If user has `two_factor_confirmed_at` → session-stash `auth.two_factor.user_id`/`guard`/`remember`, redirect to `/two-factor/challenge`
+  - Otherwise → fully logged in
+- 2FA built on `pragmarx/google2fa-laravel` + `bacon/bacon-qr-code` (SVG QR data URIs). `App\Services\TwoFactorService` does the crypto; `App\Traits\HasTwoFactorAuth` is mixed into both User models. Recovery codes are individually `Hash::make()`'d before being encrypted in `two_factor_recovery_codes`.
+- Sessions switched to the `database` driver — central uses the existing `sessions` table from the default Laravel migration; tenants got a new `2026_05_02_000022_create_sessions_table.php`. `SESSION_DOMAIN=null` so each subdomain has its own cookie.
+- Password rules apply on update + reset: `Password::min(10)->mixedCase()->numbers()->symbols()`. Login itself only requires non-empty (so users can copy/paste long random passwords without re-validating them).
+- Frontend: `Login.tsx`, `ForgotPassword.tsx`, `ResetPassword.tsx`, `ConfirmPassword.tsx`, `VerifyEmail.tsx`, `Profile/Edit.tsx` updated to use relative URLs (no Ziggy `route()` calls). New pages: `TwoFactorChallenge.tsx`, `TwoFactorSetup.tsx`. `Register.tsx` removed.
+- 19 new auth tests pass — 36 total in the suite. Smoke: `https://einaya.test/`, `https://app.einaya.test/login`, `https://demo.einaya.test/login` all return 200; `https://app.einaya.test/` redirects guests to `/login`.
+- `storage/logs/laravel.log` empty.
 
 ### ✅ Phase 3 — Tenant Database Schema (2026-05-02)
 
@@ -103,6 +119,20 @@ _(none)_
 - **Tenant DB prefix is now env-driven.** `config('tenancy.database.prefix')` reads `TENANCY_DB_PREFIX` (default `einaya_tenant_`). `phpunit.xml` sets it to `einaya_test_tenant_` so `php artisan test` cannot drop the dev tenant DBs (the test cleanup helpers also DROP the prefixed DB; without isolation, every test run nuked `einaya_tenant_demo`). All test cleanup helpers compute the DB name from config rather than hardcoding.
 - **`DemoClinicSeeder` is idempotent** (re-run safe): finds existing demo clinic by slug, ensures the domain row + active subscription exist, only triggers tenant DB creation on first run. Includes a guard that warns and skips `tenants:migrate` if `database/migrations/tenant/` is empty (Phase 3 fills that folder).
 - **`AuditLogService` accepts a nullable `Request` and nullable `User`** — the audit log table allows null user_id, and seeder/cron contexts have no request. Backend-conventions rule "no facades in services" is honored: Request is constructor-injected (Laravel resolves it from the container) instead of using the `request()` helper.
+
+### Phase 4
+
+- **Two guards + two providers + two brokers in `config/auth.php`.** Default guard is `web` (tenant); `web_central` is the central-context guard. The `EnsureCentralContext` middleware mutates `config('auth.defaults.guard')` and `auth.defaults.passwords` for the lifetime of central requests so `Auth::user()` / `Auth::attempt()` / `Password::sendResetLink()` resolve to the right model and table without explicit guard threading. This isn't elegant (config mutation is shared state) but it keeps the Breeze-style controllers reusable across both contexts.
+- **`routes/auth.php` is a closure, not a route file.** It returns a callable that accepts a name prefix (`central` or `tenant`) and registers the same set of routes under that prefix. Both `routes/central.php` and `routes/tenant.php` `(require __DIR__.'/auth.php')('xxx')`. Why: route names are global in Laravel — registering `login` twice would silently let only the last-registered version generate URLs. Prefixing avoids collisions. The trade-off is `redirect()->route('login')` doesn't work; controllers use `redirect()->route(AuthContext::prefix().'.login')`.
+- **Frontend uses relative URLs (`/login`, `/profile`, `/two-factor`) instead of Ziggy `route('xxx')`.** Same reason as above — Ziggy's `route('login')` would fail for one of the two contexts. Relative paths route correctly to the current host.
+- **`bootstrap/app.php` calls `redirectGuestsTo(fn () => '/login')`** — Laravel's default `Authenticate` middleware tries to resolve `route('login')` on 401, which doesn't exist. The closure short-circuits the named-route lookup with a relative URL.
+- **`HasTwoFactorAuth` trait + `TwoFactorService`** — service is the cryptography layer (Google2FA + QR), trait is the model-attribute layer (encrypt/decrypt secret, hash recovery codes, `confirmTwoFactor` returns the plaintext recovery codes once). Recovery code format `XXXX-XXXX` (8 chars). Codes are `Hash::make()`'d individually then JSON-encoded then `Crypt::encryptString`'d — three layers — so a stolen DB still requires the `APP_KEY` plus a brute-force pass.
+- **2FA challenge runs against a separate rate limiter** (key: `two-factor|user_id|ip`) so a TOTP guesser can't bypass the login rate limit by skipping the credential step.
+- **`Auth::attempt()` is split into `validate()` + `login()`** in `AuthenticatedSessionController::store()` so we can branch on `hasTwoFactorEnabled()` *before* the session is logged in. Without this, the user would already be authed before being asked for their second factor.
+- **Sessions switched to `database` driver. Central uses the default Laravel `sessions` migration; tenant got `2026_05_02_000022_create_sessions_table.php`.** `SESSION_DOMAIN=null` keeps cookies per-host so a clinic A session never leaks into clinic B (each subdomain gets its own cookie). The `FilesystemTenancyBootstrapper` already handles per-tenant storage paths if anything needs file sessions later.
+- **Password rules NOT applied on login.** A user with a strong existing password (set via reset/update) shouldn't fail to log in just because it has unusual characters — Laravel's Password rule is for *new* passwords. Applied to: password update (`PUT /password`) and password reset (`POST /reset-password`). Rule: `Password::min(10)->mixedCase()->numbers()->symbols()`.
+- **Old Breeze auth tests deleted.** `AuthenticationTest`, `EmailVerificationTest`, `PasswordConfirmationTest`, `PasswordResetTest`, `PasswordUpdateTest`, `RegistrationTest`, `ProfileTest` all removed. Replaced with the 7 Phase 4 tests, which cover the same ground plus 2FA, throttling, and cross-context auth. `Register.tsx` and `RegisteredUserController` also deleted (no v1 self-signup).
+- **`tests/Feature/Auth/TenantLoginTest` and `WrongContextTest` opt out of `RefreshDatabase`** because they create real tenant DBs (DDL auto-commits and breaks transaction rollback). Listed explicitly in `tests/Pest.php` alongside `TenancyTest` and the tenant tests. The other 5 auth tests stay in the RefreshDatabase group since they only touch the central DB.
 
 ### Phase 3
 
@@ -177,6 +207,49 @@ _(none)_
 - `app/Providers/TenancyServiceProvider.php` — `SeedTenantDatabaseInDev::class` added to `TenantCreated` pipeline
 - `database/seeders/Central/DemoClinicSeeder.php` — dropped manual `tenants:migrate` and `tenantMigrationsExist()` (the pipeline runs migrations + seeder now)
 - `tests/Pest.php` — `Feature/Tenant` opted out of `RefreshDatabase`
+
+### Phase 4 — Created
+
+- `app/Services/TwoFactorService.php`
+- `app/Traits/HasTwoFactorAuth.php`
+- `app/Support/AuthContext.php` (helper for `central.`/`tenant.` route-name prefix + guard/broker resolution)
+- `app/Http/Middleware/EnsureCentralContext.php`
+- `app/Http/Middleware/RequireTwoFactor.php`
+- `app/Http/Controllers/Auth/TwoFactorChallengeController.php`
+- `app/Http/Controllers/Auth/TwoFactorSetupController.php`
+- `app/Http/Requests/Auth/TwoFactorChallengeRequest.php`
+- `database/migrations/tenant/2026_05_02_000022_create_sessions_table.php`
+- `resources/js/Pages/Auth/TwoFactorChallenge.tsx`
+- `resources/js/Pages/Auth/TwoFactorSetup.tsx`
+- `tests/Feature/Auth/{CentralLoginTest,TenantLoginTest,WrongContextTest,TwoFactorSetupTest,TwoFactorChallengeTest,LoginThrottlingTest,PasswordRequirementsTest}.php`
+
+### Phase 4 — Modified
+
+- `composer.json` / `composer.lock` — added `pragmarx/google2fa-laravel`, `bacon/bacon-qr-code`
+- `config/auth.php` — two guards, two providers, two password brokers
+- `bootstrap/app.php` — middleware aliases (`central`, `two_factor`); `redirectGuestsTo(fn () => '/login')`
+- `app/Providers/TenancyServiceProvider.php` — unchanged from Phase 3
+- `app/Models/Central/User.php` + `app/Models/Tenant/User.php` — `HasTwoFactorAuth` trait
+- `app/Http/Controllers/Auth/*` — context-aware redirects, password broker selection, password rules
+- `app/Http/Controllers/ProfileController.php` — context-aware
+- `app/Http/Requests/ProfileUpdateRequest.php` + `Auth/LoginRequest.php` — model resolution by guard, throttling-only login
+- `routes/auth.php` — closure-based, name-prefixed
+- `routes/web.php` — only marketing root remains
+- `routes/central.php` — `central` middleware + auth route inclusion + auth-guarded dashboard
+- `routes/tenant.php` — auth route inclusion + auth-aware tenant home
+- `resources/js/Pages/Auth/{Login,ForgotPassword,ResetPassword,ConfirmPassword,VerifyEmail}.tsx` — relative URLs
+- `resources/js/Pages/Profile/{Edit,Partials/*}.tsx` — relative URLs + 2FA section in Edit
+- `resources/js/Layouts/AuthenticatedLayout.tsx` — relative URLs + path-based active state
+- `tests/Pest.php` — auth test files split between RefreshDatabase / non-RefreshDatabase groups
+- `tests/Feature/TenancyTest.php` — central root assertion changed to `/login` (root now requires auth)
+- `.env`, `.env.example` — `SESSION_DRIVER=database`
+
+### Phase 4 — Deleted
+
+- `app/Http/Controllers/Auth/RegisteredUserController.php`
+- `resources/js/Pages/Auth/Register.tsx`
+- `tests/Feature/Auth/{Authentication,EmailVerification,PasswordConfirmation,PasswordReset,PasswordUpdate,Registration}Test.php`
+- `tests/Feature/ProfileTest.php`
 
 ### Background processes
 - Vite dev server running with PID in `storage/logs/vite.pid`, log in `storage/logs/vite.log` (HTTPS via Herd cert at `https://einaya.test:5173`).

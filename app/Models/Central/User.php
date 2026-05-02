@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Central;
 
+use App\Traits\HasTwoFactorAuth;
 use Database\Factories\Central\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
+    use HasTwoFactorAuth;
     use Notifiable;
     use SoftDeletes;
 

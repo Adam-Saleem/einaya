@@ -21,7 +21,16 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        $middleware->alias([
+            'central' => \App\Http\Middleware\EnsureCentralContext::class,
+            'two_factor' => \App\Http\Middleware\RequireTwoFactor::class,
+        ]);
+
+        // Auth routes are registered with context-prefixed names
+        // (`central.login` / `tenant.login`) — there is no global `login` route,
+        // so the default Authenticate middleware can't resolve it. Redirect
+        // unauthenticated guests to `/login` on the current host instead.
+        $middleware->redirectGuestsTo(fn () => '/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

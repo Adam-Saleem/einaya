@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
-use App\Models\Central\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -10,12 +11,15 @@ use Illuminate\Validation\Rule;
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * Get the validation rules that apply to the request.
+     * Validates against whichever User model the active guard resolves to —
+     * Central\User on app.einaya.test, Tenant\User on a clinic subdomain.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $userModel = $this->user() === null ? null : $this->user()::class;
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -23,8 +27,10 @@ class ProfileUpdateRequest extends FormRequest
                 'string',
                 'lowercase',
                 'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                'max:191',
+                $userModel !== null
+                    ? Rule::unique($userModel, 'email')->ignore($this->user()->getKey())
+                    : 'unique:users,email',
             ],
         ];
     }
