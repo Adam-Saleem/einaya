@@ -14,16 +14,25 @@ use Tests\TestCase;
 |
 */
 
-// Breeze-installed tests that exercise Eloquent and need a clean DB per test.
+// Breeze-installed tests + central tests that don't touch tenant DDL.
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->in('Feature/Auth', 'Feature/ProfileTest.php', 'Feature/ExampleTest.php');
+    ->in(
+        'Feature/Auth',
+        'Feature/ProfileTest.php',
+        'Feature/ExampleTest.php',
+        'Feature/Central/SubscriptionPlanTest.php',
+        'Feature/Central/AuditLogTest.php',
+    );
 
-// Tenancy tests must NOT use RefreshDatabase: tenant DB creation/deletion is
-// DDL that auto-commits and cannot be rolled back per-test. They manage their
-// own state.
+// Tests that create/delete tenant databases must NOT use RefreshDatabase:
+// tenant DB creation/deletion is DDL that auto-commits and cannot be rolled
+// back per-test. They manage their own state.
 pest()->extend(TestCase::class)
-    ->in('Feature/TenancyTest.php');
+    ->in(
+        'Feature/TenancyTest.php',
+        'Feature/Central/ClinicCreationTest.php',
+    );
 
 /*
 |--------------------------------------------------------------------------

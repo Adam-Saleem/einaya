@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Models\Central\Tenant;
+use App\Models\Central\Clinic;
 use Stancl\Tenancy\Database\Models\Domain;
 
 return [
-    'tenant_model' => Tenant::class,
+    'tenant_model' => Clinic::class,
     'id_generator' => Stancl\Tenancy\UUIDGenerator::class,
 
     'domain_model' => Domain::class,
@@ -58,8 +58,8 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'einaya_tenant_',
-        'suffix' => '',
+        'prefix' => env('TENANCY_DB_PREFIX', 'einaya_tenant_'),
+        'suffix' => env('TENANCY_DB_SUFFIX', ''),
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.

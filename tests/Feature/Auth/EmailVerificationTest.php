@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;

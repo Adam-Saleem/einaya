@@ -6,13 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDomainsTable extends Migration
+return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up(): void
     {
         Schema::create('domains', function (Blueprint $table) {
@@ -21,17 +16,16 @@ class CreateDomainsTable extends Migration
             $table->string('tenant_id');
 
             $table->timestamps();
-            $table->foreign('tenant_id')->references('id')->on('tenants')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('tenant_id')
+                ->references('id')->on('clinics')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down(): void
     {
         Schema::dropIfExists('domains');
     }
-}
+};
