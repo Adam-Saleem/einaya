@@ -10,7 +10,6 @@ use App\Models\Central\Clinic;
 use App\Models\Central\Subscription;
 use App\Models\Central\SubscriptionPlan;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\File;
 
 class DemoClinicSeeder extends Seeder
 {
@@ -43,17 +42,9 @@ class DemoClinicSeeder extends Seeder
 
         $this->ensureDomainAndSubscription($clinic);
 
-        if ($this->tenantMigrationsExist()) {
-            $clinic->run(function () {
-                // Tenant migrations exist; run them so the demo DB has tables.
-                \Artisan::call('tenants:migrate', ['--tenants' => ['demo']]);
-            });
-        } else {
-            $this->command?->warn(
-                'Tenant migrations folder is empty — skipping tenant migration. '
-                .'(Phase 3 will populate database/migrations/tenant/.)'
-            );
-        }
+        // Tenant DB creation, migration, and (in non-production) seeding all
+        // run automatically via the TenantCreated JobPipeline configured in
+        // TenancyServiceProvider — no manual artisan calls needed here.
     }
 
     private function ensureDomainAndSubscription(Clinic $clinic): void
@@ -85,21 +76,5 @@ class DemoClinicSeeder extends Seeder
 
         $clinic->subscription_id = $subscription->id;
         $clinic->save();
-    }
-
-    private function tenantMigrationsExist(): bool
-    {
-        $path = database_path('migrations/tenant');
-
-        if (! File::isDirectory($path)) {
-            return false;
-        }
-
-        $files = array_filter(
-            File::files($path),
-            fn ($file) => str_ends_with($file->getFilename(), '.php'),
-        );
-
-        return count($files) > 0;
     }
 }

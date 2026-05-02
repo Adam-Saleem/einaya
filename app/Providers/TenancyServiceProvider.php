@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Jobs\Tenancy\SeedTenantDatabaseInDev;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -27,11 +28,9 @@ class TenancyServiceProvider extends ServiceProvider
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
                     Jobs\MigrateDatabase::class,
-                    // Jobs\SeedDatabase::class,
-
-                    // Your own jobs to prepare the tenant.
-                    // Provision API keys, create S3 buckets, anything you want!
-
+                    // Custom: seed the tenant DB with demo data — non-production only.
+                    // Skipped in production via env check inside the job itself.
+                    SeedTenantDatabaseInDev::class,
                 ])->send(function (Events\TenantCreated $event) {
                     return $event->tenant;
                 })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.

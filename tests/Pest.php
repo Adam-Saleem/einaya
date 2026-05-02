@@ -32,6 +32,7 @@ pest()->extend(TestCase::class)
     ->in(
         'Feature/TenancyTest.php',
         'Feature/Central/ClinicCreationTest.php',
+        'Feature/Tenant',
     );
 
 /*
