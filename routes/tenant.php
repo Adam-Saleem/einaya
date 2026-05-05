@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\PreferenceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -37,4 +38,18 @@ Route::middleware([
             'tenantId' => tenant('id'),
         ]);
     })->name('tenant.welcome');
+
+    Route::middleware('auth')->group(function () {
+        Route::post('/api/preferences/language', [PreferenceController::class, 'language'])
+            ->name('tenant.preferences.language');
+        Route::post('/api/preferences/theme', [PreferenceController::class, 'theme'])
+            ->name('tenant.preferences.theme');
+    });
+
+    Route::middleware('design_system')->get('/design-system', function () {
+        return Inertia::render('DesignSystem', ['context' => 'tenant']);
+    })->name('tenant.design-system');
+
+    Route::post('/api/preferences/language/guest', [PreferenceController::class, 'language'])
+        ->name('tenant.preferences.language.guest');
 });

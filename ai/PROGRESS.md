@@ -7,12 +7,43 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 5 complete; ready to start Phase 6 (UI Foundation).
-**Last session date:** 2026-05-02
+**Active phase:** None — Phase 6 complete; ready to start Phase 7 (Super Admin).
+**Last session date:** 2026-05-05
 
 ---
 
 ## Completed Phases
+
+### ✅ Phase 6 — UI Foundation: shadcn, Layout, i18n, RTL, Dark Mode (2026-05-05)
+
+All Definition of Done items met:
+- shadcn/ui installed (`new-york` style) with 33 primitives under `resources/js/Components/ui/`. `components.json` configured with `@/Components`, `@/Components/ui`, `@/lib/utils`, `@/Hooks` aliases. CLI managed to non-interactively add components after `components.json` was hand-written.
+- `tailwind.config.ts` (replaces `tailwind.config.js`) wires the full token surface: 30+ semantic colors via `rgb(var(--token) / <alpha-value>)`, sidebar palette, status palette (FullCalendar), Manrope/IBM Plex Sans Arabic/JetBrains Mono fonts, type scale (h1–display + base 14px), 8px radius, soft shadow ramp, sidebar/header spacing tokens. Plugins: `tailwindcss-animate`, `tailwindcss-rtl`, `@tailwindcss/forms`, `@tailwindcss/typography`. Tailwindcss upgraded 3.2.1 → 3.4.19.
+- `resources/css/app.css` carries the `:root` + `.dark` CSS variable blocks (RGB triplets) + body font setup. `html[lang="ar"] body` swaps to `--font-arabic` automatically, so anywhere a body descendant inherits font-family.
+- Backend prefs:
+  - Migration `2026_05_05_000001_add_theme_preference_to_users` adds `theme_preference` (string, default `system`) to BOTH the central `users` table and the tenant `users` table (mirrored migration in `database/migrations/tenant/`).
+  - `App\Http\Controllers\PreferenceController` handles `POST /api/preferences/language` (en/ar) and `POST /api/preferences/theme` (light/dark/system) — writes the column, sets the session `locale`, redirects back. Routes registered in both `central.php` and `tenant.php` with auth-gated + guest-allowed language variants.
+  - `App\Http\Middleware\SetLocale` runs in the `web` group: pulls locale from session > user pref > config, calls `app()->setLocale()`. Wired in `bootstrap/app.php` ahead of `HandleInertiaRequests`.
+  - `HandleInertiaRequests` now shares `preferences: { locale, direction, theme }` and `auth.isSuperAdmin` alongside the existing auth/permissions/roles/flash bag.
+  - `resources/views/app.blade.php` reads the user's theme + locale server-side, sets `<html lang dir>`, runs an inline pre-paint script that applies `.dark` from `localStorage` (or stored pref / OS preference) before React mounts — kills theme FOUC.
+- i18n: `resources/js/i18n.ts` uses i18next + react-i18next + browser-language-detector with `htmlTag → localStorage → navigator` resolution order. Three namespaces shipped (`common`, `auth`, `dashboard`) in `resources/js/locales/{en,ar}/`. Default NS = `common`. Hot-loaded JSON imports (no async fetch).
+- Hooks: `useDirection()` (reads Inertia `preferences.direction`), `useLocale()` (changes language + persists + reload — needed because dir/font flip can't happen mid-render), `useTheme()` (light/dark/system, syncs `<html class="dark">`, listens to `prefers-color-scheme` for `system`, persists to both localStorage AND backend), `useFlashToasts()` (Inertia flash → Sonner toast, deduped by JSON fingerprint).
+- Layouts: `resources/js/Layouts/AppLayout.tsx` + `CentralLayout.tsx` — both wrap content in shadcn's `<SidebarProvider>` + `<SidebarInset>` and accept `title`, `pageTitle`, `description`, `actions`, `breadcrumbs`. Domain components (`Components/domain/layout/`): `AppSidebar`, `CentralSidebar`, `AppTopbar`, `SidebarBrand`, `ThemeToggle`, `LanguageSwitcher`, `UserMenu`. All sidebars choose `side="left|right"` based on `useDirection()` so RTL puts navigation on the right edge automatically.
+- AppSidebar items wrapped in `<Can permission=… />` filters at the section level — sections collapse to nothing when no item passes. Sections: Main, Medical, Billing, Admin (per spec).
+- Reusable patterns in `Components/domain/`: `DataTable<TData, TValue>` (TanStack Table v8 + shadcn Table — pagination, global/column search, column toggle, RTL chevrons), `FormModal`, `EmptyState`, `StatusBadge` (5 variants: success/warning/info/danger/neutral), `ConfirmDialog`, `LoadingSpinner`, `PageSkeleton`, `PageHeader`, `AppBreadcrumb`.
+- `resources/js/Pages/DesignSystem.tsx` — single-page showcase rendering color swatches, typography ramp, all button variants/sizes, all form controls, status badges, alerts, the DataTable, avatars + tabs, accordion, dialogs (FormModal + ConfirmDialog) with toast triggers, EmptyState + PageSkeleton. Page chooses AppLayout vs CentralLayout via the `context` prop. Gated by `App\Http\Middleware\AllowDesignSystem` — passes in `local`/`development` env or for `is_super_admin = true` users; 404 otherwise.
+- Dashboard stubs: `Pages/Tenant/Dashboard.tsx` + `Pages/Central/Dashboard.tsx`, each with 4 stat cards using the design-token color/spacing system. Old `Pages/Central/SuperAdmin.tsx` deleted (route now points at `Central/Dashboard`).
+- 4 new Pest tests in `tests/Feature/Central/PreferencesTest.php` (language persists, theme persists, invalid language rejected, invalid theme rejected). 46 total in the suite (was 42).
+- TypeScript clean (`pnpm exec tsc --noEmit` zero errors). `pnpm build` produces a working manifest (5.5s, 506kB main bundle gzip 167kB — flagged for code-splitting in Phase 7+).
+- Smoke: `https://einaya.test/` (200), `https://app.einaya.test/login` (200), `https://app.einaya.test/` (302→login), `https://demo.einaya.test/login` (200), `https://demo.einaya.test/` (200), `https://demo.einaya.test/design-system` (200). `storage/logs/laravel.log` empty.
+
+**Phase 6 deviations from the prompt:**
+- Did NOT use `next-themes` — wrote our own `useTheme()` hook (`resources/js/Hooks/useTheme.ts`) instead. Reasons: (a) we already needed Inertia-aware theme persistence to the backend, (b) `next-themes` is built around Next.js's app router idioms, and (c) the FOUC-prevention script in `app.blade.php` already runs before React mounts. The shadcn `sonner.tsx` component was rewritten to call our hook instead of `next-themes`'s.
+- The shadcn-CLI `add` command silently rewrote `tailwind.config.ts` (HSL sidebar tokens, duplicated `darkMode`, mangled font fallbacks) and `resources/css/app.css` (HSL sidebar variables, extra `--sidebar-background`/`--sidebar-primary` keys). Both files were manually reset to RGB-triplet consistency afterward. If you re-run `shadcn add` for new components, expect another rewrite — diff before committing.
+- Search bar in `AppTopbar` is a visual stub (button-styled command opener with ⌘K hint) — actual `cmdk` dialog wiring deferred to Phase 7 when there's something to search.
+- Deleted `resources/js/Pages/Central/SuperAdmin.tsx`. The central root route renders `Central/Dashboard` now. No tests referenced the old name.
+- Notifications dropdown in topbar is an empty-state placeholder (no notification model yet) — same approach as the spec calls for.
+- Date-picker is not a separate file: shadcn ships `calendar.tsx` and `popover.tsx`; composing a `DatePicker` is a 10-line consumer-side pattern, deferred until first consumer (appointments UI in Phase 8).
 
 ### ✅ Phase 1 — Setup & Tenancy Foundation (2026-05-01 → 2026-05-02)
 
@@ -96,7 +127,7 @@ All Definition of Done items met:
 
 ## In Progress
 
-_(none — pause point. Next: Phase 4 — Auth + Roles + 2FA)_
+_(none — pause point. Next: Phase 7 — Super Admin)_
 
 ---
 
@@ -162,6 +193,21 @@ _(none)_
 - **Password rules NOT applied on login.** A user with a strong existing password (set via reset/update) shouldn't fail to log in just because it has unusual characters — Laravel's Password rule is for *new* passwords. Applied to: password update (`PUT /password`) and password reset (`POST /reset-password`). Rule: `Password::min(10)->mixedCase()->numbers()->symbols()`.
 - **Old Breeze auth tests deleted.** `AuthenticationTest`, `EmailVerificationTest`, `PasswordConfirmationTest`, `PasswordResetTest`, `PasswordUpdateTest`, `RegistrationTest`, `ProfileTest` all removed. Replaced with the 7 Phase 4 tests, which cover the same ground plus 2FA, throttling, and cross-context auth. `Register.tsx` and `RegisteredUserController` also deleted (no v1 self-signup).
 - **`tests/Feature/Auth/TenantLoginTest` and `WrongContextTest` opt out of `RefreshDatabase`** because they create real tenant DBs (DDL auto-commits and breaks transaction rollback). Listed explicitly in `tests/Pest.php` alongside `TenancyTest` and the tenant tests. The other 5 auth tests stay in the RefreshDatabase group since they only touch the central DB.
+
+### Phase 6
+
+- **Self-rolled `useTheme()` over `next-themes`.** next-themes is great for Next.js (it owns the document head and body), but in our Inertia/Blade setup we needed: (a) backend persistence, (b) a pre-paint script in Blade that runs *before* React mounts, (c) compatibility with the `<html>` `dir`/`lang` attributes Blade sets server-side. A single hook (44 lines) handles all three; the shadcn `sonner.tsx` component was patched to use it.
+- **Tailwind tokens in RGB triplets, not HSL.** The shadcn `init` command produced HSL-format sidebar tokens that clashed with the rest of our palette. Standardizing on `rgb(var(--token) / <alpha-value>)` everywhere keeps the `<alpha-value>` shorthand working with utilities like `bg-primary/15`, which we use heavily in `StatusBadge`. Trade-off: re-running `shadcn add` will overwrite this and must be diffed.
+- **Language switcher does a full page reload.** Inertia partial reloads can swap the JSON props but can't re-paint the `<html dir>`/`lang`/font-family chain in one tick — and forcing a hard reload also lets the in-page Blade boot script set the right pre-paint state for the new locale. This is intentional, not a TODO.
+- **Pre-paint theme script in `app.blade.php`.** Reads `localStorage['einaya-theme']` first, falls back to the user's stored pref, falls back to OS preference, then sets `document.documentElement.classList` BEFORE Vite assets load. Without this, every navigation would flash light-mode for ~80–120ms while React mounts. The same script also reads `auth()->user()->theme_preference` server-side as a tertiary fallback so first-paint-after-login is correct without client storage.
+- **`<html dir>` set by Blade, not React.** The dir attribute is computed from `session('locale') ?? user->preferred_language ?? app->getLocale()` in the layout view. React-driven dir-swapping would mean a flash of LTR content for AR users on first paint. Reload-on-locale-change keeps this server-rendered.
+- **`HandleInertiaRequests` shares `auth.isSuperAdmin`** as a precomputed boolean. The frontend uses this to decide which layout to mount (`AppLayout` vs `CentralLayout`) and whether `/design-system` is reachable, without having to inspect the user model client-side. The central super admin's user model has no `HasRoles` trait, so we can't infer "super admin" from `roles` alone.
+- **Sidebar side computed from `useDirection()`.** shadcn's `<Sidebar side="left|right">` accepts a literal value; passing `side={direction === 'rtl' ? 'right' : 'left'}` mirrors the entire sidebar including its drawer behavior on mobile. Combined with `tailwindcss-rtl` and logical-property classes (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`), the layout swaps without per-component RTL conditionals.
+- **Sonner is mounted once at app root** (in `app.tsx`, inside `<TooltipProvider>` so all toast actions can have tooltips). Pages opt-in to flash-toast forwarding via `useFlashToasts()` — kept as an opt-in hook rather than a layout-level effect so flash propagation is explicit and easy to disable on pages that handle their own success/error UI.
+- **`AllowDesignSystem` middleware uses `app()->environment('local', 'development')`** rather than `app()->isLocal()`. The latter only checks for `local`; we treat both `local` and `development` (and *only* those) as "you can see internals." Production super admins can still see it because it's a useful debugging surface for them.
+- **Three i18n namespaces shipped now:** `common` (nav, actions, status, topbar, language, empty, table), `auth` (login, 2FA), `dashboard` (welcome, stats). Phase 7+ adds `patients`, `appointments`, `consultations`, `forms`, `payments`, `staff`, `settings` as those features ship — keeps each namespace's JSON file small and lazy-load-ready.
+- **`User | null` in `PageProps.auth.user`.** Most pages assume an authenticated user, but `Tenant/Welcome.tsx` (unauthenticated tenant landing) doesn't. Typing it as nullable is honest; the two surviving Breeze files (`AuthenticatedLayout`, `UpdateProfileInformationForm`) use a `!` non-null assertion since their middleware guarantees a user.
+- **Bundle size warning is acknowledged, not fixed.** Phase 6 ships a 506kB main bundle (167kB gzip) because every shadcn primitive + i18n + TanStack table + Sonner + lucide is statically imported. Code-splitting is a Phase-7 concern: route-level `lazy()` for `DesignSystem` and the per-feature pages, and a separate locale-fetch path so AR users don't ship EN strings (and vice versa).
 
 ### Phase 3
 
@@ -304,6 +350,48 @@ _(none)_
 - `app/Http/Middleware/HandleInertiaRequests.php` — shares `auth.permissions`, `auth.roles`, and a `flash` bag
 - `database/seeders/Tenant/TenantDemoSeeder.php` — assigns `clinic_admin`+`doctor` and `secretary` roles
 - `resources/js/types/index.d.ts` — `auth.permissions` + `auth.roles` typed via `auth.ts`
+
+### Phase 6 — Created
+
+- `tailwind.config.ts` (replaces `tailwind.config.js`)
+- `components.json` (shadcn registry config)
+- `resources/css/app.css` (rewritten with full token block)
+- `resources/js/lib/utils.ts` (`cn()` helper)
+- `resources/js/Components/ui/{accordion,alert,alert-dialog,avatar,badge,breadcrumb,button,calendar,card,checkbox,command,dialog,dropdown-menu,form,input,label,navigation-menu,pagination,popover,progress,radio-group,scroll-area,select,separator,sheet,sidebar,skeleton,sonner,switch,table,tabs,textarea,tooltip}.tsx` (33 shadcn primitives — `sonner.tsx` modified to use our `useTheme`)
+- `resources/js/Components/domain/{AppBreadcrumb,ConfirmDialog,DataTable,EmptyState,FormModal,LoadingSpinner,PageHeader,PageSkeleton,StatusBadge}.tsx`
+- `resources/js/Components/domain/layout/{AppSidebar,AppTopbar,CentralSidebar,LanguageSwitcher,SidebarBrand,ThemeToggle,UserMenu}.tsx`
+- `resources/js/Hooks/{useDirection,useFlashToasts,useLocale,useTheme}.ts`
+- `resources/js/Hooks/use-mobile.tsx` (shipped by shadcn `sidebar`)
+- `resources/js/Layouts/{AppLayout,CentralLayout}.tsx`
+- `resources/js/Pages/{DesignSystem,Tenant/Dashboard,Central/Dashboard}.tsx`
+- `resources/js/i18n.ts`
+- `resources/js/locales/{en,ar}/{common,auth,dashboard}.json`
+- `app/Http/Controllers/PreferenceController.php`
+- `app/Http/Middleware/{SetLocale,AllowDesignSystem}.php`
+- `database/migrations/2026_05_05_000001_add_theme_preference_to_users.php`
+- `database/migrations/tenant/2026_05_05_000001_add_theme_preference_to_users.php`
+- `tests/Feature/Central/PreferencesTest.php` (4 tests)
+
+### Phase 6 — Modified
+
+- `package.json` / `pnpm-lock.yaml` — added: tailwindcss@^3.4 (upgraded from 3.2.1), tailwindcss-animate, tailwindcss-rtl, @tailwindcss/typography, class-variance-authority, clsx, tailwind-merge, lucide-react, sonner, cmdk, vaul, next-themes (transitive shadcn dep — unused at runtime), date-fns, react-day-picker, @tanstack/react-table, i18next, react-i18next, i18next-browser-languagedetector, plus 19 `@radix-ui/react-*` primitives.
+- `resources/js/app.tsx` — imports `i18n.ts`, mounts `<TooltipProvider>` + `<Toaster>` at root, swaps progress bar color to primary blue.
+- `resources/js/types/index.d.ts` — `User` interface picks up `preferred_language` + `theme_preference`; new `Preferences` type; `PageProps.auth.user` now `User | null`; `PageProps.auth.isSuperAdmin` boolean; new `PageProps.preferences`.
+- `resources/views/app.blade.php` — server-renders `<html lang dir>`, embeds Google Fonts (Manrope + IBM Plex Sans Arabic + JetBrains Mono), runs pre-paint theme script.
+- `app/Models/Central/User.php`, `app/Models/Tenant/User.php` — added `theme_preference` to `$fillable`.
+- `app/Http/Middleware/HandleInertiaRequests.php` — shares `preferences` and `auth.isSuperAdmin`.
+- `bootstrap/app.php` — `SetLocale` prepended to web group; aliases `central`, `two_factor`, `design_system`.
+- `routes/central.php` — renames root render to `Central/Dashboard`; adds `/api/preferences/{language,theme}` (auth) + `/api/preferences/language/guest` + `/design-system` (`design_system` middleware).
+- `routes/tenant.php` — adds `/api/preferences/{language,theme}` + guest variant + `/design-system`.
+- `resources/js/Layouts/AuthenticatedLayout.tsx`, `resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.tsx` — `auth.user!` non-null assertion to satisfy the new nullable type.
+- `resources/js/Components/ui/button.tsx` — sized to spec (`h-11` default, `h-14` lg, `icon: h-11 w-11`).
+- `resources/js/Components/ui/input.tsx` — sized to spec (`h-11`, ring-2).
+- `tests/Pest.php` — `Feature/Central/PreferencesTest.php` added to `RefreshDatabase` group.
+
+### Phase 6 — Deleted
+
+- `resources/js/Pages/Central/SuperAdmin.tsx` (replaced by `Central/Dashboard.tsx`)
+- `tailwind.config.js` (replaced by `tailwind.config.ts`)
 
 ### Phase 5 — Post-completion fix
 

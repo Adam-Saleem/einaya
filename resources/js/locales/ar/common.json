@@ -1,0 +1,90 @@
+{
+    "app": {
+        "name": "عناية",
+        "tagline": "منصة إدارة العيادات"
+    },
+    "actions": {
+        "save": "حفظ",
+        "saving": "جارٍ الحفظ…",
+        "cancel": "إلغاء",
+        "delete": "حذف",
+        "edit": "تعديل",
+        "create": "إنشاء",
+        "update": "تحديث",
+        "confirm": "تأكيد",
+        "search": "بحث",
+        "filter": "تصفية",
+        "export": "تصدير",
+        "back": "رجوع",
+        "next": "التالي",
+        "previous": "السابق",
+        "close": "إغلاق",
+        "view": "عرض",
+        "open": "فتح",
+        "more": "المزيد"
+    },
+    "status": {
+        "loading": "جارٍ التحميل…",
+        "saving": "جارٍ الحفظ…",
+        "saved": "تم الحفظ",
+        "error": "حدث خطأ ما",
+        "success": "تم بنجاح",
+        "warning": "تنبيه",
+        "info": "معلومة"
+    },
+    "nav": {
+        "main": "الرئيسية",
+        "dashboard": "لوحة التحكم",
+        "patients": "المرضى",
+        "appointments": "المواعيد",
+        "medical": "طبي",
+        "consultations": "الاستشارات",
+        "forms": "النماذج",
+        "prescriptions": "الوصفات الطبية",
+        "billing": "الفواتير",
+        "payments": "المدفوعات",
+        "reports": "التقارير",
+        "admin": "الإدارة",
+        "staff": "الموظفون",
+        "settings": "الإعدادات",
+        "branding": "الهوية البصرية",
+        "platform": "المنصة",
+        "clinics": "العيادات",
+        "subscriptions": "الاشتراكات",
+        "operations": "العمليات",
+        "supportTickets": "تذاكر الدعم",
+        "auditLogs": "سجل التدقيق",
+        "plans": "الخطط",
+        "globalSettings": "الإعدادات العامة"
+    },
+    "topbar": {
+        "search": "بحث…",
+        "openSearch": "فتح قائمة الأوامر",
+        "notifications": "الإشعارات",
+        "noNotifications": "لا توجد إشعارات جديدة",
+        "openMenu": "فتح القائمة",
+        "language": "اللغة",
+        "theme": "السمة",
+        "themeLight": "فاتح",
+        "themeDark": "داكن",
+        "themeSystem": "النظام",
+        "user": "قائمة المستخدم",
+        "profile": "الملف الشخصي",
+        "logout": "تسجيل الخروج"
+    },
+    "language": {
+        "en": "English",
+        "ar": "العربية"
+    },
+    "empty": {
+        "title": "لا يوجد شيء بعد",
+        "description": "ستظهر العناصر التي تنشئها هنا."
+    },
+    "table": {
+        "rowsPerPage": "صفوف في الصفحة",
+        "page": "الصفحة {{current}} من {{total}}",
+        "showing": "عرض {{from}}–{{to}} من {{count}}",
+        "noResults": "لا توجد نتائج مطابقة",
+        "columns": "الأعمدة"
+    }
+}

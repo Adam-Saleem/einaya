@@ -31,6 +31,11 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
+        $locale = $request->session()->get('locale')
+            ?? ($user?->preferred_language)
+            ?? app()->getLocale();
+        $theme = $user?->theme_preference ?? 'system';
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -44,6 +49,12 @@ class HandleInertiaRequests extends Middleware
                 'roles' => $user !== null && method_exists($user, 'getRoleNames')
                     ? $user->getRoleNames()->values()->all()
                     : [],
+                'isSuperAdmin' => (bool) ($user->is_super_admin ?? false),
+            ],
+            'preferences' => [
+                'locale' => $locale,
+                'direction' => $locale === 'ar' ? 'rtl' : 'ltr',
+                'theme' => $theme,
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),

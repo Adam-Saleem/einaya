@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'central' => \App\Http\Middleware\EnsureCentralContext::class,
             'two_factor' => \App\Http\Middleware\RequireTwoFactor::class,
+            'design_system' => \App\Http\Middleware\AllowDesignSystem::class,
         ]);
 
         // Auth routes are registered with context-prefixed names

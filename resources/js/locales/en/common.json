@@ -1,0 +1,90 @@
+{
+    "app": {
+        "name": "Einaya",
+        "tagline": "Clinic Management Platform"
+    },
+    "actions": {
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "update": "Update",
+        "confirm": "Confirm",
+        "search": "Search",
+        "filter": "Filter",
+        "export": "Export",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "close": "Close",
+        "view": "View",
+        "open": "Open",
+        "more": "More"
+    },
+    "status": {
+        "loading": "Loading…",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "error": "Something went wrong",
+        "success": "Success",
+        "warning": "Warning",
+        "info": "Info"
+    },
+    "nav": {
+        "main": "Main",
+        "dashboard": "Dashboard",
+        "patients": "Patients",
+        "appointments": "Appointments",
+        "medical": "Medical",
+        "consultations": "Consultations",
+        "forms": "Forms",
+        "prescriptions": "Prescriptions",
+        "billing": "Billing",
+        "payments": "Payments",
+        "reports": "Reports",
+        "admin": "Admin",
+        "staff": "Staff",
+        "settings": "Settings",
+        "branding": "Branding",
+        "platform": "Platform",
+        "clinics": "Clinics",
+        "subscriptions": "Subscriptions",
+        "operations": "Operations",
+        "supportTickets": "Support Tickets",
+        "auditLogs": "Audit Logs",
+        "plans": "Plans",
+        "globalSettings": "Global Settings"
+    },
+    "topbar": {
+        "search": "Search…",
+        "openSearch": "Open command menu",
+        "notifications": "Notifications",
+        "noNotifications": "You're all caught up",
+        "openMenu": "Open menu",
+        "language": "Language",
+        "theme": "Theme",
+        "themeLight": "Light",
+        "themeDark": "Dark",
+        "themeSystem": "System",
+        "user": "User menu",
+        "profile": "Profile",
+        "logout": "Log out"
+    },
+    "language": {
+        "en": "English",
+        "ar": "العربية"
+    },
+    "empty": {
+        "title": "Nothing here yet",
+        "description": "Items you create will appear here."
+    },
+    "table": {
+        "rowsPerPage": "Rows per page",
+        "page": "Page {{current}} of {{total}}",
+        "showing": "Showing {{from}}–{{to}} of {{count}}",
+        "noResults": "No matching results",
+        "columns": "Columns"
+    }
+}

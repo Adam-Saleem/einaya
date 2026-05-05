@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'is_super_admin',
         'preferred_language',
+        'theme_preference',
     ];
 
     protected $hidden = [

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\PreferenceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,7 +25,23 @@ foreach (['app.einaya.ps', 'app.einaya.test'] as $domain) {
         (require __DIR__.'/auth.php')('central');
 
         Route::get('/', function () {
-            return Inertia::render('Central/SuperAdmin');
+            return Inertia::render('Central/Dashboard');
         })->middleware('auth')->name('central.dashboard');
+
+        Route::middleware('auth')->group(function () {
+            Route::post('/api/preferences/language', [PreferenceController::class, 'language'])
+                ->name('central.preferences.language');
+            Route::post('/api/preferences/theme', [PreferenceController::class, 'theme'])
+                ->name('central.preferences.theme');
+        });
+
+        Route::middleware('design_system')->get('/design-system', function () {
+            return Inertia::render('DesignSystem', ['context' => 'central']);
+        })->name('central.design-system');
+
+        // Language preference is updatable while logged out so guests
+        // can browse the marketing/login pages in their language.
+        Route::post('/api/preferences/language/guest', [PreferenceController::class, 'language'])
+            ->name('central.preferences.language.guest');
     });
 }

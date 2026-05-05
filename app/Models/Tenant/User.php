@@ -35,6 +35,7 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'two_factor_confirmed_at',
         'preferred_language',
+        'theme_preference',
         'is_active',
         'last_login_at',
         'last_login_ip',

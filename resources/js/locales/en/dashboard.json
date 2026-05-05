@@ -1,0 +1,18 @@
+{
+    "welcome": "Welcome, {{name}}",
+    "stats": {
+        "patients": "Patients",
+        "appointmentsToday": "Appointments today",
+        "pendingPayments": "Pending payments",
+        "consultationsThisWeek": "Consultations this week"
+    },
+    "central": {
+        "title": "Super Admin Dashboard",
+        "stats": {
+            "clinics": "Active clinics",
+            "subscriptions": "Active subscriptions",
+            "supportTickets": "Open tickets",
+            "revenue": "Monthly revenue"
+        }
+    }
+}

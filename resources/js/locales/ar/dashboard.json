@@ -1,0 +1,18 @@
+{
+    "welcome": "مرحبًا، {{name}}",
+    "stats": {
+        "patients": "المرضى",
+        "appointmentsToday": "مواعيد اليوم",
+        "pendingPayments": "مدفوعات معلّقة",
+        "consultationsThisWeek": "الاستشارات هذا الأسبوع"
+    },
+    "central": {
+        "title": "لوحة المسؤول العام",
+        "stats": {
+            "clinics": "العيادات النشطة",
+            "subscriptions": "الاشتراكات النشطة",
+            "supportTickets": "التذاكر المفتوحة",
+            "revenue": "الإيرادات الشهرية"
+        }
+    }
+}

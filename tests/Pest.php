@@ -26,6 +26,7 @@ pest()->extend(TestCase::class)
         'Feature/Auth/PasswordRequirementsTest.php',
         'Feature/Central/SubscriptionPlanTest.php',
         'Feature/Central/AuditLogTest.php',
+        'Feature/Central/PreferencesTest.php',
     );
 
 // Tests that create/delete tenant databases must NOT use RefreshDatabase:
