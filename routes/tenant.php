@@ -23,6 +23,7 @@ Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
+    'clinic_active',
 ])->group(function () {
     // Shared auth routes — names prefixed with `tenant.`.
     (require __DIR__.'/auth.php')('tenant');

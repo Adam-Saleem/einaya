@@ -1,0 +1,242 @@
+{
+    "dashboard": {
+        "title": "Super Admin Dashboard",
+        "subtitle": "Platform overview across all clinics",
+        "stats": {
+            "totalClinics": "Total clinics",
+            "activeClinics": "Active clinics",
+            "activeSubscriptions": "Active subscriptions",
+            "openTickets": "Open tickets",
+            "totalPatients": "Total patients",
+            "totalStaff": "Total staff",
+            "monthlyRevenue": "Monthly revenue"
+        },
+        "charts": {
+            "newClinics": "New clinics — last 12 months",
+            "planDistribution": "Plan distribution"
+        },
+        "recentActivity": "Recent activity",
+        "noActivity": "No activity yet",
+        "refresh": "Refresh stats",
+        "lastRefreshed": "Updated {{when}}",
+        "neverRefreshed": "Cross-tenant counts have not been computed yet."
+    },
+    "clinics": {
+        "title": "Clinics",
+        "subtitle": "All registered clinics on the platform",
+        "create": "Create clinic",
+        "search": "Search by name, slug, or owner email",
+        "filters": {
+            "allStatuses": "All statuses",
+            "allPlans": "All plans"
+        },
+        "columns": {
+            "clinic": "Clinic",
+            "owner": "Owner",
+            "plan": "Plan",
+            "status": "Status",
+            "createdAt": "Created",
+            "actions": "Actions"
+        },
+        "actions": {
+            "view": "View",
+            "suspend": "Suspend",
+            "activate": "Activate",
+            "delete": "Delete",
+            "openSubdomain": "Open subdomain"
+        },
+        "form": {
+            "createTitle": "Create clinic",
+            "editTitle": "Edit clinic",
+            "name": "Clinic name",
+            "slug": "Subdomain slug",
+            "slugHint": "Will live at {{slug}}.einaya.ps",
+            "ownerName": "Owner name",
+            "ownerEmail": "Owner email",
+            "ownerPhone": "Owner phone",
+            "plan": "Subscription plan",
+            "trialDays": "Trial days",
+            "trialDaysHint": "Set to 0 to skip trial.",
+            "submit": "Create clinic",
+            "saveChanges": "Save changes"
+        },
+        "show": {
+            "tabs": {
+                "overview": "Overview",
+                "subscription": "Subscription",
+                "usage": "Usage",
+                "audit": "Audit",
+                "danger": "Danger Zone"
+            },
+            "overview": {
+                "ownerContact": "Owner contact",
+                "subdomain": "Subdomain",
+                "status": "Status",
+                "plan": "Current plan",
+                "createdAt": "Created at",
+                "trialEndsAt": "Trial ends",
+                "noTrial": "No trial"
+            },
+            "subscription": {
+                "plan": "Plan",
+                "status": "Status",
+                "starts": "Started",
+                "ends": "Ends",
+                "trialEnds": "Trial ends",
+                "changePlan": "Change plan",
+                "selectPlan": "Select a plan",
+                "extendEnds": "Extend end date",
+                "extendNow": "Extend"
+            },
+            "usage": {
+                "patients": "Patients",
+                "staff": "Active staff",
+                "lastActivity": "Last computed",
+                "neverComputed": "Stats not yet aggregated."
+            },
+            "danger": {
+                "suspendTitle": "Suspend access",
+                "suspendDescription": "Tenant logins will be blocked. Data is preserved.",
+                "activateTitle": "Reactivate clinic",
+                "activateDescription": "Restores tenant access immediately.",
+                "deleteTitle": "Cancel and archive",
+                "deleteDescription": "Tenant DB stays on disk; clinic record is soft-deleted."
+            }
+        }
+    },
+    "plans": {
+        "title": "Subscription plans",
+        "subtitle": "Manage tier offering and limits",
+        "create": "Create plan",
+        "columns": {
+            "name": "Name",
+            "slug": "Slug",
+            "monthly": "Monthly",
+            "yearly": "Yearly",
+            "patients": "Max patients",
+            "staff": "Max staff",
+            "active": "Active",
+            "subscribers": "Active subs",
+            "actions": "Actions"
+        },
+        "form": {
+            "createTitle": "Create plan",
+            "editTitle": "Edit plan",
+            "name": "Plan name",
+            "slug": "Slug",
+            "monthly": "Monthly price",
+            "yearly": "Yearly price",
+            "maxPatients": "Maximum patients",
+            "maxStaff": "Maximum staff",
+            "features": "Features (one per line)",
+            "isActive": "Visible to new clinics",
+            "order": "Display order"
+        },
+        "deleteBlocked": "Plan has active subscriptions and cannot be deleted."
+    },
+    "subscriptions": {
+        "title": "Subscriptions",
+        "subtitle": "Read-only roster — full billing in v2",
+        "columns": {
+            "clinic": "Clinic",
+            "plan": "Plan",
+            "status": "Status",
+            "starts": "Starts",
+            "ends": "Ends",
+            "trialEnds": "Trial ends",
+            "actions": "Actions"
+        },
+        "extend": "Extend",
+        "extendDialog": {
+            "title": "Extend subscription",
+            "description": "Manually push the end date to grant time before billing is wired.",
+            "endsAt": "New end date",
+            "note": "Note (optional)"
+        }
+    },
+    "tickets": {
+        "title": "Support tickets",
+        "subtitle": "Triage clinic-side support requests",
+        "columns": {
+            "subject": "Subject",
+            "clinic": "Clinic",
+            "openedBy": "Opened by",
+            "status": "Status",
+            "openedAt": "Opened",
+            "actions": "Actions"
+        },
+        "show": {
+            "responseLabel": "Add response",
+            "responseHint": "Stored on the ticket. Email delivery comes in v2.",
+            "statusLabel": "Status",
+            "submit": "Save",
+            "history": "Conversation",
+            "openedFrom": "Opened from {{clinic}}"
+        }
+    },
+    "audit": {
+        "title": "Audit log",
+        "subtitle": "Every super-admin action with old/new values",
+        "filters": {
+            "from": "From",
+            "to": "To",
+            "user": "User",
+            "action": "Action",
+            "type": "Auditable type",
+            "anyUser": "Any user",
+            "anyAction": "Any action",
+            "anyType": "Any type"
+        },
+        "columns": {
+            "when": "When",
+            "user": "User",
+            "action": "Action",
+            "target": "Target",
+            "ip": "IP"
+        },
+        "diff": {
+            "title": "Change details",
+            "old": "Previous",
+            "new": "New",
+            "noDiff": "No diff captured for this action."
+        }
+    },
+    "settings": {
+        "title": "Global settings",
+        "subtitle": "Platform-wide defaults",
+        "tabs": {
+            "general": "General",
+            "legal": "Legal",
+            "branding": "Branding",
+            "email": "Email"
+        },
+        "general": {
+            "platformName": "Platform name",
+            "supportEmail": "Support email",
+            "defaultLanguage": "Default language"
+        },
+        "legal": {
+            "termsUrl": "Terms of service URL",
+            "privacyUrl": "Privacy policy URL"
+        },
+        "branding": {
+            "logoUrl": "Platform logo URL"
+        },
+        "email": {
+            "stub": "Email integration ships in v2."
+        },
+        "save": "Save settings"
+    },
+    "common": {
+        "viewLog": "View",
+        "noResults": "No matching records.",
+        "confirmSuspend": "Suspend this clinic?",
+        "confirmSuspendBody": "Tenant logins will be blocked immediately. Data is preserved.",
+        "confirmActivate": "Reactivate this clinic?",
+        "confirmActivateBody": "Tenant logins resume immediately.",
+        "confirmDelete": "Cancel and archive this clinic?",
+        "confirmDeleteBody": "Marks the clinic cancelled and soft-deletes the central record.",
+        "confirmPlanDelete": "Archive this plan?",
+        "confirmPlanDeleteBody": "Plan disappears from selection lists. Existing subscriptions keep their plan reference."
+    }
+}

@@ -8,9 +8,11 @@ use App\Enums\Central\TicketStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 class SupportTicket extends Model
 {
+    use CentralConnection;
     use SoftDeletes;
 
     protected $fillable = [

@@ -24,9 +24,26 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'central' => \App\Http\Middleware\EnsureCentralContext::class,
+            'super_admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
             'two_factor' => \App\Http\Middleware\RequireTwoFactor::class,
             'design_system' => \App\Http\Middleware\AllowDesignSystem::class,
+            'clinic_active' => \App\Http\Middleware\EnsureClinicActive::class,
         ]);
+
+        // Laravel's default middleware priority list contains the
+        // AuthenticatesRequests *contract* (which Authenticate implements)
+        // ahead of any unlisted route middleware. Without these explicit
+        // priority hooks, `auth` would run BEFORE `central` and
+        // `clinic_active`, see the wrong default guard, and trigger an
+        // infinite /login redirect loop.
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            prepend: \App\Http\Middleware\EnsureCentralContext::class,
+        );
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            prepend: \App\Http\Middleware\EnsureClinicActive::class,
+        );
 
         // Auth routes are registered with context-prefixed names
         // (`central.login` / `tenant.login`) — there is no global `login` route,

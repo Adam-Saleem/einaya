@@ -64,6 +64,24 @@ class Clinic extends BaseTenant implements TenantWithDatabase
         ];
     }
 
+    public function isActive(): bool
+    {
+        return $this->status === ClinicStatus::Active;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->status === ClinicStatus::Suspended;
+    }
+
+    public function activeSubscription(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->whereIn('status', ['trial', 'active'])
+            ->latest('starts_at')
+            ->first();
+    }
+
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);

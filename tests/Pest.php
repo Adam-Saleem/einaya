@@ -27,6 +27,9 @@ pest()->extend(TestCase::class)
         'Feature/Central/SubscriptionPlanTest.php',
         'Feature/Central/AuditLogTest.php',
         'Feature/Central/PreferencesTest.php',
+        'Feature/Central/PlanCannotBeDeletedTest.php',
+        'Feature/Central/AuditLogCreatedOnClinicSuspensionTest.php',
+        'Feature/Central/OnlySuperAdminCanAccessTest.php',
     );
 
 // Tests that create/delete tenant databases must NOT use RefreshDatabase:
@@ -36,6 +39,8 @@ pest()->extend(TestCase::class)
     ->in(
         'Feature/TenancyTest.php',
         'Feature/Central/ClinicCreationTest.php',
+        'Feature/Central/CreateClinicTest.php',
+        'Feature/Central/SuspendClinicTest.php',
         'Feature/Tenant',
         'Feature/Auth/TenantLoginTest.php',
         'Feature/Auth/WrongContextTest.php',

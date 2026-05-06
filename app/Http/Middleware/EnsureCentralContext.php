@@ -17,6 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
  * routes hit on a tenant domain. This middleware closes that gap and also
  * swaps the auth guard default to `web_central` for the lifetime of the
  * request so controller-level Auth::user() reads the right model.
+ *
+ * NOTE: this middleware is registered in `bootstrap/app.php`'s priority
+ * list ahead of `Authenticate`. Without that, Laravel's default sort
+ * would run `auth` first (default guard = `web`, no user) and trigger
+ * a redirect to /login, looping forever.
  */
 class EnsureCentralContext
 {

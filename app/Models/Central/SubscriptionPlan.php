@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 class SubscriptionPlan extends Model
 {
     /** @use HasFactory<SubscriptionPlanFactory> */
+    use CentralConnection;
     use HasFactory;
     use SoftDeletes;
 

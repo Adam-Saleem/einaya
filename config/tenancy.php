@@ -137,13 +137,14 @@ return [
         'suffix_storage_path' => true,
 
         /**
-         * By default, asset() calls are made multi-tenant too. You can use global_asset() and mix()
-         * for global, non-tenant-specific assets. However, you might have some issues when using
-         * packages that use asset() calls inside the tenant app. To avoid such issues, you can
-         * disable asset() helper tenancy and explicitly use tenant_asset() calls in places
-         * where you want to use tenant-specific assets (product images, avatars, etc).
+         * Disabled because Vite emits asset URLs under /build/, NOT under
+         * storage/app/public/. Leaving this on rewrites the asset root to
+         * stancl's `tenancy.asset` route, which only serves files from
+         * storage/app/public/ — the tenant login (and every other tenant
+         * page) blanks out because every JS/CSS request 404s. Tenant-scoped
+         * uploads should use `tenant_asset()` explicitly.
          */
-        'asset_helper_tenancy' => true,
+        'asset_helper_tenancy' => false,
     ],
 
     /**

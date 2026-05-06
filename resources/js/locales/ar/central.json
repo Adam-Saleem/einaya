@@ -1,0 +1,242 @@
+{
+    "dashboard": {
+        "title": "لوحة المسؤول العام",
+        "subtitle": "نظرة شاملة على المنصّة عبر جميع العيادات",
+        "stats": {
+            "totalClinics": "إجمالي العيادات",
+            "activeClinics": "العيادات النشطة",
+            "activeSubscriptions": "الاشتراكات النشطة",
+            "openTickets": "تذاكر مفتوحة",
+            "totalPatients": "إجمالي المرضى",
+            "totalStaff": "إجمالي الموظفين",
+            "monthlyRevenue": "الإيرادات الشهرية"
+        },
+        "charts": {
+            "newClinics": "العيادات الجديدة — آخر 12 شهرًا",
+            "planDistribution": "توزيع الخطط"
+        },
+        "recentActivity": "النشاط الأخير",
+        "noActivity": "لا يوجد نشاط بعد",
+        "refresh": "تحديث الإحصائيات",
+        "lastRefreshed": "تم التحديث {{when}}",
+        "neverRefreshed": "لم يتم احتساب أعداد المستأجرين بعد."
+    },
+    "clinics": {
+        "title": "العيادات",
+        "subtitle": "جميع العيادات المسجّلة على المنصّة",
+        "create": "إنشاء عيادة",
+        "search": "ابحث بالاسم أو النطاق أو بريد المالك",
+        "filters": {
+            "allStatuses": "كل الحالات",
+            "allPlans": "كل الخطط"
+        },
+        "columns": {
+            "clinic": "العيادة",
+            "owner": "المالك",
+            "plan": "الخطّة",
+            "status": "الحالة",
+            "createdAt": "تاريخ الإنشاء",
+            "actions": "إجراءات"
+        },
+        "actions": {
+            "view": "عرض",
+            "suspend": "إيقاف",
+            "activate": "تفعيل",
+            "delete": "حذف",
+            "openSubdomain": "فتح النطاق الفرعي"
+        },
+        "form": {
+            "createTitle": "إنشاء عيادة",
+            "editTitle": "تعديل العيادة",
+            "name": "اسم العيادة",
+            "slug": "النطاق الفرعي",
+            "slugHint": "سيكون الرابط {{slug}}.einaya.ps",
+            "ownerName": "اسم المالك",
+            "ownerEmail": "بريد المالك",
+            "ownerPhone": "هاتف المالك",
+            "plan": "خطّة الاشتراك",
+            "trialDays": "أيام التجربة",
+            "trialDaysHint": "اضبطها على 0 لتخطّي التجربة.",
+            "submit": "إنشاء",
+            "saveChanges": "حفظ التغييرات"
+        },
+        "show": {
+            "tabs": {
+                "overview": "نظرة عامة",
+                "subscription": "الاشتراك",
+                "usage": "الاستخدام",
+                "audit": "سجل التدقيق",
+                "danger": "منطقة الخطر"
+            },
+            "overview": {
+                "ownerContact": "بيانات المالك",
+                "subdomain": "النطاق الفرعي",
+                "status": "الحالة",
+                "plan": "الخطّة الحالية",
+                "createdAt": "أُنشئت في",
+                "trialEndsAt": "تنتهي التجربة",
+                "noTrial": "لا توجد تجربة"
+            },
+            "subscription": {
+                "plan": "الخطّة",
+                "status": "الحالة",
+                "starts": "تبدأ",
+                "ends": "تنتهي",
+                "trialEnds": "تنتهي التجربة",
+                "changePlan": "تغيير الخطّة",
+                "selectPlan": "اختر خطّة",
+                "extendEnds": "تمديد تاريخ الانتهاء",
+                "extendNow": "تمديد"
+            },
+            "usage": {
+                "patients": "المرضى",
+                "staff": "الموظفون النشطون",
+                "lastActivity": "آخر احتساب",
+                "neverComputed": "لم تُجمّع الإحصائيات بعد."
+            },
+            "danger": {
+                "suspendTitle": "إيقاف الوصول",
+                "suspendDescription": "سيُمنع تسجيل الدخول. البيانات تبقى محفوظة.",
+                "activateTitle": "إعادة التفعيل",
+                "activateDescription": "يُستأنف الوصول فورًا.",
+                "deleteTitle": "إلغاء وأرشفة",
+                "deleteDescription": "تبقى قاعدة بيانات المستأجر؛ يُحذف السجل المركزي ناعمًا."
+            }
+        }
+    },
+    "plans": {
+        "title": "خطط الاشتراك",
+        "subtitle": "إدارة العروض والحدود",
+        "create": "إنشاء خطّة",
+        "columns": {
+            "name": "الاسم",
+            "slug": "المعرّف",
+            "monthly": "شهري",
+            "yearly": "سنوي",
+            "patients": "حد المرضى",
+            "staff": "حد الموظفين",
+            "active": "نشطة",
+            "subscribers": "اشتراكات نشطة",
+            "actions": "إجراءات"
+        },
+        "form": {
+            "createTitle": "إنشاء خطّة",
+            "editTitle": "تعديل الخطّة",
+            "name": "اسم الخطّة",
+            "slug": "المعرّف",
+            "monthly": "السعر الشهري",
+            "yearly": "السعر السنوي",
+            "maxPatients": "الحدّ الأقصى للمرضى",
+            "maxStaff": "الحدّ الأقصى للموظفين",
+            "features": "الميزات (سطر لكل ميزة)",
+            "isActive": "ظاهرة للعيادات الجديدة",
+            "order": "الترتيب"
+        },
+        "deleteBlocked": "للخطّة اشتراكات نشطة ولا يمكن حذفها."
+    },
+    "subscriptions": {
+        "title": "الاشتراكات",
+        "subtitle": "للقراءة فقط — الإدارة الكاملة في الإصدار الثاني",
+        "columns": {
+            "clinic": "العيادة",
+            "plan": "الخطّة",
+            "status": "الحالة",
+            "starts": "تبدأ",
+            "ends": "تنتهي",
+            "trialEnds": "نهاية التجربة",
+            "actions": "إجراءات"
+        },
+        "extend": "تمديد",
+        "extendDialog": {
+            "title": "تمديد الاشتراك",
+            "description": "ادفع تاريخ الانتهاء يدويًا قبل تفعيل الفوترة.",
+            "endsAt": "تاريخ انتهاء جديد",
+            "note": "ملاحظة (اختياري)"
+        }
+    },
+    "tickets": {
+        "title": "تذاكر الدعم",
+        "subtitle": "متابعة طلبات الدعم من العيادات",
+        "columns": {
+            "subject": "الموضوع",
+            "clinic": "العيادة",
+            "openedBy": "أنشأها",
+            "status": "الحالة",
+            "openedAt": "تاريخ الفتح",
+            "actions": "إجراءات"
+        },
+        "show": {
+            "responseLabel": "إضافة ردّ",
+            "responseHint": "يُحفظ على التذكرة. إرسال البريد في الإصدار الثاني.",
+            "statusLabel": "الحالة",
+            "submit": "حفظ",
+            "history": "المحادثة",
+            "openedFrom": "أُنشئت من {{clinic}}"
+        }
+    },
+    "audit": {
+        "title": "سجل التدقيق",
+        "subtitle": "كل إجراء بقيمته السابقة والجديدة",
+        "filters": {
+            "from": "من",
+            "to": "إلى",
+            "user": "المستخدم",
+            "action": "الإجراء",
+            "type": "نوع المورد",
+            "anyUser": "أي مستخدم",
+            "anyAction": "أي إجراء",
+            "anyType": "أي نوع"
+        },
+        "columns": {
+            "when": "متى",
+            "user": "المستخدم",
+            "action": "الإجراء",
+            "target": "الهدف",
+            "ip": "IP"
+        },
+        "diff": {
+            "title": "تفاصيل التغيير",
+            "old": "السابق",
+            "new": "الجديد",
+            "noDiff": "لا يوجد diff لهذا الإجراء."
+        }
+    },
+    "settings": {
+        "title": "الإعدادات العامة",
+        "subtitle": "افتراضيات على مستوى المنصّة",
+        "tabs": {
+            "general": "عام",
+            "legal": "قانوني",
+            "branding": "الهوية",
+            "email": "البريد"
+        },
+        "general": {
+            "platformName": "اسم المنصّة",
+            "supportEmail": "بريد الدعم",
+            "defaultLanguage": "اللغة الافتراضية"
+        },
+        "legal": {
+            "termsUrl": "رابط الشروط",
+            "privacyUrl": "رابط الخصوصية"
+        },
+        "branding": {
+            "logoUrl": "رابط شعار المنصّة"
+        },
+        "email": {
+            "stub": "تكامل البريد متاح في الإصدار الثاني."
+        },
+        "save": "حفظ"
+    },
+    "common": {
+        "viewLog": "عرض",
+        "noResults": "لا توجد سجلات مطابقة.",
+        "confirmSuspend": "إيقاف هذه العيادة؟",
+        "confirmSuspendBody": "سيُمنع تسجيل الدخول فورًا. البيانات تبقى محفوظة.",
+        "confirmActivate": "إعادة تفعيل العيادة؟",
+        "confirmActivateBody": "يُستأنف الوصول فورًا.",
+        "confirmDelete": "إلغاء وأرشفة هذه العيادة؟",
+        "confirmDeleteBody": "يُعلَّم الاشتراك ملغى ويُحذف السجل المركزي ناعمًا.",
+        "confirmPlanDelete": "أرشفة هذه الخطّة؟",
+        "confirmPlanDeleteBody": "ستختفي من قوائم الاختيار. الاشتراكات الحالية تحتفظ بمرجع الخطّة."
+    }
+}

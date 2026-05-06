@@ -7,12 +7,63 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 6 complete; ready to start Phase 7 (Super Admin).
-**Last session date:** 2026-05-05
+**Active phase:** None — Phase 7 complete; ready to start Phase 8 (Clinic Admin).
+**Last session date:** 2026-05-06
 
 ---
 
 ## Completed Phases
+
+### ✅ Phase 7 — Super Admin Module (2026-05-06)
+
+**Post-completion fixes (same session)** — both regressions only surfaced when the user actually loaded the page in a browser, which the Pest + curl smoke checks didn't exercise:
+
+- **Blank page on every Inertia route.** `app.tsx` mounts `<Toaster />` as a sibling of `<App />` so toasts persist across page transitions. The Toaster called `useTheme()`, which uses Inertia's `usePage()` — and `usePage()` requires the React context provided by `<App />`. Mounting Toaster outside that context threw, and React rendered nothing. Fix in `resources/js/Components/ui/sonner.tsx`: replaced the `useTheme` dependency with a small `useDomTheme()` that reads `document.documentElement.classList.contains('dark')` and observes class changes via `MutationObserver`. The pre-paint script in `app.blade.php` already keeps the `dark` class accurate, and `useTheme()` (used by the in-app toggle) updates the same class — so the DOM is the source of truth here, no Inertia context needed.
+- **Login redirect loop.** Logging in as the super admin sent the browser into an infinite `/login → / → /login` chain. Root cause: Laravel's middleware priority list contains the `AuthenticatesRequests` *contract* (which `Authenticate` implements), and the framework auto-sorts a route's middleware stack against that list. `EnsureCentralContext` wasn't in the priority list, so it got demoted past `Authenticate` — meaning `auth` ran with the default `web` (tenant) guard active, didn't see the central session, and bounced the user to `/login`. The login page bounced authed users back to `/`, looping. Fix in `bootstrap/app.php`: explicit `prependToPriorityList(before: AuthenticatesRequests::class, prepend: EnsureCentralContext::class)` (and the same for `EnsureClinicActive`). The middleware docblock now warns future-me not to remove these.
+- **Tenant pages 100% blank.** Visiting `https://demo.einaya.test/login` rendered nothing because every JS/CSS asset 404'd. `FilesystemTenancyBootstrapper` rewrites Laravel's asset URL root to point at stancl's `tenancy.asset` route (which only serves files from `storage/app/public/`), but Vite emits assets under `public/build/`. So the HTML referenced `https://demo.einaya.test/tenancy/assets/build/assets/app-*.js` and stancl's controller couldn't find any of them. Fix in `config/tenancy.php`: `tenancy.filesystem.asset_helper_tenancy` set to `false`. Tenant-scoped uploads (avatars, patient files in Phase 8+) should call `tenant_asset()` explicitly instead of relying on the global `asset()` helper rewrite.
+
+All Definition of Done items met:
+- `EnsureSuperAdmin` middleware (alias `super_admin`) gates every `/clinics`, `/plans`, `/subscriptions`, `/tickets`, `/audit`, `/settings`, `/` route on the central domain. Non-super-admin central users get 403; guests redirect to `/login`.
+- `EnsureClinicActive` middleware (alias `clinic_active`) is wired into the tenant route group right after `InitializeTenancyByDomain`. Reads status fresh from the central DB on every request (see Phase 7 decisions for why) and aborts 503 when the clinic is `Suspended` or `Cancelled`. Always lets `*.logout` through so an in-flight session can terminate cleanly.
+- Three action classes in `app/Actions/Central/`:
+  - `CreateClinicAction` — provisions central record + domain + subscription, runs the `TenantCreated` pipeline (DB + migrations + role seeder), creates the tenant-DB clinic_admin user with a generated 14-char temp password, returns `[clinic, temp_password, admin_email]`. Errors hard-delete the central record so state stays aligned.
+  - `SuspendClinicAction` — suspend / activate / cancel transitions, each writes an audit row with old+new status.
+  - `ChangeClinicPlanAction` — closes the active subscription and creates a new one, all centrally and atomically (no tenant DB calls, so a transaction is safe here).
+- 7 form requests under `app/Http/Requests/Central/` — slug regex + reserved-word check on clinic create, slug NOT editable on update, soft-deleted plan rejection on delete, status enum validation on tickets, future-only `ends_at` on subscription extension.
+- 5 Inertia/JSON resources under `app/Http/Resources/Central/` (Clinic, Plan, Subscription, Ticket, AuditLog) — all date fields ISO-8601, status carries both raw value and human label.
+- 7 controllers under `app/Http/Controllers/Central/` (Dashboard, Clinic, Plan, Subscription, Ticket, Audit, Setting). Filters wire query strings into eloquent scopes; pagination uses Laravel's `Paginated` shape that maps cleanly to the `Paginated<T>` TS helper.
+- 30 routes registered (all under the `auth + super_admin` middleware stack except the design-system + guest language endpoints).
+- Cross-tenant aggregation: `App\Jobs\Central\AggregatePlatformStats` walks every active Clinic via `$clinic->run(...)` to count Patients + active Tenant Users, stores the result in `global_settings.platform_stats`. Scheduled hourly via `Schedule::job(...)` in `routes/console.php`. Dashboard reads the cached value and exposes a "Refresh now" button (`POST /api/aggregate-stats`) that runs the job synchronously for super admins.
+- Dashboard renders 4 stat cards (real central counts + cross-tenant patients from cache), recharts `<LineChart>` of new clinics per month for the last 12 months, recharts `<PieChart>` of plan distribution across active subscriptions, recent-activity feed of the last 10 `CentralAuditLog` rows.
+- Clinic UI:
+  - `Pages/Central/Clinics/Index.tsx` — DataTable with status / plan / search filters, "Create clinic" `<FormModal>`, dropdown actions per row (View / Open subdomain / Suspend|Activate / Delete), confirm dialogs for destructive ops. Slug is auto-lowercased and stripped to `[a-z0-9-]` client-side.
+  - `Pages/Central/Clinics/Show.tsx` — 5 tabs: Overview (editable owner / trial), Subscription (read + change-plan + extend ends), Usage (cached patient/staff counts), Audit (50 most recent for this clinic), Danger Zone (suspend/activate/cancel).
+- Plans UI: full CRUD with delete-block when active subscriptions exist, features stored as newline-delimited textarea client-side and round-tripped as `string[]` via `form.transform()`.
+- Subscriptions UI: read-only roster + "Extend" modal that POSTs `ends_at` (must be in the future).
+- Tickets UI: index + show with append-to-body response (date-stamped), status select.
+- Audit log UI: full filter set (date range, user, action, type), per-row "view diff" dialog rendering old/new JSON side-by-side.
+- Settings UI: tabbed General / Legal / Branding (Email is a stub alert) — saves each section to its own `global_settings.key` row so audit rows are discrete.
+- New translation namespace `central` (EN + AR) — every UI string passes through `t()`. i18n config updated to load it.
+- `theme_preference` column was added in Phase 6 — Phase 7 adds `change_central_audit_logs_auditable_id_to_string`: widens `auditable_id` from `unsignedBigInteger` to `string(64)` because Clinic IDs are slug strings, not integers. Index drops + recreates around the column change.
+- Schema follow-up: applied `Stancl\Tenancy\Database\Concerns\CentralConnection` to `User`, `SupportTicket`, `SubscriptionPlan`, `Subscription`, `GlobalSetting`, `CentralAuditLog`. Without this, any model write from inside a tenant-bootstrapped context (e.g., clinic creation, audit logging during suspend, refresh-stats job) ends up on the tenant DB connection and fails because the table only exists centrally.
+- 9 new Pest tests across `tests/Feature/Central/`:
+  - `CreateClinicTest` — full provisioning: tenant DB created, admin user gets `clinic_admin` role, temp password hashes match, subdomain returns 200 on `/login`.
+  - `SuspendClinicTest` — active → 200, suspend → 503, activate → 200.
+  - `PlanCannotBeDeletedTest` — DELETE refused with `error` flash when active subs exist; soft-deletes when none.
+  - `AuditLogCreatedOnClinicSuspensionTest` — verifies `clinic.suspended` row carries `old: status=active`, `new: status=suspended, reason=...`.
+  - `OnlySuperAdminCanAccessTest` — non-super-admin gets 403 on every Phase 7 path; guest redirects to login; super admin gets through.
+- Total Pest count: **55 passed (347 assertions)** — up from 46 before Phase 7.
+- TypeScript clean (`pnpm exec tsc --noEmit` zero errors). `pnpm build` succeeds (520kB main bundle, 376kB Dashboard bundle from recharts; both flagged for code-splitting in Phase 8+).
+- Smoke check: `https://einaya.test/` 200, `https://app.einaya.test/login` 200, `https://app.einaya.test/` 302→/login (guest), `https://demo.einaya.test/login` 200, `https://demo.einaya.test/` 200. `storage/logs/laravel.log` empty.
+
+**Phase 7 deviations from the prompt:**
+- Spec calls out impersonation ("super admin can log in as any clinic admin"). Not implemented — defer to Phase 8 because tenant-side `clinic_admin` UX needs to exist first (otherwise impersonation lands on a 404).
+- Email/SMS sending is stubbed: `CreateClinicAction` returns the temp password in the redirect's success flash so the super admin can copy it once. Email integration is v2 per spec.
+- The `Settings → Email` tab is intentionally an alert ("v2") — the migration / model already supports the section (`global_settings.email`) but no fields are exposed.
+- Branding per-clinic is stored on the Clinic record but not editable from the super-admin UI in v1 — clinic admins set it from the tenant side in Phase 8 per spec.
+- "Search" inputs use blur + Enter rather than debounced live filtering. Easier to ship correctly; Phase 8+ can swap in `useDebouncedCallback` if the table lengths warrant it.
+- Notifications dropdown in topbar is still an empty placeholder (same as Phase 6). Real notifications belong with the activity stream once we have one.
+- Bundle warning is not addressed: `Dashboard-*.js` is now 376kB (recharts) and shipped to every super admin even on non-dashboard pages. Code-splitting (`React.lazy()` per Inertia page) is a Phase 8+ concern.
 
 ### ✅ Phase 6 — UI Foundation: shadcn, Layout, i18n, RTL, Dark Mode (2026-05-05)
 
@@ -127,7 +178,7 @@ All Definition of Done items met:
 
 ## In Progress
 
-_(none — pause point. Next: Phase 7 — Super Admin)_
+_(none — pause point. Next: Phase 8 — Clinic Admin)_
 
 ---
 
@@ -193,6 +244,26 @@ _(none)_
 - **Password rules NOT applied on login.** A user with a strong existing password (set via reset/update) shouldn't fail to log in just because it has unusual characters — Laravel's Password rule is for *new* passwords. Applied to: password update (`PUT /password`) and password reset (`POST /reset-password`). Rule: `Password::min(10)->mixedCase()->numbers()->symbols()`.
 - **Old Breeze auth tests deleted.** `AuthenticationTest`, `EmailVerificationTest`, `PasswordConfirmationTest`, `PasswordResetTest`, `PasswordUpdateTest`, `RegistrationTest`, `ProfileTest` all removed. Replaced with the 7 Phase 4 tests, which cover the same ground plus 2FA, throttling, and cross-context auth. `Register.tsx` and `RegisteredUserController` also deleted (no v1 self-signup).
 - **`tests/Feature/Auth/TenantLoginTest` and `WrongContextTest` opt out of `RefreshDatabase`** because they create real tenant DBs (DDL auto-commits and breaks transaction rollback). Listed explicitly in `tests/Pest.php` alongside `TenancyTest` and the tenant tests. The other 5 auth tests stay in the RefreshDatabase group since they only touch the central DB.
+
+### Phase 7
+
+- **`EnsureCentralContext` and `EnsureClinicActive` are pinned in the middleware priority list.** Laravel auto-sorts a route's middleware stack against `MiddlewarePriority`, where `Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests` (the contract `Authenticate` implements) appears early. Any custom middleware not in that list gets demoted past `auth`. For `central`/`clinic_active` that's a correctness bug: they swap the default guard / verify clinic status, and they MUST run before `auth` evaluates `Auth::check()`. `bootstrap/app.php` calls `prependToPriorityList(before: AuthenticatesRequests::class, prepend: ...)` for both. Symptom when missing: a clean login posts succeed, but `GET /` then redirects back to `/login` because `auth` sees the wrong default guard.
+- **`tenancy.filesystem.asset_helper_tenancy` is OFF.** stancl's default rewires `asset()` (and Vite's emitted asset URLs) through its `tenancy.asset` route, which only knows how to serve files out of `storage/app/public/`. Vite ships build output to `public/build/`, so every asset URL in tenant context 404s and the page renders blank. We disable the rewrite globally; any tenant-scoped upload (patient files, doctor avatars, etc.) calls `tenant_asset()` explicitly so it goes through the per-tenant filesystem disk that stancl already configured.
+- **`<Toaster />` reads theme from the DOM, not from `useTheme`.** Toaster mounts at the app root as a sibling of `<App />`, so it can't call any hook that depends on Inertia's `usePage()` context. `Components/ui/sonner.tsx` uses a tiny `useDomTheme()` that reads `documentElement.classList` and watches it via `MutationObserver`. Both the pre-paint script in `app.blade.php` and the in-app `useTheme()` toggle keep the `dark` class accurate, so this is robust without coupling.
+- **`EnsureClinicActive` reads status fresh on every request, not from `tenant()`.** Stancl's `Tenancy::initialize($tenant)` short-circuits when re-called with the same tenant key in one process — it leaves the in-memory Clinic stale rather than swapping in the freshly-resolved one. That's a perf optimization in stancl, but it's a security gap for status checks: a long-running queue worker, a test runner, or any scenario that hits `initialize()` twice in a process keeps serving traffic for a clinic that was just suspended. The middleware does a one-row lookup (`Clinic::query()->whereKey(...)->first()`) per request and trusts that, not `tenant()`. Cost is one cheap central-DB select per tenant request.
+- **`CreateClinicAction` is NOT wrapped in `DB::transaction`.** Stancl's `TenantCreated` pipeline runs `CREATE DATABASE` (DDL) inside the create flow, which implicitly commits any open transaction and then crashes the outer commit with "no active transaction". Instead the action wraps the central writes in a try/catch that hard-deletes the central record on any error (`Clinic::forceDelete()` fires `DeleteDatabase`, cleaning up the tenant DB too). This is one of those places where Eloquent's "transactions inside model events" assumption breaks down for multi-DB setups.
+- **`CentralConnection` trait applied to every central-only Eloquent model.** When a request runs with tenancy initialized (e.g., clinic creation, suspend-during-tenant-context, the aggregation job iterating tenants), Eloquent's default connection is the active tenant DB. Without `CentralConnection`, a `CentralAuditLog::create()` call inside `SuspendClinicAction` would write to the tenant DB and crash because the table only exists centrally. Trait applied to: `User`, `Clinic` (already had it via `BaseTenant`), `SubscriptionPlan`, `Subscription`, `SupportTicket`, `GlobalSetting`, `CentralAuditLog`.
+- **`AggregatePlatformStats` runs synchronously on dashboard "Refresh now" but queues hourly.** The `ShouldQueue` interface puts it on the default queue for the cron tick (`Schedule::job(...)`); the controller bypasses dispatch with `(new AggregatePlatformStats())->handle()` for the manual button so the super admin sees fresh numbers immediately. Cost is bounded — even with 50 clinics, the per-tenant counts are two trivial SELECTs.
+- **`auditable_id` widened from `unsignedBigInteger` to `string(64)`.** Phase 2 set up the audit table assuming numeric primary keys; Phase 7 needs to log `Clinic` events whose primary key is a slug string. The migration drops the composite index, changes the column, and recreates the index — no data loss for existing logs (string column can hold the previous numeric values as their text representation).
+- **Slug regex `/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/` plus a hard-coded `RESERVED` list (`app`, `admin`, `api`, `www`, `mail`, `central`, `einaya`).** The regex prevents leading/trailing dashes (which break some DNS resolvers) and double-dashes; the reserved list specifically blocks slugs that would collide with our `app.einaya.{ps,test}` central domain or look like a phishing target. Slug is also non-editable post-create (would break the FK chain on subscriptions / audit / domains).
+- **Inertia paginator response shape is `{data, meta, links}`.** `XxxResource::collection($paginator)` produces that nested shape automatically. The `Paginated<T>` TS type in `resources/js/types/central.ts` matches it 1:1 — pages just render `paginator.data`, link to `paginator.links.next`, and read `paginator.meta.total/from/to` for the "showing N–M of K" line.
+- **Plan delete is soft-delete + reference preservation.** Spec says "edits should preserve historical data" and "don't allow deletion if any active subscription uses the plan". Implementation: count `whereIn('status', ['trial', 'active'])` subscriptions; if zero, soft-delete the plan; the existing subscriptions keep their `plan_id` foreign key pointing at the now-trashed plan, and `Subscription->plan()` works fine because the relationship doesn't apply soft-delete scoping by default.
+- **Ticket responses append to `body` with a date stamp instead of going to a `ticket_messages` table.** Single-table keeps Phase 7 small; the format `\n\n--- {datetime} (admin) ---\n{response}` is greppable and trivially parseable when v2 introduces threaded messages.
+- **Tests use `Clinic::withoutEvents(fn () => Clinic::create([...]))` whenever a real tenant DB isn't required.** This skips the `TenantCreated` pipeline (no DB creation, no migrations), keeping `RefreshDatabase`-using tests fast and free of cross-test tenant-DB leakage. The two tests that DO need a real tenant DB (`CreateClinicTest`, `SuspendClinicTest`) opt out of `RefreshDatabase` and run their own cleanup helpers that drop databases by prefix.
+- **Test cleanup helpers use `forceDelete()` inside `Clinic::withoutEvents(...)` then drop the DBs by `SHOW DATABASES LIKE` pattern.** A previous failed run can leave half-state — central row gone but tenant DB still around, or vice versa. The two-step cleanup (delete-without-events first, then DROP IF EXISTS) handles either failure mode.
+- **Clinic ID is the slug string.** Phase 1 already set this up (the stancl tenant_id is `$clinic->id`), but Phase 7 makes it visible: every URL like `/clinics/{clinic}` binds against the string ID, every resource serializes `id` as a string, every audit row carries the slug as `auditable_id`. No numeric-ID indirection.
+- **`auth.user!` non-null assertions remain.** PageProps types `auth.user` as `User | null` to support the unauthenticated tenant welcome page. Every Phase 7 page is auth-required, so a `!` assertion is correct (and minimal — the page renders inside `CentralLayout` which itself only mounts after middleware says you're a super admin).
+- **`router.post('/api/aggregate-stats', {}, { onFinish })` rather than `axios.post(...)`.** Inertia's `router` carries the CSRF token + handles flash redirects automatically. The endpoint redirects back via `back()->with('success', ...)`, which `useFlashToasts()` then surfaces as a Sonner toast. No JSON API needed.
 
 ### Phase 6
 
@@ -350,6 +421,50 @@ _(none)_
 - `app/Http/Middleware/HandleInertiaRequests.php` — shares `auth.permissions`, `auth.roles`, and a `flash` bag
 - `database/seeders/Tenant/TenantDemoSeeder.php` — assigns `clinic_admin`+`doctor` and `secretary` roles
 - `resources/js/types/index.d.ts` — `auth.permissions` + `auth.roles` typed via `auth.ts`
+
+### Phase 7 — Created
+
+- `app/Http/Middleware/{EnsureSuperAdmin,EnsureClinicActive}.php`
+- `app/Http/Controllers/Central/{Dashboard,Clinic,Plan,Subscription,Ticket,Audit,Setting}Controller.php`
+- `app/Http/Requests/Central/{StoreClinic,UpdateClinic,StorePlan,UpdatePlan,UpdateTicket,UpdateSubscription,UpdateSettings}Request.php`
+- `app/Http/Resources/Central/{Clinic,Plan,Subscription,Ticket,AuditLog}Resource.php`
+- `app/Actions/Central/{CreateClinic,SuspendClinic,ChangeClinicPlan}Action.php`
+- `app/Jobs/Central/AggregatePlatformStats.php`
+- `database/migrations/2026_05_06_000001_change_central_audit_logs_auditable_id_to_string.php`
+- `resources/js/types/central.ts`
+- `resources/js/Pages/Central/Dashboard.tsx` (rewrote — was a stub)
+- `resources/js/Pages/Central/Clinics/{Index,Show}.tsx`
+- `resources/js/Pages/Central/Plans/Index.tsx`
+- `resources/js/Pages/Central/Subscriptions/Index.tsx`
+- `resources/js/Pages/Central/Tickets/{Index,Show}.tsx`
+- `resources/js/Pages/Central/Audit/Index.tsx`
+- `resources/js/Pages/Central/Settings/Index.tsx`
+- `resources/js/locales/{en,ar}/central.json`
+- `tests/Feature/Central/{CreateClinic,SuspendClinic,PlanCannotBeDeleted,AuditLogCreatedOnClinicSuspension,OnlySuperAdminCanAccess}Test.php`
+
+### Phase 7 — Modified
+
+- `composer.json` — none
+- `package.json` — added `recharts ^3.8`
+- `app/Models/Central/User.php` — `CentralConnection` trait
+- `app/Models/Central/SubscriptionPlan.php` — `CentralConnection` trait
+- `app/Models/Central/Subscription.php` — `CentralConnection` trait
+- `app/Models/Central/SupportTicket.php` — `CentralConnection` trait
+- `app/Models/Central/GlobalSetting.php` — `CentralConnection` trait
+- `app/Models/Central/CentralAuditLog.php` — `CentralConnection` trait
+- `app/Models/Central/Clinic.php` — added `isActive()`, `isSuspended()`, `activeSubscription()` helpers
+- `bootstrap/app.php` — added `super_admin` and `clinic_active` middleware aliases; pinned `EnsureCentralContext` and `EnsureClinicActive` ahead of `AuthenticatesRequests` in the middleware priority list (post-completion fix — see Phase 7 decisions)
+- `config/tenancy.php` — `filesystem.asset_helper_tenancy` set to `false` so Vite's `/build/...` URLs are NOT rewritten through stancl's `tenancy.asset` route (post-completion fix — was making every tenant page render blank)
+- `resources/js/Components/ui/sonner.tsx` — replaced `useTheme()` (which depends on Inertia's `usePage`) with a self-contained `useDomTheme()` so the Toaster can mount outside the `<App />` tree without throwing (post-completion fix)
+- `routes/central.php` — replaced single-route block with full `auth + super_admin` route group covering 30 routes (clinics, plans, subscriptions, tickets, audit, settings, dashboard, refresh-stats, prefs)
+- `routes/tenant.php` — added `clinic_active` middleware to the tenancy group
+- `routes/console.php` — schedules `AggregatePlatformStats` hourly
+- `resources/js/i18n.ts` — registers the `central` namespace
+- `tests/Pest.php` — `PreferencesTest`, `PlanCannotBeDeletedTest`, `AuditLogCreatedOnClinicSuspensionTest`, `OnlySuperAdminCanAccessTest` in the RefreshDatabase group; `CreateClinicTest`, `SuspendClinicTest` in the non-RefreshDatabase group
+
+### Phase 7 — Deleted
+
+_(none)_
 
 ### Phase 6 — Created
 

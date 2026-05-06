@@ -7,9 +7,16 @@ namespace App\Models\Central;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 class CentralAuditLog extends Model
 {
+    // Forces the model onto the central connection even when tenancy is
+    // initialized — without this, an audit written mid-tenant-request
+    // (e.g. provisioning, suspending) would land in the active tenant DB
+    // and crash because the table only lives centrally.
+    use CentralConnection;
+
     public $timestamps = false;
 
     protected $fillable = [
