@@ -7,12 +7,56 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 7 complete; ready to start Phase 8 (Clinic Admin).
+**Active phase:** None — Phase 8 complete; ready to start Phase 9 (Secretary / patient & appointment management).
 **Last session date:** 2026-05-06
 
 ---
 
 ## Completed Phases
+
+### ✅ Phase 8 — Clinic Admin Module incl. Form Builder (2026-05-06)
+
+**Post-completion fix (same session):**
+- **Form Builder rendered a blank page.** `MedicalFormResource` was returning nested `sections` as `FormSectionResource::collection($this->whenLoaded('sections'))` which wraps the payload in `{ data: [...] }` — but the front-end Builder reads `formData.sections` as a flat array (`.find()`, `.map()`, `arrayMove(...)`). Result: `Object` where an array was expected, runtime crash, blank page. Same wrapper issue cascaded into `FormSectionResource.questions`. Fix in both resources: replace `Resource::collection(...)` with `$this->whenLoaded('rel', fn () => RelResource::collection($this->rel)->resolve($request))` so the inner payload is materialized as a plain array. The smoke checks in PROGRESS.md returned 200 because the page HTML loaded fine — only the React tree crashed at runtime, which curl can't see.
+
+All Definition of Done items met:
+- 12 tenant controllers (`app/Http/Controllers/Tenant/`): Dashboard, Staff, DoctorProfile, WorkingHours, Settings, InsuranceProvider, Report, Audit, MedicalForm, FormSection, FormQuestion, FormSubmission. Each authorizes via Spatie permissions and writes to the tenant audit log.
+- 16 form requests under `app/Http/Requests/Tenant/` (Staff store/update, DoctorProfile, WorkingHours, Break, TimeOff, ClinicSettings, UploadLogo, InsuranceProvider store/update, Form store/update, Section store/update, Question store/update, Reorder).
+- 8 Inertia/JSON resources under `app/Http/Resources/Tenant/` (Staff, Doctor, InsuranceProvider, MedicalForm, FormSection, FormQuestion, FormSubmission, AuditLog).
+- 5 services under `app/Services/Tenant/`:
+  - `FormSnapshotService::snapshot()` returns the canonical JSON shape that gets frozen onto each `FormSubmission` and is also used by the front-end `<FormRenderer />` for previews — same shape on both sides keeps the builder preview byte-identical to the patient view.
+  - `MedicalFormService` — `generateKey()` (label → snake_case), `uniqueKey()` (per-form unique with `_2`/`_3` fallback), `duplicate()` (deep-clones sections/questions/options, marks the copy inactive).
+  - `StatsService` — dashboard counters (today's appointments by status, patients this month new+returning, revenue this month, follow-ups due in 7 days).
+  - `ReportService` — appointments / revenue / patients / diagnoses aggregations over a date range.
+  - `CSVExporter` — UTF-8-BOM streamed CSV download (BOM keeps Excel happy with Arabic content).
+- 53 new tenant routes registered in `routes/tenant.php` (auth-gated, behind `clinic_active`). Explicit `Route::bind` for `staff`, `form`, `section`, `question`, `submission`, `break`, `time_off`, `insurance_provider` — Laravel's implicit binding doesn't match these param names.
+- Existing `App\Services\Tenant\AuditLogService` reused (Phase 3) — every Phase 8 mutation persists an audit row with old/new values.
+- Frontend (Pages under `resources/js/Pages/Tenant/`): Dashboard (real stat cards, today's schedule, recent patients, quick actions), Staff/Index (CRUD + reset password + soft-delete), Doctor/Profile (avatar upload, EN+AR bio, specialty, license, consultation duration), Doctor/WorkingHours (weekly schedule, breaks, time off), Settings/Index (5 tabs: General/Branding/Localization/Receipt/Notifications + react-colorful color picker for primary), InsuranceProviders/Index (CRUD with patient-link guard), Reports/Index (4 tabs + CSV export), Audit/Index (filters + diff dialog), Forms/Index (DataTable with duplicate/edit/archive), Forms/Submissions (per-form list), Forms/Submission (snapshot replay).
+- **Forms/Builder.tsx** — split panel (sections left, questions right), dnd-kit sortable for both, autosave on metadata edits (debounced 1s), publish toggle, in-place section title/description editor, question dialog with type-specific validation rules (text: min/max/regex; number: min/max; date: min_date/max_date; file: max_size_mb/allowed_types), per-type options builder (radio/checkbox/select), preview dialog using `FormRenderer`, soft-delete + confirm dialogs.
+- `Components/domain/forms/FormRenderer.tsx` — read-only renderer of a `FormSnapshot`. Used by the builder preview and the submission detail view. Phase 10 will add a write-mode for live consultation submission (the API surface is ready — pass `answers` and a `readOnly={false}` flag once react-hook-form integration ships).
+- `resources/js/types/tenant.ts` — full TS surface for tenant entities.
+- New translation namespace `tenant` (EN + AR) — every UI string passes through `t()`. `i18n.ts` registers it.
+- 5 new Pest tests in `tests/Feature/Tenant/`:
+  - `FormBuilderTest` — 3 scenarios: snapshot shape correctness, stable-key uniqueness within a form, secretary cannot manage forms.
+  - `StaffManagementTest` — secretary 403 on `POST /staff`; clinic admin can create + assign role.
+  - `WorkingHoursTest` — weekly schedule POST persists 5 active days (inactive days don't get rows because the schema requires NOT NULL start/end).
+  - `InsuranceProviderTest` — provider with linked patients can't be hard-deleted (returns flash error).
+  - `ReportsTest` — `ReportService::revenue()` aggregates by payment method and totals correctly.
+  - `BrandingUploadTest` — uploads through the controller, verifies `clinic_settings.branding.logo_url` is set.
+- Total Pest count: **64 passed (387 assertions)** — up from 55 before Phase 8.
+- TypeScript clean (`pnpm exec tsc --noEmit` zero errors). `pnpm build` succeeds (520kB main bundle, 376kB Dashboard bundle from recharts).
+- Smoke check after fixes: every Phase 8 tenant page (`/`, `/staff`, `/doctor/profile`, `/doctor/hours`, `/settings`, `/insurance-providers`, `/forms`, `/reports`, `/audit`) returns 200 when authenticated as `doctor@demo.einaya.test`. `storage/logs/laravel.log` empty.
+
+**Phase 8 deviations from the prompt:**
+- Multi-doctor staff support is intentionally disabled (per spec) — the role select on Staff/Index has a `doctor` item disabled with a tooltip "Multi-doctor support coming soon"; the form request rejects anything but `secretary` for v1.
+- Welcome email on staff create is stubbed: temp password is shown once in the success flash. Same pattern as Phase 7 for clinic admins.
+- Receipt PDF rendering / "show logo on receipts" toggle is wired, but PDF generation is v2 (per spec).
+- Patient-side branding (per-clinic primary color override) saves to `clinic_settings.branding.primary_color` but is not yet applied to the running tenant UI — Phase 9 (or sooner if needed) can wire it through `ClinicTheme` provider that reads the setting on Inertia share and updates the CSS variable.
+- Working-hours weekly mini-calendar visualization (the spec mentions "shaded working hours") is replaced by a simpler row-per-day editor + breaks list for v1. The data model supports it; the visual is deferred.
+- "Send appointment reminders to patients (in-app only for v1)" is a toggle in Settings → Notifications; the actual reminder dispatch is v2.
+- `FormQuestionController::destroy` is soft-delete only (per spec — submissions reference questions, but the snapshot makes it safe). The section delete checks for any `JSON_CONTAINS_PATH` matches in `form_submissions.answers` before deleting and returns flash-error if so.
+- `Staff` route param doesn't auto-bind to `User` (Laravel implicit binding only matches `{user}`); same for `form` → `MedicalForm`, `section` → `FormSection`, etc. Explicit `Route::bind(...)` calls cover them — see `routes/tenant.php` head.
+- Bundle warning unaddressed (520kB main). Code-splitting per Inertia route is a Phase 9+ concern.
 
 ### ✅ Phase 7 — Super Admin Module (2026-05-06)
 
@@ -178,7 +222,7 @@ All Definition of Done items met:
 
 ## In Progress
 
-_(none — pause point. Next: Phase 8 — Clinic Admin)_
+_(none — pause point. Next: Phase 9 — Secretary)_
 
 ---
 
@@ -244,6 +288,21 @@ _(none)_
 - **Password rules NOT applied on login.** A user with a strong existing password (set via reset/update) shouldn't fail to log in just because it has unusual characters — Laravel's Password rule is for *new* passwords. Applied to: password update (`PUT /password`) and password reset (`POST /reset-password`). Rule: `Password::min(10)->mixedCase()->numbers()->symbols()`.
 - **Old Breeze auth tests deleted.** `AuthenticationTest`, `EmailVerificationTest`, `PasswordConfirmationTest`, `PasswordResetTest`, `PasswordUpdateTest`, `RegistrationTest`, `ProfileTest` all removed. Replaced with the 7 Phase 4 tests, which cover the same ground plus 2FA, throttling, and cross-context auth. `Register.tsx` and `RegisteredUserController` also deleted (no v1 self-signup).
 - **`tests/Feature/Auth/TenantLoginTest` and `WrongContextTest` opt out of `RefreshDatabase`** because they create real tenant DBs (DDL auto-commits and breaks transaction rollback). Listed explicitly in `tests/Pest.php` alongside `TenancyTest` and the tenant tests. The other 5 auth tests stay in the RefreshDatabase group since they only touch the central DB.
+
+### Phase 8
+
+- **Nested resources serialize as plain arrays, not `Resource::collection()`.** Laravel's `Resource::collection($items)` wraps the result in `{ data: [...] }`. That's fine for top-level Inertia props (the FE knows to read `.data`), but for nested arrays the FE consumes them as flat lists. Pattern: `'rel' => $this->whenLoaded('rel', fn () => RelResource::collection($this->rel)->resolve($request))`. Calling `->resolve()` materializes the resource into the plain array shape and skips the wrapping. Applied to `MedicalFormResource.sections` and `FormSectionResource.questions`. Same shape was already used by `FormQuestionResource.options` (which manually `->map()`s).
+- **`Appointment.scheduled_for`, NOT `Appointment.starts_at`.** The Phase 3 schema named the column `scheduled_for`. Several Phase 8 services and the dashboard controller initially used `starts_at` (matching the Inertia prop name we expose to the FE), which 500'd on every page that touches appointments. Fixed by using `scheduled_for` in DB queries and aliasing to `starts_at` only when serializing to the front-end (`'starts_at' => $a->scheduled_for?->toIso8601String()`). FE TypeScript continues to use `starts_at` since it reads more naturally.
+- **`DoctorWorkingHour` doesn't store inactive days at all.** The migration sets `start_time` / `end_time` as NOT NULL, so an "inactive" entry can't be persisted with nulls. The controller deletes the row for any inactive day instead. The `show` method synthesizes an inactive entry per missing day at read time so the UI always renders 7 rows (Sun–Sat).
+- **`FormSnapshotService::snapshot()` is the canonical contract** between builder/preview/submission/Phase-10. The shape is intentionally flat (no Eloquent leakage, no relationship lazy-loads), and `version_at` is included so a submission's snapshot is a frozen-at-time-T view of the form. Used by the builder preview to render a live snapshot from the in-memory form state — that means the patient view in preview is BYTE-IDENTICAL to what Phase 10 will render at consultation time.
+- **`MedicalFormService::uniqueKey()` always returns a unique key.** Bare label slug is tried first; if it collides, `_2`, `_3`, etc. are appended. Used by the question controller on both create and update paths (passing the question ID as `$ignoreQuestionId` on update so an unchanged label doesn't trigger a rename).
+- **dnd-kit param ordering.** Both section and question reorder endpoints accept `{ ids: number[] }` — the array index becomes the new `order` (1-based). Optimistic UI applies the new order locally and POSTs to the server in `preserveScroll` + `only: []` mode, so a slow round-trip doesn't block another drag. If the request fails, the next page reload re-syncs from the server (no rollback in v1; would be a Phase 9+ refinement).
+- **`FormQuestion` soft-delete is safe across submissions.** Spec mandated "don't hard-delete questions referenced by submissions." Because submissions store a JSON snapshot of the form at submit time, the live `FormQuestion` row can soft-delete without breaking historical replays. The section-delete path checks `JSON_CONTAINS_PATH(answers, 'one', '$."<key>"')` against `form_submissions` to refuse deletion only when the answers actually contain a key that matches a question in this section. Belt-and-suspenders given the snapshot, but matches the spec wording.
+- **`CSVExporter` writes a UTF-8 BOM** before the CSV body so Excel doesn't mangle Arabic. The exporter is dumb on purpose: the caller passes headers + row iterator, the exporter stringifies primitives, formats `DateTime` as `Y-m-d H:i:s`, json-encodes arrays. No locale-aware number formatting (spec doesn't ask for it) — `(string)` casts on numerics keep DB precision intact.
+- **Tenant routes wrap up to 53 explicit definitions** because Phase 8 doesn't use `Route::resource`. The trade-off: more verbose, but each route is greppable by name and uses Laravel's named-route URL generator without surprises. Resource controllers would have been shorter for staff/insurance but inconsistent with the form-builder routes (which deliberately scope questions under sections, not forms).
+- **`UploadLogoRequest` only allows png/jpg/jpeg/svg up to 1MB.** The path is stored in `clinic_settings.branding.logo_url` as `/storage/branding/<file>` so the global asset URL works directly (which we re-enabled by setting `tenancy.filesystem.asset_helper_tenancy = false` in Phase 7). Per-tenant filesystem isolation still holds because stancl's `FilesystemTenancyBootstrapper` rewires `Storage::disk('public')` → `storage/<tenant_suffix>/app/public/` per request.
+- **`TenancyTestSetup::tenantTestCleanup()` was hardened** in this phase (similar to Phase 7's CreateClinic/Suspend tests): wraps the cleanup `Clinic::forceDelete()` calls in `Clinic::withoutEvents(...)` so a partially-cleaned-up state from a previous failed run (DB missing but central row still present, or vice versa) doesn't crash with "database doesn't exist". Then drops the DBs by `SHOW DATABASES LIKE` pattern. This is now the canonical pattern across all multi-tenant tests.
+- **Bundle warning unaddressed.** Main bundle is now 520kB minified (+ 376kB recharts vendor on the dashboard). Code-splitting per Inertia route via `import.meta.glob('./Pages/**/*.tsx', { eager: false })` is the obvious next move — the form Builder alone pulls in dnd-kit + react-hook-form + zod + react-colorful, which doesn't need to be on the login page. Phase 9+ should wire `lazy()` per page once a clear pattern is set.
 
 ### Phase 7
 
@@ -421,6 +480,36 @@ _(none)_
 - `app/Http/Middleware/HandleInertiaRequests.php` — shares `auth.permissions`, `auth.roles`, and a `flash` bag
 - `database/seeders/Tenant/TenantDemoSeeder.php` — assigns `clinic_admin`+`doctor` and `secretary` roles
 - `resources/js/types/index.d.ts` — `auth.permissions` + `auth.roles` typed via `auth.ts`
+
+### Phase 8 — Created
+
+- `app/Services/Tenant/{FormSnapshotService,MedicalFormService,StatsService,ReportService,CSVExporter}.php`
+- `app/Http/Controllers/Tenant/{Dashboard,Staff,DoctorProfile,WorkingHours,Settings,InsuranceProvider,Report,Audit,MedicalForm,FormSection,FormQuestion,FormSubmission}Controller.php`
+- `app/Http/Requests/Tenant/{StoreStaff,UpdateStaff,UpdateDoctorProfile,UpdateWorkingHours,StoreBreak,StoreTimeOff,UpdateClinicSettings,UploadLogo,StoreInsuranceProvider,UpdateInsuranceProvider,StoreForm,UpdateForm,StoreSection,UpdateSection,StoreQuestion,UpdateQuestion,Reorder}Request.php`
+- `app/Http/Resources/Tenant/{Staff,Doctor,InsuranceProvider,MedicalForm,FormSection,FormQuestion,FormSubmission,AuditLog}Resource.php`
+- `resources/js/types/tenant.ts`
+- `resources/js/Components/domain/forms/FormRenderer.tsx`
+- `resources/js/Pages/Tenant/Dashboard.tsx` (rewrote — was a stub from Phase 6)
+- `resources/js/Pages/Tenant/Staff/Index.tsx`
+- `resources/js/Pages/Tenant/Doctor/{Profile,WorkingHours}.tsx`
+- `resources/js/Pages/Tenant/Settings/Index.tsx`
+- `resources/js/Pages/Tenant/InsuranceProviders/Index.tsx`
+- `resources/js/Pages/Tenant/Reports/Index.tsx`
+- `resources/js/Pages/Tenant/Audit/Index.tsx`
+- `resources/js/Pages/Tenant/Forms/{Index,Builder,Submissions,Submission}.tsx`
+- `resources/js/locales/{en,ar}/tenant.json`
+- `tests/Feature/Tenant/{FormBuilder,StaffManagement,WorkingHours,InsuranceProvider,Reports,BrandingUpload}Test.php`
+
+### Phase 8 — Modified
+
+- `package.json` — added `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `react-colorful` (react-hook-form / zod / @hookform/resolvers were already pinned).
+- `routes/tenant.php` — 53 new routes wired behind auth, with explicit `Route::bind` for `staff` / `form` / `section` / `question` / `submission` / `break` / `time_off` / `insurance_provider`.
+- `resources/js/i18n.ts` — registers the `tenant` namespace.
+- `tests/Feature/Tenant/TenancyTestSetup.php` — `tenantTestCleanup()` now uses `Clinic::withoutEvents()` + `forceDelete()` so partial failure states don't deadlock subsequent runs.
+
+### Phase 8 — Deleted
+
+_(none)_
 
 ### Phase 7 — Created
 

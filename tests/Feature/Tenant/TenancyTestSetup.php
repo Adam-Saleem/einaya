@@ -18,11 +18,16 @@ function tenantTestCleanup(string $prefix = 'pesttest'): void
         tenancy()->end();
     }
 
-    $clinics = Clinic::query()->where('id', 'like', $prefix.'%')->get();
-
-    foreach ($clinics as $clinic) {
-        $clinic->delete();
-    }
+    // withoutEvents skips stancl's DeleteDatabase job — we drop the DBs
+    // ourselves below so a partial state from a previous run (DB missing
+    // but Clinic row still present, or vice versa) doesn't crash.
+    Clinic::withoutEvents(function () use ($prefix) {
+        Clinic::query()
+            ->withTrashed()
+            ->where('id', 'like', $prefix.'%')
+            ->get()
+            ->each(fn (Clinic $c) => $c->forceDelete());
+    });
 
     // Belt-and-suspenders: even if the row delete didn't fire DeleteDatabase
     // (or ran in a separate test that crashed mid-run), drop the DBs by name.

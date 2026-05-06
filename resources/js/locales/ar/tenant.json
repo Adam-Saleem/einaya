@@ -1,0 +1,323 @@
+{
+    "dashboard": {
+        "title": "مرحبًا، {{name}}",
+        "todayAppointments": "مواعيد اليوم",
+        "patientsThisMonth": "مرضى هذا الشهر",
+        "revenueThisMonth": "إيرادات هذا الشهر",
+        "pendingFollowups": "متابعات معلّقة (خلال 7 أيام)",
+        "todayBreakdown": "{{completed}} مكتملة · {{arrived}} حضر · {{pending}} قيد الانتظار",
+        "newReturning": "{{new}} جديد · {{returning}} عائد",
+        "todaySchedule": "جدول اليوم",
+        "noAppointmentsToday": "لا مواعيد لهذا اليوم.",
+        "recentPatients": "أحدث المرضى",
+        "noRecentPatients": "لا يوجد مرضى بعد.",
+        "quickActions": "إجراءات سريعة",
+        "addPatient": "إضافة مريض",
+        "bookAppointment": "حجز موعد",
+        "startConsultation": "بدء استشارة"
+    },
+    "staff": {
+        "title": "الموظفون",
+        "subtitle": "إدارة مستخدمي العيادة وأدوارهم",
+        "create": "إضافة موظف",
+        "columns": {
+            "name": "الاسم",
+            "email": "البريد",
+            "role": "الدور",
+            "lastLogin": "آخر دخول",
+            "status": "الحالة",
+            "actions": "إجراءات"
+        },
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "form": {
+            "createTitle": "إضافة موظف",
+            "editTitle": "تعديل بيانات الموظف",
+            "name": "الاسم",
+            "email": "البريد",
+            "phone": "الهاتف",
+            "role": "الدور",
+            "doctorRoleDisabled": "دعم تعدد الأطباء قريبًا",
+            "active": "نشط"
+        },
+        "actions": {
+            "edit": "تعديل",
+            "resetPassword": "إعادة تعيين كلمة المرور",
+            "delete": "حذف"
+        },
+        "confirmDelete": "أرشفة هذا الموظف؟",
+        "confirmDeleteBody": "يُؤرشف الحساب ناعمًا. تبقى إجراءاته في سجل التدقيق.",
+        "confirmReset": "توليد كلمة مرور مؤقتة جديدة؟",
+        "confirmResetBody": "ستُعرض كلمة المرور مرة واحدة. يجب على المستخدم تغييرها عند الدخول التالي."
+    },
+    "doctor": {
+        "profile": {
+            "title": "الملف الشخصي للطبيب",
+            "subtitle": "البيانات الظاهرة للمرضى",
+            "name": "الاسم الظاهر",
+            "phone": "هاتف الاتصال",
+            "avatar": "الصورة",
+            "specialty": "التخصّص",
+            "license": "رقم الترخيص",
+            "bio": "السيرة",
+            "bioEn": "السيرة — إنجليزية",
+            "bioAr": "السيرة — عربية",
+            "consultationDuration": "مدة الاستشارة الافتراضية (دقيقة)"
+        },
+        "hours": {
+            "title": "ساعات العمل",
+            "subtitle": "الجدول الأسبوعي والاستراحات والإجازات",
+            "weekly": "الجدول الأسبوعي",
+            "active": "يعمل",
+            "start": "البداية",
+            "end": "النهاية",
+            "save": "حفظ الجدول",
+            "breaks": "الاستراحات",
+            "breaksHint": "استراحات يومية متكرّرة (الغداء، الصلاة، إلخ).",
+            "addBreak": "إضافة استراحة",
+            "breakLabel": "وسم (اختياري)",
+            "timeOff": "الإجازات",
+            "addTimeOff": "إضافة إجازة",
+            "noTimeOff": "لا توجد إجازات قادمة.",
+            "from": "من",
+            "to": "إلى",
+            "reason": "السبب"
+        },
+        "days": {
+            "0": "الأحد",
+            "1": "الإثنين",
+            "2": "الثلاثاء",
+            "3": "الأربعاء",
+            "4": "الخميس",
+            "5": "الجمعة",
+            "6": "السبت"
+        }
+    },
+    "settings": {
+        "title": "إعدادات العيادة",
+        "subtitle": "الأسماء والهوية والإيصالات والإشعارات",
+        "tabs": {
+            "general": "عام",
+            "branding": "الهوية",
+            "localization": "اللغة",
+            "receipt": "الإيصال",
+            "notifications": "الإشعارات"
+        },
+        "general": {
+            "name": "اسم العيادة",
+            "address": "العنوان",
+            "phone": "الهاتف",
+            "email": "البريد"
+        },
+        "branding": {
+            "logo": "شعار العيادة",
+            "uploadLogo": "رفع الشعار",
+            "removeLogo": "إزالة",
+            "primaryColor": "اللون الأساسي",
+            "primaryColorHint": "يستبدل اللون الافتراضي في هذه العيادة فقط."
+        },
+        "localization": {
+            "defaultLanguage": "اللغة الافتراضية للمرضى الجدد"
+        },
+        "receipt": {
+            "header": "رأس الإيصال",
+            "footer": "تذييل الإيصال",
+            "showLogo": "إظهار الشعار على الإيصالات"
+        },
+        "notifications": {
+            "appointmentReminders": "إرسال تذكيرات المواعيد للمرضى (داخل التطبيق فقط في v1)"
+        },
+        "save": "حفظ التغييرات"
+    },
+    "insurance": {
+        "title": "شركات التأمين",
+        "subtitle": "الشركات التي يختار منها المرضى أثناء التسجيل",
+        "create": "إضافة شركة",
+        "columns": {
+            "name": "اسم الشركة",
+            "active": "نشطة",
+            "patients": "المرضى",
+            "actions": "إجراءات"
+        },
+        "form": {
+            "name": "الاسم",
+            "active": "نشطة",
+            "createTitle": "إضافة شركة",
+            "editTitle": "تعديل الشركة"
+        },
+        "confirmDelete": "أرشفة هذه الشركة؟",
+        "confirmDeleteBody": "يجب نقل المرضى المرتبطين أولًا."
+    },
+    "reports": {
+        "title": "التقارير",
+        "subtitle": "ملخّصات حسب نطاق التواريخ",
+        "range": "نطاق التواريخ",
+        "from": "من",
+        "to": "إلى",
+        "tabs": {
+            "appointments": "المواعيد",
+            "revenue": "الإيرادات",
+            "patients": "المرضى",
+            "diagnoses": "التشخيصات"
+        },
+        "export": "تصدير CSV",
+        "appointments": {
+            "byStatus": "حسب الحالة",
+            "status": "الحالة",
+            "count": "العدد",
+            "total": "إجمالي المواعيد: {{count}}"
+        },
+        "revenue": {
+            "method": "طريقة الدفع",
+            "count": "العدد",
+            "amount": "المبلغ",
+            "total": "الإجمالي: {{amount}}"
+        },
+        "patients": {
+            "summary": "{{new}} جديد · {{returning}} عائد",
+            "byGender": "حسب الجنس",
+            "byAge": "حسب الفئة العمرية",
+            "gender": "الجنس",
+            "age": "العمر",
+            "count": "العدد"
+        },
+        "diagnoses": {
+            "description": "التشخيص",
+            "code": "الكود",
+            "count": "العدد",
+            "total": "{{unique}} فريد · {{total}} إجمالي"
+        }
+    },
+    "audit": {
+        "title": "سجل التدقيق",
+        "subtitle": "كل إجراء مع القيم السابقة والجديدة",
+        "filters": {
+            "from": "من",
+            "to": "إلى",
+            "user": "المستخدم",
+            "action": "الإجراء",
+            "anyUser": "أي مستخدم",
+            "anyAction": "أي إجراء"
+        },
+        "columns": {
+            "when": "متى",
+            "user": "المستخدم",
+            "action": "الإجراء",
+            "target": "الهدف"
+        },
+        "diffTitle": "تفاصيل التغيير",
+        "previous": "السابق",
+        "next": "الجديد"
+    },
+    "forms": {
+        "title": "النماذج الطبية",
+        "subtitle": "بناء الاستبيانات التي يملؤها المرضى أثناء الاستشارة",
+        "create": "إنشاء نموذج",
+        "columns": {
+            "title": "العنوان",
+            "type": "النوع",
+            "sections": "الأقسام",
+            "questions": "الأسئلة",
+            "submissions": "الإجابات",
+            "status": "الحالة",
+            "createdAt": "تاريخ الإنشاء",
+            "actions": "إجراءات"
+        },
+        "active": "منشور",
+        "inactive": "مسوّدة",
+        "actions": {
+            "edit": "تعديل",
+            "duplicate": "نسخ",
+            "viewSubmissions": "عرض الإجابات",
+            "activate": "نشر",
+            "deactivate": "إلغاء النشر",
+            "delete": "أرشفة"
+        },
+        "form": {
+            "createTitle": "إنشاء نموذج",
+            "title": "عنوان النموذج",
+            "description": "الوصف",
+            "type": "نوع النموذج"
+        },
+        "confirmDelete": "أرشفة هذا النموذج؟",
+        "confirmDeleteBody": "إن كانت هناك إجابات مرتبطة، يُحتفظ بالنموذج ويُلغى نشره فقط."
+    },
+    "builder": {
+        "publish": "نشر",
+        "unpublish": "إلغاء النشر",
+        "publishedHint": "متاح للاستخدام أثناء الاستشارات.",
+        "draftHint": "مسوّدة — غير قابلة للاستخدام في الاستشارات.",
+        "saving": "جارٍ الحفظ…",
+        "saved": "تم الحفظ",
+        "preview": "معاينة النموذج",
+        "back": "الرجوع إلى النماذج",
+
+        "sectionsTitle": "الأقسام",
+        "addSection": "إضافة قسم",
+        "sectionTitle": "عنوان القسم",
+        "sectionDescription": "وصف القسم (اختياري)",
+        "noSections": "أضف قسمًا للبدء في بناء النموذج.",
+        "deleteSection": "حذف القسم",
+        "confirmDeleteSection": "حذف هذا القسم؟",
+        "confirmDeleteSectionBody": "ستُؤرشف جميع الأسئلة. تحتفظ الإجابات السابقة بنسختها.",
+        "selectSection": "اختر قسمًا لإدارة أسئلته.",
+
+        "questionsTitle": "الأسئلة",
+        "addQuestion": "إضافة سؤال",
+        "noQuestions": "لا توجد أسئلة بعد — أضف سؤالًا أدناه.",
+        "deleteQuestion": "حذف السؤال",
+        "confirmDeleteQuestion": "حذف هذا السؤال؟",
+        "confirmDeleteQuestionBody": "سيُؤرشف السؤال. الإجابات السابقة لا تتأثر لأنها تخزن نسخة من النموذج.",
+
+        "questionDialog": {
+            "createTitle": "إضافة سؤال",
+            "editTitle": "تعديل السؤال",
+            "label": "نص السؤال",
+            "key": "المفتاح الثابت",
+            "keyHint": "يُولَّد تلقائيًا من النص. يُستخدم للتحليلات عبر الإصدارات — لا تعدّله إلا عند الضرورة.",
+            "helpText": "نص توضيحي (اختياري)",
+            "type": "نوع السؤال",
+            "required": "إلزامي",
+            "options": "الخيارات",
+            "addOption": "إضافة خيار",
+            "optionValue": "القيمة",
+            "optionLabel": "النص",
+            "validation": "قواعد التحقّق",
+            "minLength": "الحدّ الأدنى للأحرف",
+            "maxLength": "الحدّ الأقصى للأحرف",
+            "regex": "نمط Regex",
+            "min": "الحدّ الأدنى",
+            "max": "الحدّ الأقصى",
+            "minDate": "أقرب تاريخ",
+            "maxDate": "أقصى تاريخ",
+            "maxFileSize": "حجم الملف الأقصى (ميجابايت)",
+            "allowedTypes": "الامتدادات المسموحة (مفصولة بفواصل)"
+        },
+
+        "questionTypes": {
+            "text": "نص قصير",
+            "textarea": "نص طويل",
+            "number": "رقم",
+            "radio": "اختيار واحد",
+            "checkbox": "اختيار متعدد",
+            "select": "قائمة منسدلة",
+            "date": "تاريخ",
+            "file": "رفع ملف",
+            "signature": "توقيع"
+        },
+
+        "previewTitle": "معاينة من جانب المريض",
+        "submissions": {
+            "title": "إجابات نموذج {{form}}",
+            "back": "الرجوع إلى النموذج",
+            "noSubmissions": "لا توجد إجابات بعد.",
+            "columns": {
+                "patient": "المريض",
+                "doctor": "الطبيب",
+                "submittedAt": "تاريخ الإرسال",
+                "actions": "إجراءات"
+            },
+            "view": "عرض"
+        }
+    }
+}

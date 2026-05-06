@@ -1,0 +1,323 @@
+{
+    "dashboard": {
+        "title": "Welcome, {{name}}",
+        "todayAppointments": "Today's appointments",
+        "patientsThisMonth": "Patients this month",
+        "revenueThisMonth": "Revenue this month",
+        "pendingFollowups": "Pending follow-ups (next 7 days)",
+        "todayBreakdown": "{{completed}} completed · {{arrived}} arrived · {{pending}} pending",
+        "newReturning": "{{new}} new · {{returning}} returning",
+        "todaySchedule": "Today's schedule",
+        "noAppointmentsToday": "No appointments today.",
+        "recentPatients": "Recent patients",
+        "noRecentPatients": "No patients yet.",
+        "quickActions": "Quick actions",
+        "addPatient": "Add patient",
+        "bookAppointment": "Book appointment",
+        "startConsultation": "Start consultation"
+    },
+    "staff": {
+        "title": "Staff",
+        "subtitle": "Manage clinic users and their roles",
+        "create": "Add staff",
+        "columns": {
+            "name": "Name",
+            "email": "Email",
+            "role": "Role",
+            "lastLogin": "Last login",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "active": "Active",
+        "inactive": "Inactive",
+        "form": {
+            "createTitle": "Add staff member",
+            "editTitle": "Edit staff member",
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "role": "Role",
+            "doctorRoleDisabled": "Multi-doctor support coming soon",
+            "active": "Active"
+        },
+        "actions": {
+            "edit": "Edit",
+            "resetPassword": "Reset password",
+            "delete": "Delete"
+        },
+        "confirmDelete": "Archive this staff member?",
+        "confirmDeleteBody": "Their account is soft-deleted; their historical actions stay in the audit log.",
+        "confirmReset": "Generate a new temporary password?",
+        "confirmResetBody": "The new password will be shown once. The user must change it on next login."
+    },
+    "doctor": {
+        "profile": {
+            "title": "Doctor profile",
+            "subtitle": "Public-facing details visible to patients",
+            "name": "Display name",
+            "phone": "Contact phone",
+            "avatar": "Photo",
+            "specialty": "Specialty",
+            "license": "License number",
+            "bio": "Bio",
+            "bioEn": "Bio — English",
+            "bioAr": "Bio — Arabic",
+            "consultationDuration": "Default consultation length (minutes)"
+        },
+        "hours": {
+            "title": "Working hours",
+            "subtitle": "Weekly schedule, breaks, and time off",
+            "weekly": "Weekly schedule",
+            "active": "Working",
+            "start": "Start",
+            "end": "End",
+            "save": "Save schedule",
+            "breaks": "Breaks",
+            "breaksHint": "Recurring daily breaks (lunch, prayer, etc.).",
+            "addBreak": "Add break",
+            "breakLabel": "Label (optional)",
+            "timeOff": "Time off",
+            "addTimeOff": "Add time off",
+            "noTimeOff": "No upcoming time off.",
+            "from": "From",
+            "to": "To",
+            "reason": "Reason"
+        },
+        "days": {
+            "0": "Sunday",
+            "1": "Monday",
+            "2": "Tuesday",
+            "3": "Wednesday",
+            "4": "Thursday",
+            "5": "Friday",
+            "6": "Saturday"
+        }
+    },
+    "settings": {
+        "title": "Clinic settings",
+        "subtitle": "Names, branding, receipts, and notifications",
+        "tabs": {
+            "general": "General",
+            "branding": "Branding",
+            "localization": "Localization",
+            "receipt": "Receipt",
+            "notifications": "Notifications"
+        },
+        "general": {
+            "name": "Clinic name",
+            "address": "Address",
+            "phone": "Phone",
+            "email": "Email"
+        },
+        "branding": {
+            "logo": "Clinic logo",
+            "uploadLogo": "Upload logo",
+            "removeLogo": "Remove",
+            "primaryColor": "Primary color",
+            "primaryColorHint": "Overrides the platform default for this clinic only."
+        },
+        "localization": {
+            "defaultLanguage": "Default language for new patients"
+        },
+        "receipt": {
+            "header": "Receipt header",
+            "footer": "Receipt footer",
+            "showLogo": "Show clinic logo on receipts"
+        },
+        "notifications": {
+            "appointmentReminders": "Send appointment reminders to patients (in-app only for v1)"
+        },
+        "save": "Save changes"
+    },
+    "insurance": {
+        "title": "Insurance providers",
+        "subtitle": "Providers your patients can pick from at registration",
+        "create": "Add provider",
+        "columns": {
+            "name": "Provider name",
+            "active": "Active",
+            "patients": "Patients",
+            "actions": "Actions"
+        },
+        "form": {
+            "name": "Name",
+            "active": "Active",
+            "createTitle": "Add provider",
+            "editTitle": "Edit provider"
+        },
+        "confirmDelete": "Archive this provider?",
+        "confirmDeleteBody": "Patients linked to this provider must be moved first."
+    },
+    "reports": {
+        "title": "Reports",
+        "subtitle": "Aggregate views over a date range",
+        "range": "Date range",
+        "from": "From",
+        "to": "To",
+        "tabs": {
+            "appointments": "Appointments",
+            "revenue": "Revenue",
+            "patients": "Patients",
+            "diagnoses": "Diagnoses"
+        },
+        "export": "Export CSV",
+        "appointments": {
+            "byStatus": "By status",
+            "status": "Status",
+            "count": "Count",
+            "total": "Total appointments: {{count}}"
+        },
+        "revenue": {
+            "method": "Payment method",
+            "count": "Count",
+            "amount": "Amount",
+            "total": "Total: {{amount}}"
+        },
+        "patients": {
+            "summary": "{{new}} new · {{returning}} returning",
+            "byGender": "By gender",
+            "byAge": "By age group",
+            "gender": "Gender",
+            "age": "Age",
+            "count": "Count"
+        },
+        "diagnoses": {
+            "description": "Diagnosis",
+            "code": "Code",
+            "count": "Count",
+            "total": "{{unique}} unique · {{total}} total instances"
+        }
+    },
+    "audit": {
+        "title": "Audit log",
+        "subtitle": "Every staff action with old/new values",
+        "filters": {
+            "from": "From",
+            "to": "To",
+            "user": "User",
+            "action": "Action",
+            "anyUser": "Any user",
+            "anyAction": "Any action"
+        },
+        "columns": {
+            "when": "When",
+            "user": "User",
+            "action": "Action",
+            "target": "Target"
+        },
+        "diffTitle": "Change details",
+        "previous": "Previous",
+        "next": "New"
+    },
+    "forms": {
+        "title": "Medical forms",
+        "subtitle": "Build the questionnaires patients fill in during consultations",
+        "create": "Create form",
+        "columns": {
+            "title": "Title",
+            "type": "Type",
+            "sections": "Sections",
+            "questions": "Questions",
+            "submissions": "Submissions",
+            "status": "Status",
+            "createdAt": "Created",
+            "actions": "Actions"
+        },
+        "active": "Published",
+        "inactive": "Draft",
+        "actions": {
+            "edit": "Edit",
+            "duplicate": "Duplicate",
+            "viewSubmissions": "View submissions",
+            "activate": "Publish",
+            "deactivate": "Unpublish",
+            "delete": "Archive"
+        },
+        "form": {
+            "createTitle": "Create form",
+            "title": "Form title",
+            "description": "Description",
+            "type": "Form type"
+        },
+        "confirmDelete": "Archive this form?",
+        "confirmDeleteBody": "If any submissions reference it, the form is kept and only deactivated."
+    },
+    "builder": {
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "publishedHint": "Available for use during consultations.",
+        "draftHint": "Draft — not yet usable in consultations.",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "preview": "Preview form",
+        "back": "Back to forms",
+
+        "sectionsTitle": "Sections",
+        "addSection": "Add section",
+        "sectionTitle": "Section title",
+        "sectionDescription": "Section description (optional)",
+        "noSections": "Add a section to start building your form.",
+        "deleteSection": "Delete section",
+        "confirmDeleteSection": "Delete this section?",
+        "confirmDeleteSectionBody": "All questions in this section will be archived. Historical submissions retain their snapshot.",
+        "selectSection": "Select a section to manage its questions.",
+
+        "questionsTitle": "Questions",
+        "addQuestion": "Add question",
+        "noQuestions": "No questions yet — add one below.",
+        "deleteQuestion": "Delete question",
+        "confirmDeleteQuestion": "Delete this question?",
+        "confirmDeleteQuestionBody": "Question will be archived. Historical submissions are unaffected because they store a snapshot.",
+
+        "questionDialog": {
+            "createTitle": "Add question",
+            "editTitle": "Edit question",
+            "label": "Question label",
+            "key": "Stable key",
+            "keyHint": "Auto-generated from label. Used for cross-version analytics — only edit if you know what you're doing.",
+            "helpText": "Help text (optional)",
+            "type": "Question type",
+            "required": "Required",
+            "options": "Options",
+            "addOption": "Add option",
+            "optionValue": "Value",
+            "optionLabel": "Label",
+            "validation": "Validation rules",
+            "minLength": "Minimum length",
+            "maxLength": "Maximum length",
+            "regex": "Regex pattern",
+            "min": "Minimum",
+            "max": "Maximum",
+            "minDate": "Earliest date",
+            "maxDate": "Latest date",
+            "maxFileSize": "Max file size (MB)",
+            "allowedTypes": "Allowed extensions (comma-separated)"
+        },
+
+        "questionTypes": {
+            "text": "Short text",
+            "textarea": "Long text",
+            "number": "Number",
+            "radio": "Single choice",
+            "checkbox": "Multiple choice",
+            "select": "Dropdown",
+            "date": "Date",
+            "file": "File upload",
+            "signature": "Signature"
+        },
+
+        "previewTitle": "Patient view preview",
+        "submissions": {
+            "title": "Submissions of {{form}}",
+            "back": "Back to form",
+            "noSubmissions": "No submissions yet.",
+            "columns": {
+                "patient": "Patient",
+                "doctor": "Doctor",
+                "submittedAt": "Submitted",
+                "actions": "Actions"
+            },
+            "view": "View"
+        }
+    }
+}
