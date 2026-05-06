@@ -61,6 +61,11 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'warning' => $request->session()->get('warning'),
                 'status' => $request->session()->get('status'),
+                // Phase 11.6: surface PatientController's duplicate-phone
+                // matches to the registration dialog. Stashed via
+                // back()->with('duplicate_phone_matches', ...) and only
+                // present on the immediate next render.
+                'duplicate_phone_matches' => $request->session()->get('duplicate_phone_matches'),
             ],
         ];
     }

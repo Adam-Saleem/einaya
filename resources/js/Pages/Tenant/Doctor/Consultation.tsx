@@ -208,49 +208,14 @@ export default function ConsultationPage({ consultation, history, forms }: Props
 
     const loadFormSnapshot = async (formId: string) => {
         if (!formId) return;
-        // The /forms/:id/edit endpoint returns the full form structure
-        // server-side; the FE Builder already knows how to read it.
-        // Here we fetch the lightweight version through a small ad-hoc
-        // axios call that returns the canonical FormSnapshot shape via
-        // FormSnapshotService — wired through a future endpoint. For v1,
-        // we let the doctor pick a form, then the Submit endpoint
-        // freezes the snapshot server-side from form_id, so we can
-        // ship without a snapshot fetch by rendering a placeholder.
+        // GET /forms/:id/snapshot returns the canonical FormSnapshot JSON
+        // shape produced by FormSnapshotService — same shape used at
+        // submission time + on the historical replay. Single source of
+        // truth for the FormRenderer.
         try {
-            const { data } = await axios.get(`/forms/${formId}/edit`, {
-                headers: { 'X-Inertia': 'true', 'X-Inertia-Version': '*' },
-            });
-            const form = data?.props?.form;
-            if (form) {
-                setFormSnapshot({
-                    form_id: form.id,
-                    title: form.title,
-                    description: form.description,
-                    type: form.type,
-                    version_at: new Date().toISOString(),
-                    sections: (form.sections ?? []).map((s: { id: number; title: string; description: string | null; order: number; questions: Array<{ id: number; key: string; label: string; help_text: string | null; type: string; is_required: boolean; order: number; validation_rules: Record<string, unknown> | null; options: Array<{ value: string; label: string }> }> }) => ({
-                        id: s.id,
-                        title: s.title,
-                        description: s.description,
-                        order: s.order,
-                        questions: (s.questions ?? []).map((q) => ({
-                            id: q.id,
-                            key: q.key,
-                            label: q.label,
-                            help_text: q.help_text,
-                            type: q.type as FormSnapshot['sections'][number]['questions'][number]['type'],
-                            required: q.is_required,
-                            order: q.order,
-                            validation_rules: q.validation_rules,
-                            options: (q.options ?? []).map((o) => ({
-                                value: o.value,
-                                label: o.label,
-                            })),
-                        })),
-                    })),
-                });
-                setFormAnswers({});
-            }
+            const { data } = await axios.get<FormSnapshot>(`/forms/${formId}/snapshot`);
+            setFormSnapshot(data);
+            setFormAnswers({});
         } catch {
             toast.error('Could not load form');
         }
@@ -320,7 +285,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
         <AppLayout
             title={consultation.patient.name}
             breadcrumbs={[
-                { label: 'Consultations', href: '/doctor' },
+                { label: 'Consultations', href: '/consultations' },
                 { label: consultation.patient.name },
             ]}
             actions={

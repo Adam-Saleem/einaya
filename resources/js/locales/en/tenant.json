@@ -248,7 +248,8 @@
         "stats": {
             "todayTotal": "Today's appointments",
             "walkIns": "Walk-ins today",
-            "pendingPayments": "Pending payments"
+            "pendingPayments": "Pending payments",
+            "completedToday": "Completed today"
         },
         "queue": "Today's queue",
         "noAppointments": "No appointments today.",

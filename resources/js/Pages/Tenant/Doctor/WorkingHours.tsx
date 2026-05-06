@@ -17,6 +17,7 @@ import {
 import { Switch } from '@/Components/ui/switch';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { cn } from '@/lib/utils';
 import type { DoctorBreakRow, DoctorTimeOffRow, WorkingHourRow } from '@/types/tenant';
 
 type Props = {
@@ -79,6 +80,12 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
             pageTitle={t('doctor.hours.title')}
             description={t('doctor.hours.subtitle')}
         >
+            <WeekVisualization
+                hours={hoursForm.data.hours}
+                breaks={breaks}
+                dayLabel={(d) => t(`doctor.days.${d}`)}
+            />
+
             <Card>
                 <CardHeader>
                     <CardTitle>{t('doctor.hours.weekly')}</CardTitle>
@@ -280,3 +287,95 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
         </AppLayout>
     );
 }
+
+/**
+ * Read-only mini week-grid: rows = days, columns = hours from 06:00 to
+ * 22:00 in 30-min steps. Working hours render as a primary-colored band,
+ * breaks as a muted overlay. Time-off is conveyed in the textual list
+ * below — too sparse for the calendar grid to add value here.
+ */
+function WeekVisualization({
+    hours,
+    breaks,
+    dayLabel,
+}: {
+    hours: WorkingHourRow[];
+    breaks: DoctorBreakRow[];
+    dayLabel: (d: number) => string;
+}) {
+    const HOUR_START = 6;
+    const HOUR_END = 22;
+    const STEPS = (HOUR_END - HOUR_START) * 2; // 30-min slots
+
+    const toMinutes = (hhmm: string | null) => {
+        if (!hhmm) return null;
+        const [h, m] = hhmm.split(':').map(Number);
+        return h * 60 + m;
+    };
+
+    const cellPercent = (mins: number) => {
+        const offset = mins - HOUR_START * 60;
+        return (offset / ((HOUR_END - HOUR_START) * 60)) * 100;
+    };
+
+    return (
+        <div className="rounded-lg border bg-card p-4">
+            <div className="grid grid-cols-[120px_1fr] items-center text-xs text-muted-foreground">
+                <div></div>
+                <div className="grid grid-flow-col auto-cols-fr">
+                    {Array.from({ length: HOUR_END - HOUR_START + 1 }).map((_, i) => (
+                        <div key={i} className="text-center">
+                            {(HOUR_START + i).toString().padStart(2, '0')}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {hours.map((row) => {
+                const start = toMinutes(row.start_time);
+                const end = toMinutes(row.end_time);
+                const dayBreaks = breaks.filter((b) => b.day_of_week === row.day_of_week);
+
+                return (
+                    <div
+                        key={row.day_of_week}
+                        className="grid grid-cols-[120px_1fr] items-center border-t py-1"
+                    >
+                        <div className="text-sm font-medium">{dayLabel(row.day_of_week)}</div>
+                        <div className="relative h-6 rounded-md bg-muted/30">
+                            {row.is_active && start !== null && end !== null && (
+                                <div
+                                    className="absolute inset-y-0 rounded-sm bg-primary/70"
+                                    style={{
+                                        insetInlineStart: `${cellPercent(start)}%`,
+                                        width: `${cellPercent(end) - cellPercent(start)}%`,
+                                    }}
+                                    title={`${row.start_time}–${row.end_time}`}
+                                />
+                            )}
+                            {dayBreaks.map((b, idx) => {
+                                const bStart = toMinutes(b.start_time);
+                                const bEnd = toMinutes(b.end_time);
+                                if (bStart === null || bEnd === null) return null;
+                                return (
+                                    <div
+                                        key={idx}
+                                        className={cn(
+                                            'absolute inset-y-0 rounded-sm bg-warning/40 border border-warning/60',
+                                        )}
+                                        style={{
+                                            insetInlineStart: `${cellPercent(bStart)}%`,
+                                            width: `${cellPercent(bEnd) - cellPercent(bStart)}%`,
+                                        }}
+                                        title={`${b.label ?? 'Break'}: ${b.start_time}–${b.end_time}`}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+

@@ -1,8 +1,10 @@
 import { Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { AppBreadcrumb, type Crumb } from '@/Components/domain/AppBreadcrumb';
 import { PageHeader } from '@/Components/domain/PageHeader';
+import { PatientSearch } from '@/Components/domain/PatientSearch';
+import { PatientRegistrationForm } from '@/Components/domain/PatientRegistrationForm';
 import { AppSidebar } from '@/Components/domain/layout/AppSidebar';
 import { AppTopbar } from '@/Components/domain/layout/AppTopbar';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
@@ -24,6 +26,12 @@ export default function AppLayout({
     breadcrumbs,
     children,
 }: Props) {
+    // Cmd+K patient search lives at the layout level so it's reachable
+    // from any tenant page. The "register new" path opens the registration
+    // dialog with the search query pre-filled.
+    const [registerOpen, setRegisterOpen] = useState(false);
+    const [registerQuery, setRegisterQuery] = useState('');
+
     return (
         <SidebarProvider>
             {title && <Head title={title} />}
@@ -44,6 +52,19 @@ export default function AppLayout({
                     <div className="flex flex-col gap-6">{children}</div>
                 </main>
             </SidebarInset>
+
+            <PatientSearch
+                onCreateNew={(query) => {
+                    setRegisterQuery(query);
+                    setRegisterOpen(true);
+                }}
+            />
+            <PatientRegistrationForm
+                open={registerOpen}
+                onOpenChange={setRegisterOpen}
+                initialQuery={registerQuery}
+                insuranceProviders={[]}
+            />
         </SidebarProvider>
     );
 }

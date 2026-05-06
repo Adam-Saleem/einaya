@@ -248,7 +248,8 @@
         "stats": {
             "todayTotal": "مواعيد اليوم",
             "walkIns": "حضور مباشر اليوم",
-            "pendingPayments": "مدفوعات معلّقة"
+            "pendingPayments": "مدفوعات معلّقة",
+            "completedToday": "مكتملة اليوم"
         },
         "queue": "طابور اليوم",
         "noAppointments": "لا توجد مواعيد لهذا اليوم.",

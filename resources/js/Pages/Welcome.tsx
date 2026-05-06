@@ -1,16 +1,17 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 
 export default function Welcome() {
+    const { t } = useTranslation('common');
+
     return (
         <>
             <Head title="Welcome" />
-            <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6 dark:bg-gray-900">
+            <div className="flex min-h-screen items-center justify-center bg-background p-6">
                 <div className="text-center">
-                    <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
-                        Welcome to Einaya
-                    </h1>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Multi-tenant SaaS for medical clinics.
+                    <h1 className="text-display text-foreground">{t('app.name')}</h1>
+                    <p className="mt-3 text-base text-muted-foreground">
+                        {t('app.tagline')}
                     </p>
                 </div>
             </div>

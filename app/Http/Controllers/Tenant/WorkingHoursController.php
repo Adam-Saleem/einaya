@@ -27,6 +27,10 @@ class WorkingHoursController extends Controller
 
     public function show(Request $request): Response
     {
+        if (! $request->user()?->can('doctor.manage_hours')) {
+            abort(403);
+        }
+
         $doctor = $this->doctorOrFail($request);
         $doctor->loadMissing(['workingHours', 'breaks', 'timeOff']);
 

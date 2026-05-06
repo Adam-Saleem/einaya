@@ -9,11 +9,21 @@ export interface User {
     theme_preference?: 'light' | 'dark' | 'system';
 }
 
+export type DuplicatePhoneMatch = {
+    id: number;
+    patient_code: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    date_of_birth: string | null;
+};
+
 export type FlashBag = {
     success?: string;
     error?: string;
     warning?: string;
     status?: string;
+    duplicate_phone_matches?: DuplicatePhoneMatch[];
 };
 
 export type Preferences = {

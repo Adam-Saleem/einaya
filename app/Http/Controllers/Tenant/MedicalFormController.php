@@ -57,6 +57,25 @@ class MedicalFormController extends Controller
         return redirect("/forms/{$form->id}/edit");
     }
 
+    /**
+     * JSON endpoint used by the consultation page (Phase 10) to load a
+     * form's canonical snapshot before fill-in. Returning the raw
+     * FormSnapshotService output keeps the FormRenderer fed by the same
+     * shape it'll see when the submission comes back from history.
+     */
+    public function snapshot(MedicalForm $form): \Illuminate\Http\JsonResponse
+    {
+        if (! request()->user()?->can('forms.submit')) {
+            abort(403);
+        }
+
+        $form->load(['sections.questions.options']);
+
+        return response()->json(
+            app(\App\Services\Tenant\FormSnapshotService::class)->snapshot($form),
+        );
+    }
+
     public function edit(MedicalForm $form): Response
     {
         if (! request()->user()?->can('forms.manage')) {

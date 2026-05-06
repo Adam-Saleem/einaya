@@ -13,6 +13,7 @@ use App\Models\Tenant\MedicalForm;
 use App\Models\Tenant\User as TenantUser;
 use App\Http\Controllers\Tenant\AppointmentController;
 use App\Http\Controllers\Tenant\AuditController;
+use App\Http\Controllers\Tenant\ConsultationListController;
 use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\Doctor\ConsultationController as DoctorConsultationController;
 use App\Http\Controllers\Tenant\Doctor\DashboardController as DoctorDashboardController;
@@ -170,6 +171,8 @@ Route::middleware([
         Route::post('/forms', [MedicalFormController::class, 'store'])->name('tenant.forms.store');
         Route::get('/forms/{form}/edit', [MedicalFormController::class, 'edit'])
             ->name('tenant.forms.edit');
+        Route::get('/forms/{form}/snapshot', [MedicalFormController::class, 'snapshot'])
+            ->name('tenant.forms.snapshot');
         Route::patch('/forms/{form}', [MedicalFormController::class, 'update'])
             ->name('tenant.forms.update');
         Route::delete('/forms/{form}', [MedicalFormController::class, 'destroy'])
@@ -259,6 +262,8 @@ Route::middleware([
             ->name('tenant.doctor.queue');
 
         // Consultations
+        Route::get('/consultations', [ConsultationListController::class, 'index'])
+            ->name('tenant.consultations.index');
         Route::post('/consultations', [DoctorConsultationController::class, 'store'])
             ->name('tenant.consultations.store');
         Route::get('/consultations/{consultation}', [DoctorConsultationController::class, 'show'])

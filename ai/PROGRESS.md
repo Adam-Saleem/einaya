@@ -7,12 +7,34 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 10 complete. **v1 feature surface is shippable.**
-**Last session date:** 2026-05-06
+**Active phase:** None — Phase 11 (post-v1 triage) shipped. v1 surface is shippable + cleaner.
+**Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### ✅ Phase 11 — Post-v1 Triage (2026-05-07)
+
+15 items from `ai/ENHANCEMENTS.md` Phase 11. All shipped together.
+
+- **11.1 + 11.10 Sidebar dead links + breadcrumbs.** Removed `/branding` and `/prescriptions` (no controllers existed). Added `/consultations` linked to the new index. Doctor/Consultation breadcrumb now links "Consultations" to `/consultations` instead of `/doctor`. Trimmed unused `Pill` and `Palette` imports.
+- **11.2 Consultations index page.** New `app/Http/Controllers/Tenant/ConsultationListController.php` and `resources/js/Pages/Tenant/Consultations/Index.tsx`. Doctor sees their own consultations, clinic_admin sees all. Filters: status (open/completed), from/to date, patient search.
+- **11.3 Permission gates retrofit.** Added explicit `forms.view` checks to `DoctorProfileController::show` (`doctor.view_profile`), `WorkingHoursController::show` (`doctor.manage_hours`), `SettingsController::show` (`clinic.view_settings`). New `tests/Feature/Tenant/SecretaryAccessMatrixTest.php` walks the full secretary 403 matrix across 4 blocked paths and 7 allowed paths.
+- **11.4 Reception duplicate stat card.** Replaced "Total today" with "Completed today" + a no-show subtitle. Added `reception.stats.completedToday` to EN+AR.
+- **11.5 Reception loads insurance providers.** `ReceptionDashboardController::index` queries active providers and passes them to the walk-in registration modal.
+- **11.6 Phone-duplicate matches reach the dialog.** Added `duplicate_phone_matches` to the shared Inertia `flash` bag in `HandleInertiaRequests`. Updated `PatientRegistrationForm` to read from `usePage().props.flash.duplicate_phone_matches` instead of the dead `(window as any).__flash` shim. The "Use existing / Create anyway" buttons now actually surface the matches.
+- **11.7 + 11.8 Cmd+K + topbar search wired.** `PatientSearch` mounted globally in `AppLayout` (alongside a `PatientRegistrationForm` for the "register new" path). The topbar search button dispatches a `einaya:open-patient-search` `CustomEvent` that the search component listens for. Cmd/Ctrl+K still works.
+- **11.9 Notifications bell hidden** until v2 — the placeholder dropdown was misleading.
+- **11.11 Form snapshot endpoint.** Added `GET /forms/{form}/snapshot` returning the canonical `FormSnapshotService::snapshot()` JSON. `Doctor/Consultation.tsx` now calls that instead of the brittle XHR-into-`/forms/:id/edit` hack with the `X-Inertia-Version: '*'` workaround.
+- **11.12 + 11.13 PatientCombobox shared component.** `Components/domain/PatientCombobox.tsx` built around shadcn `<Command>` + `<Popover>` with debounced 250ms search hitting `/patients/search`. Replaces the free-text "Patient ID" inputs in `PaymentForm` and `Appointments/Calendar`'s booking dialog.
+- **11.14 Dead Breeze pages cleaned up.** Deleted unused `resources/js/Pages/Dashboard.tsx`. Repainted `Welcome.tsx`, `Tenant/Welcome.tsx`, `Profile/Edit.tsx` and the three Profile partials (UpdateProfileInformationForm, UpdatePasswordForm, DeleteUserForm) to use shadcn primitives + design tokens instead of Breeze's `bg-white`/`bg-gray-*`/indigo focus rings. Profile pages now render correctly in both light and dark mode and dispatch to AppLayout vs CentralLayout based on `auth.isSuperAdmin`. (TwoFactorSetup still uses the legacy AuthenticatedLayout — Phase 12 will repaint that one.)
+- **11.15 Working-hours week view.** New `WeekVisualization` component renders above the editor: rows per day, columns from 06:00–22:00, working hours shown as primary-colored bands, breaks as warning-tinted overlays. Read-only — purely a visual confirmation of what's saved.
+
+**Verification:**
+- 83 Pest tests pass (was 82; +1 from `SecretaryAccessMatrixTest`).
+- TypeScript clean, `pnpm build` green.
+- Smoke check: every sidebar item now returns 200 (15 paths checked). The new `/forms/{id}/snapshot` endpoint returns JSON. `storage/logs/laravel.log` empty.
 
 ### ✅ Phase 10 — Doctor / Consultation Module (2026-05-06)
 

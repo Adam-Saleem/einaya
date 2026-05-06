@@ -37,6 +37,7 @@ type Props = {
         pending_payments: number;
     };
     queue: QueueRow[];
+    insuranceProviders: { id: number; name: string }[];
 };
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
@@ -54,7 +55,7 @@ function formatTime(iso: string | null): string {
     return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default function ReceptionDashboard({ stats, queue }: Props) {
+export default function ReceptionDashboard({ stats, queue, insuranceProviders }: Props) {
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
@@ -135,7 +136,12 @@ export default function ReceptionDashboard({ stats, queue }: Props) {
                     undefined,
                     CreditCard,
                 )}
-                {stat('Total today', stats.today_total)}
+                {stat(
+                    t('reception.stats.completedToday'),
+                    stats.by_status.completed ?? 0,
+                    `${stats.by_status.no_show ?? 0} no-show`,
+                    Calendar,
+                )}
             </div>
 
             <Card>
@@ -231,7 +237,7 @@ export default function ReceptionDashboard({ stats, queue }: Props) {
             <PatientRegistrationForm
                 open={walkInOpen}
                 onOpenChange={setWalkInOpen}
-                insuranceProviders={[]}
+                insuranceProviders={insuranceProviders}
             />
 
             <ConfirmDialog

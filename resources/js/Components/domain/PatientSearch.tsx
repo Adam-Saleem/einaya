@@ -40,14 +40,21 @@ export function PatientSearch({ onCreateNew }: Props) {
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
-        const handler = (event: KeyboardEvent) => {
+        // Two ways to open: cmd/ctrl+K, or a global custom event dispatched
+        // by AppTopbar's search button.
+        const onKey = (event: KeyboardEvent) => {
             if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
                 event.preventDefault();
                 setOpen((o) => !o);
             }
         };
-        window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
+        const onOpen = () => setOpen(true);
+        window.addEventListener('keydown', onKey);
+        window.addEventListener('einaya:open-patient-search', onOpen);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            window.removeEventListener('einaya:open-patient-search', onOpen);
+        };
     }, []);
 
     useEffect(() => {

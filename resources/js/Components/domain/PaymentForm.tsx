@@ -12,6 +12,7 @@ import {
     DialogTitle,
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
+import { PatientCombobox } from '@/Components/domain/PatientCombobox';
 import { Label } from '@/Components/ui/label';
 import {
     Select,
@@ -76,12 +77,10 @@ export function PaymentForm({ open, onOpenChange, patientId, appointmentId }: Pr
                 <form onSubmit={submit} className="space-y-3">
                     {!patientId && (
                         <div className="space-y-2">
-                            <Label htmlFor="patient_id">{t('payments.form.patient')}</Label>
-                            <Input
-                                id="patient_id"
-                                placeholder="Patient ID"
-                                value={form.data.patient_id}
-                                onChange={(e) => form.setData('patient_id', e.target.value)}
+                            <Label>{t('payments.form.patient')}</Label>
+                            <PatientCombobox
+                                value={form.data.patient_id ? Number(form.data.patient_id) : null}
+                                onChange={(id) => form.setData('patient_id', id ? String(id) : '')}
                             />
                             {form.errors.patient_id && (
                                 <p className="text-xs text-destructive">{form.errors.patient_id}</p>

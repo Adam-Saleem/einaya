@@ -23,6 +23,10 @@ class DoctorProfileController extends Controller
 
     public function show(Request $request): Response
     {
+        if (! $request->user()?->can('doctor.view_profile')) {
+            abort(403);
+        }
+
         $doctor = $this->resolveDoctor($request);
         $doctor?->loadMissing('user');
 

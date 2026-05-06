@@ -1,6 +1,14 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import AppLayout from '@/Layouts/AppLayout';
+import CentralLayout from '@/Layouts/CentralLayout';
+import { Button } from '@/Components/ui/button';
+import { useDirection } from '@/Hooks/useDirection';
+import { usePage } from '@inertiajs/react';
+import type { PageProps } from '@/types';
+
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
@@ -14,67 +22,57 @@ export default function Edit({
     status?: string;
     twoFactorEnabled: boolean;
 }>) {
-    return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Profile
-                </h2>
-            }
-        >
-            <Head title="Profile" />
+    const { t } = useTranslation('common');
+    const { props } = usePage<PageProps>();
+    // Central super admins use CentralLayout, tenant users AppLayout.
+    const Layout = props.auth.isSuperAdmin ? CentralLayout : AppLayout;
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+    return (
+        <Layout title={t('topbar.profile')} pageTitle={t('topbar.profile')}>
+            <Head title={t('topbar.profile')} />
+
+            <div className="space-y-6">
+                <Card>
+                    <CardContent className="p-6">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
                             className="max-w-xl"
                         />
-                    </div>
+                    </CardContent>
+                </Card>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+                <Card>
+                    <CardContent className="p-6">
                         <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+                    </CardContent>
+                </Card>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-                        <section className="max-w-xl">
-                            <header>
-                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                    Two-Factor Authentication
-                                </h2>
-                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                    Status:{' '}
-                                    <span
-                                        className={
-                                            twoFactorEnabled
-                                                ? 'font-medium text-green-600'
-                                                : 'font-medium text-yellow-600'
-                                        }
-                                    >
-                                        {twoFactorEnabled
-                                            ? 'Enabled'
-                                            : 'Disabled'}
-                                    </span>
-                                </p>
-                            </header>
-                            <div className="mt-4">
-                                <Link
-                                    href="/two-factor"
-                                    className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                                >
-                                    {twoFactorEnabled ? 'Manage' : 'Set up'}
-                                </Link>
-                            </div>
-                        </section>
-                    </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-h4">Two-factor authentication</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 p-6 pt-0">
+                        <p className="text-sm text-muted-foreground">
+                            Status:{' '}
+                            <span className={twoFactorEnabled ? 'font-medium text-success' : 'font-medium text-warning'}>
+                                {twoFactorEnabled ? 'Enabled' : 'Disabled'}
+                            </span>
+                        </p>
+                        <Button asChild variant="outline" size="sm">
+                            <Link href="/two-factor">
+                                {twoFactorEnabled ? 'Manage' : 'Set up'}
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+                <Card className="border-destructive/40">
+                    <CardContent className="p-6">
                         <DeleteUserForm className="max-w-xl" />
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             </div>
-        </AuthenticatedLayout>
+        </Layout>
     );
 }

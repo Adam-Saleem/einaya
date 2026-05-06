@@ -23,6 +23,10 @@ class SettingsController extends Controller
 
     public function show(): Response
     {
+        if (! request()->user()?->can('clinic.view_settings')) {
+            abort(403);
+        }
+
         $values = ClinicSetting::whereIn('key', self::SECTIONS)
             ->pluck('value', 'key')
             ->toArray();

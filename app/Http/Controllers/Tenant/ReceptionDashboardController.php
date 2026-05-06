@@ -9,6 +9,7 @@ use App\Enums\Tenant\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Tenant\AppointmentResource;
 use App\Models\Tenant\Appointment;
+use App\Models\Tenant\InsuranceProvider;
 use App\Models\Tenant\Payment;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -56,6 +57,9 @@ class ReceptionDashboardController extends Controller
                 'pending_payments' => $pendingPayments,
             ],
             'queue' => AppointmentResource::collection($todays)->resolve(request()),
+            'insuranceProviders' => InsuranceProvider::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 }

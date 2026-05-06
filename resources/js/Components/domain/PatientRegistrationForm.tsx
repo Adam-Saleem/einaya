@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -94,6 +94,9 @@ export function PatientRegistrationForm({
     }, [initialQuery]);
 
     const form = useForm(initial);
+    const { props: pageProps } = usePage<{
+        flash?: { duplicate_phone_matches?: Duplicate[] };
+    }>();
     const [duplicates, setDuplicates] = useState<Duplicate[]>([]);
 
     useEffect(() => {
@@ -105,6 +108,15 @@ export function PatientRegistrationForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, initialQuery]);
 
+    // Pick up matches from the previous render's flash bag, populated by
+    // PatientController::store via back()->with('duplicate_phone_matches').
+    useEffect(() => {
+        const matches = pageProps.flash?.duplicate_phone_matches;
+        if (matches && matches.length > 0) {
+            setDuplicates(matches);
+        }
+    }, [pageProps.flash?.duplicate_phone_matches]);
+
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         form.post('/patients', {
@@ -112,15 +124,6 @@ export function PatientRegistrationForm({
             onSuccess: () => {
                 onOpenChange(false);
                 form.reset();
-            },
-            onError: (errors) => {
-                if ((errors as Record<string, string>).phone === 'phone_duplicate') {
-                    // Server stashed matches in flash bag.
-                    const flash = (window as unknown as { __flash?: { duplicate_phone_matches?: Duplicate[] } }).__flash;
-                    if (flash?.duplicate_phone_matches) {
-                        setDuplicates(flash.duplicate_phone_matches);
-                    }
-                }
             },
         });
     };
