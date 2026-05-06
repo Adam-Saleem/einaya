@@ -21,7 +21,8 @@
         "close": "Close",
         "view": "View",
         "open": "Open",
-        "more": "More"
+        "more": "More",
+        "discardChanges": "Discard unsaved changes?"
     },
     "status": {
         "loading": "Loading…",

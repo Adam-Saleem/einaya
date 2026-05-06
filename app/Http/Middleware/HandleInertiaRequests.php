@@ -34,7 +34,7 @@ class HandleInertiaRequests extends Middleware
         $locale = $request->session()->get('locale')
             ?? ($user?->preferred_language)
             ?? app()->getLocale();
-        $theme = $user?->theme_preference ?? 'system';
+        $theme = $user?->theme_preference ?? 'light';
 
         return [
             ...parent::share($request),

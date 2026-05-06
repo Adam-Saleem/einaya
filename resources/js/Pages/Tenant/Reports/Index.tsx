@@ -53,16 +53,16 @@ export default function ReportsIndex({ range, appointments, revenue, patients, d
                         <Label>{t('reports.from')}</Label>
                         <Input
                             type="date"
-                            defaultValue={range.from.slice(0, 10)}
-                            onBlur={(e) => apply({ from: e.target.value })}
+                            value={range.from.slice(0, 10)}
+                            onChange={(e) => apply({ from: e.target.value })}
                         />
                     </div>
                     <div className="space-y-1">
                         <Label>{t('reports.to')}</Label>
                         <Input
                             type="date"
-                            defaultValue={range.to.slice(0, 10)}
-                            onBlur={(e) => apply({ to: e.target.value })}
+                            value={range.to.slice(0, 10)}
+                            onChange={(e) => apply({ to: e.target.value })}
                         />
                     </div>
                 </CardContent>

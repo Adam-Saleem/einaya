@@ -6,11 +6,11 @@ import { cn } from '@/lib/utils';
 export type StatusVariant = 'success' | 'warning' | 'info' | 'danger' | 'neutral';
 
 const variantClasses: Record<StatusVariant, string> = {
-    success: 'border-transparent bg-success/15 text-success-foreground/90 dark:bg-success/25',
-    warning: 'border-transparent bg-warning/20 text-warning-foreground dark:bg-warning/25',
-    info: 'border-transparent bg-info/15 text-info dark:bg-info/25 dark:text-info-foreground',
-    danger: 'border-transparent bg-destructive/15 text-destructive dark:bg-destructive/30 dark:text-destructive-foreground',
-    neutral: 'border-transparent bg-muted text-muted-foreground',
+    success: 'border-transparent bg-badge-success-bg text-badge-success-fg',
+    warning: 'border-transparent bg-badge-warning-bg text-badge-warning-fg',
+    info: 'border-transparent bg-badge-info-bg text-badge-info-fg',
+    danger: 'border-transparent bg-badge-danger-bg text-badge-danger-fg',
+    neutral: 'border-transparent bg-badge-neutral-bg text-badge-neutral-fg',
 };
 
 type Props = {

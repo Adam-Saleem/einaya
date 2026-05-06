@@ -22,7 +22,7 @@ export function useTheme() {
         } catch {
             // ignore
         }
-        return (props.preferences?.theme ?? 'system') as Theme;
+        return (props.preferences?.theme ?? 'light') as Theme;
     })();
 
     const [theme, setThemeState] = useState<Theme>(initial);

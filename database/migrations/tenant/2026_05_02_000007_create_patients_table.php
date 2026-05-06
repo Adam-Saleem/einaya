@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('gender', 10)->nullable();
             $table->string('marital_status', 15)->nullable();
             $table->string('occupation', 120)->nullable();
-            $table->string('preferred_language', 5)->default('ar');
+            $table->string('preferred_language', 5)->default('en');
 
             $table->string('phone', 30);
             $table->string('phone_alt', 30)->nullable();

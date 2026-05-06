@@ -329,7 +329,14 @@
             "cash": "نقدًا",
             "card": "بطاقة",
             "insurance": "تأمين",
-            "mixed": "مختلط"
+            "mixed": "مختلط",
+            "cashAmount": "المبلغ النقدي",
+            "cardAmount": "مبلغ البطاقة",
+            "insuranceAmount": "مبلغ التأمين",
+            "notes": "ملاحظات",
+            "mixedSumWarning": "مجموع النقد والبطاقة والتأمين يجب أن يساوي المبلغ.",
+            "mixedSumRunning": "التقسيم: {{sum}} / {{total}}",
+            "submit": "تسجيل الدفعة"
         }
     },
     "doctorPanel": {

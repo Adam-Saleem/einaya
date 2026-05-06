@@ -22,6 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/Components/ui/table';
+import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
 import type { Paginated } from '@/types/central';
@@ -63,6 +64,10 @@ export default function PatientsIndex({ patients, filters, insuranceProviders }:
         );
     };
 
+    const [search, setSearch] = useDebouncedFilter(filters.search, (v) =>
+        apply({ search: v }),
+    );
+
     return (
         <AppLayout
             title={t('patients.title')}
@@ -80,11 +85,8 @@ export default function PatientsIndex({ patients, filters, insuranceProviders }:
                     <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr]">
                         <Input
                             placeholder={t('patients.search')}
-                            defaultValue={filters.search}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') apply({ search: e.currentTarget.value });
-                            }}
-                            onBlur={(e) => apply({ search: e.target.value })}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                         <Select
                             value={filters.gender || 'all'}

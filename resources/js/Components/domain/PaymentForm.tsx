@@ -151,11 +151,25 @@ export function PaymentForm({ open, onOpenChange, patientId, appointmentId }: Pr
                                     }
                                 />
                             </div>
+                            <p
+                                className={
+                                    'md:col-span-3 text-sm font-medium ' +
+                                    (sumMismatch
+                                        ? 'text-destructive'
+                                        : total > 0
+                                            ? 'text-success'
+                                            : 'text-muted-foreground')
+                                }
+                            >
+                                {t('payments.form.mixedSumRunning', {
+                                    sum: sum.toFixed(2),
+                                    total: total.toFixed(2),
+                                })}
+                            </p>
                             {sumMismatch && (
                                 <Alert variant="destructive" className="md:col-span-3">
                                     <AlertDescription>
-                                        {t('payments.form.mixedSumWarning')} ({sum.toFixed(2)} vs{' '}
-                                        {total.toFixed(2)})
+                                        {t('payments.form.mixedSumWarning')}
                                     </AlertDescription>
                                 </Alert>
                             )}

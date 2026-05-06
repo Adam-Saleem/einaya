@@ -398,6 +398,7 @@
             "insuranceAmount": "Insurance amount",
             "notes": "Notes",
             "mixedSumWarning": "Cash + Card + Insurance must equal Amount.",
+            "mixedSumRunning": "Split: {{sum}} / {{total}}",
             "submit": "Record payment"
         },
         "totals": {

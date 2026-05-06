@@ -1,4 +1,5 @@
 import { Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { StatusBadge } from '@/Components/domain/StatusBadge';
@@ -27,9 +28,9 @@ type Appointment = {
 type Props = { appointments: Appointment[] };
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
-    pending: 'neutral',
+    pending: 'warning',
     confirmed: 'info',
-    arrived: 'warning',
+    arrived: 'info',
     in_progress: 'info',
     completed: 'success',
     cancelled: 'danger',
@@ -45,10 +46,32 @@ export default function TodayPage({ appointments }: Props) {
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
-    const markArrived = (id: number) =>
-        router.post(`/appointments/${id}/arrive`, {}, { preserveScroll: true });
-    const cancel = (id: number) =>
-        router.post(`/appointments/${id}/cancel`, {}, { preserveScroll: true });
+    // Track per-row in-flight mutations as "arrive:<id>" / "cancel:<id>" so a
+    // double-click on the same row is a no-op without locking other rows.
+    const [pending, setPending] = useState<Set<string>>(new Set());
+    const isPending = (key: string) => pending.has(key);
+    const startPending = (key: string) =>
+        setPending((s) => new Set(s).add(key));
+    const endPending = (key: string) =>
+        setPending((s) => {
+            const next = new Set(s);
+            next.delete(key);
+            return next;
+        });
+
+    const sendAction = (action: 'arrive' | 'cancel', id: number) => {
+        const key = `${action}:${id}`;
+        if (isPending(key)) return;
+        startPending(key);
+        router.post(
+            `/appointments/${id}/${action}`,
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => endPending(key),
+            },
+        );
+    };
 
     return (
         <AppLayout
@@ -108,7 +131,8 @@ export default function TodayPage({ appointments }: Props) {
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                onClick={() => markArrived(a.id)}
+                                                onClick={() => sendAction('arrive', a.id)}
+                                                disabled={isPending(`arrive:${a.id}`)}
                                                 className="me-2"
                                             >
                                                 Arrive
@@ -116,7 +140,8 @@ export default function TodayPage({ appointments }: Props) {
                                             <Button
                                                 size="sm"
                                                 variant="ghost"
-                                                onClick={() => cancel(a.id)}
+                                                onClick={() => sendAction('cancel', a.id)}
+                                                disabled={isPending(`cancel:${a.id}`)}
                                             >
                                                 Cancel
                                             </Button>

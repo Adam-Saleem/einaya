@@ -1,12 +1,14 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
+import { type FormEventHandler, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import GuestLayout from '@/Layouts/GuestLayout';
 
 export default function TwoFactorChallenge() {
+    const { t } = useTranslation('auth');
     const [useRecovery, setUseRecovery] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -22,72 +24,75 @@ export default function TwoFactorChallenge() {
     };
 
     return (
-        <GuestLayout>
-            <Head title="Two-Factor Challenge" />
+        <GuestLayout
+            title={t('twoFactor.title')}
+            subtitle={
+                useRecovery
+                    ? t('twoFactor.recoveryDescription')
+                    : t('twoFactor.description')
+            }
+        >
+            <Head title={t('twoFactor.title')} />
 
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                {useRecovery
-                    ? 'Enter one of your recovery codes to continue.'
-                    : 'Enter the 6-digit code from your authenticator app.'}
-            </div>
-
-            <form onSubmit={submit}>
-                {!useRecovery && (
-                    <div>
-                        <InputLabel htmlFor="code" value="Authentication code" />
-                        <TextInput
+            <form onSubmit={submit} className="space-y-4">
+                {!useRecovery ? (
+                    <div className="space-y-2">
+                        <Label htmlFor="code">{t('twoFactor.code')}</Label>
+                        <Input
                             id="code"
                             name="code"
                             inputMode="numeric"
                             autoComplete="one-time-code"
                             value={data.code}
-                            isFocused
-                            className="mt-1 block w-full tracking-widest"
+                            autoFocus
+                            className="text-center font-mono text-lg tracking-widest"
                             onChange={(e) => setData('code', e.target.value)}
                         />
-                        <InputError message={errors.code} className="mt-2" />
+                        {errors.code && (
+                            <p className="text-xs text-destructive">{errors.code}</p>
+                        )}
                     </div>
-                )}
-
-                {useRecovery && (
-                    <div>
-                        <InputLabel
-                            htmlFor="recovery_code"
-                            value="Recovery code"
-                        />
-                        <TextInput
+                ) : (
+                    <div className="space-y-2">
+                        <Label htmlFor="recovery_code">
+                            {t('twoFactor.recoveryCode')}
+                        </Label>
+                        <Input
                             id="recovery_code"
                             name="recovery_code"
                             value={data.recovery_code}
-                            isFocused
-                            className="mt-1 block w-full"
+                            autoFocus
+                            className="font-mono"
                             onChange={(e) =>
                                 setData('recovery_code', e.target.value)
                             }
                         />
-                        <InputError
-                            message={errors.recovery_code}
-                            className="mt-2"
-                        />
+                        {errors.recovery_code && (
+                            <p className="text-xs text-destructive">
+                                {errors.recovery_code}
+                            </p>
+                        )}
                     </div>
                 )}
 
-                <div className="mt-4 flex items-center justify-between">
+                <Button type="submit" className="w-full" disabled={processing}>
+                    {t('twoFactor.submit')}
+                </Button>
+
+                <p className="text-center">
                     <button
                         type="button"
-                        className="text-sm text-gray-600 underline hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        className="text-xs text-primary hover:underline"
                         onClick={() => {
                             setUseRecovery((v) => !v);
                             reset('code', 'recovery_code');
                         }}
                     >
                         {useRecovery
-                            ? 'Use authenticator code'
-                            : 'Use recovery code'}
+                            ? t('twoFactor.useAuthenticator')
+                            : t('twoFactor.useRecovery')}
                     </button>
-
-                    <PrimaryButton disabled={processing}>Verify</PrimaryButton>
-                </div>
+                </p>
             </form>
         </GuestLayout>
     );

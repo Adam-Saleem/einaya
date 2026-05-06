@@ -89,7 +89,9 @@ function FieldFor({ question, value, readOnly, onChange }: FieldProps) {
     const labelEl = (
         <Label htmlFor={id}>
             {question.label}
-            {question.required && <span className="text-destructive ms-1">*</span>}
+            {question.required && (
+                <span className="ms-1 text-muted-foreground" aria-label="required">*</span>
+            )}
         </Label>
     );
     const help = question.help_text && (

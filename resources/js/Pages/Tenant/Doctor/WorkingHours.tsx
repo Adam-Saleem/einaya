@@ -45,6 +45,23 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
         reason: '',
     });
 
+    const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set());
+    const isPendingDelete = (key: string) => pendingDeletes.has(key);
+    const deleteRow = (kind: 'break' | 'timeoff', id: number, url: string) => {
+        const key = `${kind}:${id}`;
+        if (pendingDeletes.has(key)) return;
+        setPendingDeletes((s) => new Set(s).add(key));
+        router.delete(url, {
+            preserveScroll: true,
+            onFinish: () =>
+                setPendingDeletes((s) => {
+                    const next = new Set(s);
+                    next.delete(key);
+                    return next;
+                }),
+        });
+    };
+
     const submitHours = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         hoursForm.post('/doctor/hours', { preserveScroll: true });
@@ -205,10 +222,9 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
+                                    disabled={isPendingDelete(`break:${b.id}`)}
                                     onClick={() =>
-                                        router.delete(`/doctor/breaks/${b.id}`, {
-                                            preserveScroll: true,
-                                        })
+                                        deleteRow('break', b.id, `/doctor/breaks/${b.id}`)
                                     }
                                 >
                                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -266,10 +282,9 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
+                                    disabled={isPendingDelete(`timeoff:${t.id}`)}
                                     onClick={() =>
-                                        router.delete(`/doctor/time-off/${t.id}`, {
-                                            preserveScroll: true,
-                                        })
+                                        deleteRow('timeoff', t.id, `/doctor/time-off/${t.id}`)
                                     }
                                 >
                                     <Trash2 className="h-4 w-4 text-destructive" />

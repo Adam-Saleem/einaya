@@ -56,6 +56,7 @@ import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
 import { useDirection } from '@/Hooks/useDirection';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
+import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import { cn } from '@/lib/utils';
 import type {
@@ -101,6 +102,8 @@ export default function Builder({ form: initialForm }: Props) {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [deletingSection, setDeletingSection] = useState<FormSection | null>(null);
     const [deletingQuestion, setDeletingQuestion] = useState<FormQuestion | null>(null);
+    const [sectionDeleteBusy, runSectionDelete] = usePending();
+    const [questionDeleteBusy, runQuestionDelete] = usePending();
     const [questionDialog, setQuestionDialog] = useState<
         | { mode: 'create'; sectionId: number }
         | { mode: 'edit'; sectionId: number; question: FormQuestion }
@@ -406,13 +409,18 @@ export default function Builder({ form: initialForm }: Props) {
 
             <ConfirmDialog
                 open={deletingSection !== null}
-                onOpenChange={(open) => !open && setDeletingSection(null)}
+                onOpenChange={(open) => !open && !sectionDeleteBusy && setDeletingSection(null)}
                 title={t('builder.confirmDeleteSection')}
                 description={t('builder.confirmDeleteSectionBody')}
+                busy={sectionDeleteBusy}
                 onConfirm={() => {
                     if (!deletingSection) return;
-                    router.delete(
-                        `/forms/${formData.id}/sections/${deletingSection.id}`,
+                    runSectionDelete(
+                        (opts) =>
+                            router.delete(
+                                `/forms/${formData.id}/sections/${deletingSection.id}`,
+                                opts,
+                            ),
                         {
                             preserveScroll: true,
                             onFinish: () => {
@@ -426,13 +434,18 @@ export default function Builder({ form: initialForm }: Props) {
 
             <ConfirmDialog
                 open={deletingQuestion !== null}
-                onOpenChange={(open) => !open && setDeletingQuestion(null)}
+                onOpenChange={(open) => !open && !questionDeleteBusy && setDeletingQuestion(null)}
                 title={t('builder.confirmDeleteQuestion')}
                 description={t('builder.confirmDeleteQuestionBody')}
+                busy={questionDeleteBusy}
                 onConfirm={() => {
                     if (!deletingQuestion) return;
-                    router.delete(
-                        `/sections/${deletingQuestion.form_section_id}/questions/${deletingQuestion.id}`,
+                    runQuestionDelete(
+                        (opts) =>
+                            router.delete(
+                                `/sections/${deletingQuestion.form_section_id}/questions/${deletingQuestion.id}`,
+                                opts,
+                            ),
                         {
                             preserveScroll: true,
                             onFinish: () => {
@@ -810,8 +823,24 @@ function QuestionDialog({
 
     const rules = (form.data.validation_rules ?? {}) as Record<string, string>;
 
+    // Edit/create has lots of fields — backdrop / Esc must not silently
+    // discard a half-finished question.
+    const isDirty = useMemo(() => {
+        return JSON.stringify(form.data) !== JSON.stringify(initial);
+    }, [form.data, initial]);
+
+    const requestClose = () => {
+        if (isDirty) {
+            const ok = window.confirm(
+                t('common:actions.discardChanges', { defaultValue: 'Discard unsaved changes?' }),
+            );
+            if (!ok) return;
+        }
+        onClose();
+    };
+
     return (
-        <Dialog open onOpenChange={(open) => !open && onClose()}>
+        <Dialog open onOpenChange={(open) => !open && requestClose()}>
             <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
                 <form onSubmit={submit} className="space-y-4">
                     <DialogHeader>

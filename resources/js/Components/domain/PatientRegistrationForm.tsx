@@ -73,7 +73,7 @@ export function PatientRegistrationForm({
             email: '',
             marital_status: '',
             occupation: '',
-            preferred_language: 'ar',
+            preferred_language: 'en',
             address: '',
             city: '',
             referred_by: '',
@@ -140,6 +140,23 @@ export function PatientRegistrationForm({
         });
     };
 
+    // Long form — backdrop / Esc close should warn if the user has typed
+     // anything beyond the prefill from initialQuery.
+    const isDirty = useMemo(() => {
+        for (const key of Object.keys(initial) as (keyof typeof initial)[]) {
+            if (form.data[key] !== initial[key]) return true;
+        }
+        return false;
+    }, [form.data, initial]);
+
+    const requestClose = (next: boolean) => {
+        if (!next && isDirty) {
+            const ok = window.confirm(t('common:actions.discardChanges', { defaultValue: 'Discard unsaved changes?' }));
+            if (!ok) return;
+        }
+        onOpenChange(next);
+    };
+
     const age = form.data.date_of_birth
         ? Math.max(
               0,
@@ -151,7 +168,7 @@ export function PatientRegistrationForm({
         : null;
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={requestClose}>
             <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{t('patients.form.createTitle')}</DialogTitle>
@@ -200,7 +217,7 @@ export function PatientRegistrationForm({
                     {/* Step 1 — always visible */}
                     <div className="grid gap-3 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label htmlFor="first_name">{t('patients.form.firstName')} *</Label>
+                            <Label htmlFor="first_name">{t('patients.form.firstName')}<span className="ms-1 text-muted-foreground" aria-label="required">*</span></Label>
                             <Input
                                 id="first_name"
                                 value={form.data.first_name}
@@ -211,7 +228,7 @@ export function PatientRegistrationForm({
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="last_name">{t('patients.form.lastName')} *</Label>
+                            <Label htmlFor="last_name">{t('patients.form.lastName')}<span className="ms-1 text-muted-foreground" aria-label="required">*</span></Label>
                             <Input
                                 id="last_name"
                                 value={form.data.last_name}
@@ -219,7 +236,7 @@ export function PatientRegistrationForm({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="phone">{t('patients.form.phone')} *</Label>
+                            <Label htmlFor="phone">{t('patients.form.phone')}<span className="ms-1 text-muted-foreground" aria-label="required">*</span></Label>
                             <Input
                                 id="phone"
                                 value={form.data.phone}
@@ -244,7 +261,7 @@ export function PatientRegistrationForm({
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label>{t('patients.form.gender')} *</Label>
+                            <Label>{t('patients.form.gender')}<span className="ms-1 text-muted-foreground" aria-label="required">*</span></Label>
                             <Select
                                 value={form.data.gender}
                                 onValueChange={(v) => form.setData('gender', v)}

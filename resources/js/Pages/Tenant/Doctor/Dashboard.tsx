@@ -1,5 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import { Calendar, ClipboardCheck, Stethoscope, Users } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { StatusBadge } from '@/Components/domain/StatusBadge';
@@ -44,9 +45,9 @@ type Props = {
 };
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
-    pending: 'neutral',
+    pending: 'warning',
     confirmed: 'info',
-    arrived: 'warning',
+    arrived: 'info',
     in_progress: 'info',
     completed: 'success',
     cancelled: 'danger',
@@ -62,11 +63,18 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
+    const [startingId, setStartingId] = useState<number | null>(null);
     const startConsultation = (patientId: number, appointmentId: number) => {
-        router.post('/consultations', {
-            patient_id: patientId,
-            appointment_id: appointmentId,
-        });
+        if (startingId !== null) return;
+        setStartingId(appointmentId);
+        router.post(
+            '/consultations',
+            {
+                patient_id: patientId,
+                appointment_id: appointmentId,
+            },
+            { onFinish: () => setStartingId(null) },
+        );
     };
 
     const stat = (label: string, value: number, Icon = Calendar, sub?: string) => (
@@ -149,6 +157,7 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
                                         </div>
                                         <Button
                                             size="sm"
+                                            disabled={startingId !== null}
                                             onClick={() =>
                                                 row.patient &&
                                                 startConsultation(row.patient.id, row.id)

@@ -33,6 +33,7 @@ import {
 } from '@/Components/ui/table';
 import { Textarea } from '@/Components/ui/textarea';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
+import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import type { MedicalForm, Paginated } from '@/types/tenant';
 
@@ -45,6 +46,8 @@ export default function FormsIndex({ forms }: Props) {
 
     const [createOpen, setCreateOpen] = useState(false);
     const [deleting, setDeleting] = useState<MedicalForm | null>(null);
+    const [duplicatingId, setDuplicatingId] = useState<number | null>(null);
+    const [deleteBusy, runDelete] = usePending();
 
     const form = useForm({
         title: '',
@@ -142,9 +145,19 @@ export default function FormsIndex({ forms }: Props) {
                                                         </Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        onSelect={() =>
-                                                            router.post(`/forms/${row.id}/duplicate`)
-                                                        }
+                                                        disabled={duplicatingId === row.id}
+                                                        onSelect={() => {
+                                                            if (duplicatingId !== null) return;
+                                                            setDuplicatingId(row.id);
+                                                            router.post(
+                                                                `/forms/${row.id}/duplicate`,
+                                                                {},
+                                                                {
+                                                                    onFinish: () =>
+                                                                        setDuplicatingId(null),
+                                                                },
+                                                            );
+                                                        }}
                                                     >
                                                         <Copy className="me-2 h-4 w-4" />
                                                         {t('forms.actions.duplicate')}
@@ -226,15 +239,16 @@ export default function FormsIndex({ forms }: Props) {
 
             <ConfirmDialog
                 open={deleting !== null}
-                onOpenChange={(open) => !open && setDeleting(null)}
+                onOpenChange={(open) => !open && !deleteBusy && setDeleting(null)}
                 title={t('forms.confirmDelete')}
                 description={t('forms.confirmDeleteBody')}
+                busy={deleteBusy}
                 onConfirm={() => {
                     if (!deleting) return;
-                    router.delete(`/forms/${deleting.id}`, {
-                        preserveScroll: true,
-                        onFinish: () => setDeleting(null),
-                    });
+                    runDelete(
+                        (opts) => router.delete(`/forms/${deleting.id}`, opts),
+                        { preserveScroll: true, onFinish: () => setDeleting(null) },
+                    );
                 }}
             />
         </AppLayout>

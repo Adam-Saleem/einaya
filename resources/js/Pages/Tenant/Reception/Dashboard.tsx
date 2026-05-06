@@ -41,9 +41,9 @@ type Props = {
 };
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
-    pending: 'neutral',
+    pending: 'warning',
     confirmed: 'info',
-    arrived: 'warning',
+    arrived: 'info',
     in_progress: 'info',
     completed: 'success',
     cancelled: 'danger',

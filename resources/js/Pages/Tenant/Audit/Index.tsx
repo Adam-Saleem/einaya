@@ -71,8 +71,8 @@ export default function TenantAuditIndex({ logs, filters, users, actions }: Prop
                             <Input
                                 id="audit-from"
                                 type="date"
-                                defaultValue={filters.from}
-                                onBlur={(e) => apply({ from: e.target.value })}
+                                value={filters.from}
+                                onChange={(e) => apply({ from: e.target.value })}
                             />
                         </div>
                         <div className="space-y-1">
@@ -80,8 +80,8 @@ export default function TenantAuditIndex({ logs, filters, users, actions }: Prop
                             <Input
                                 id="audit-to"
                                 type="date"
-                                defaultValue={filters.to}
-                                onBlur={(e) => apply({ to: e.target.value })}
+                                value={filters.to}
+                                onChange={(e) => apply({ to: e.target.value })}
                             />
                         </div>
                         <div className="space-y-1">

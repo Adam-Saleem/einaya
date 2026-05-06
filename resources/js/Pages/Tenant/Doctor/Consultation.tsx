@@ -34,6 +34,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Textarea } from '@/Components/ui/textarea';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
+import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import type { FormSnapshot } from '@/types/tenant';
 
@@ -132,6 +133,10 @@ export default function ConsultationPage({ consultation, history, forms }: Props
     const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [completeOpen, setCompleteOpen] = useState(false);
+    const [completeBusy, runComplete] = usePending();
+    const [submitFormBusy, runSubmitForm] = usePending();
+    const [removingDiagnosis, setRemovingDiagnosis] = useState<Set<number>>(new Set());
+    const [removingItem, setRemovingItem] = useState<Set<number>>(new Set());
 
     // Selected form for the Medical Form tab
     const [selectedFormId, setSelectedFormId] = useState<string>(forms[0]?.id ? String(forms[0].id) : '');
@@ -223,12 +228,16 @@ export default function ConsultationPage({ consultation, history, forms }: Props
 
     const submitForm = () => {
         if (!selectedFormId) return;
-        router.post(
-            `/consultations/${consultation.id}/submissions`,
-            {
-                medical_form_id: Number(selectedFormId),
-                answers: formAnswers as never,
-            },
+        runSubmitForm(
+            (opts) =>
+                router.post(
+                    `/consultations/${consultation.id}/submissions`,
+                    {
+                        medical_form_id: Number(selectedFormId),
+                        answers: formAnswers as never,
+                    },
+                    opts,
+                ),
             {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -249,7 +258,17 @@ export default function ConsultationPage({ consultation, history, forms }: Props
     };
 
     const removeDiagnosis = (id: number) => {
-        router.delete(`/diagnoses/${id}`, { preserveScroll: true });
+        if (removingDiagnosis.has(id)) return;
+        setRemovingDiagnosis((s) => new Set(s).add(id));
+        router.delete(`/diagnoses/${id}`, {
+            preserveScroll: true,
+            onFinish: () =>
+                setRemovingDiagnosis((s) => {
+                    const next = new Set(s);
+                    next.delete(id);
+                    return next;
+                }),
+        });
     };
 
     const submitItem = (event: FormEvent<HTMLFormElement>) => {
@@ -267,8 +286,16 @@ export default function ConsultationPage({ consultation, history, forms }: Props
     };
 
     const removeItem = (prescriptionId: number, itemId: number) => {
+        if (removingItem.has(itemId)) return;
+        setRemovingItem((s) => new Set(s).add(itemId));
         router.delete(`/prescriptions/${prescriptionId}/items/${itemId}`, {
             preserveScroll: true,
+            onFinish: () =>
+                setRemovingItem((s) => {
+                    const next = new Set(s);
+                    next.delete(itemId);
+                    return next;
+                }),
         });
     };
 
@@ -501,7 +528,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                         Load
                                     </Button>
                                     {formSnapshot && (
-                                        <Button onClick={submitForm}>
+                                        <Button onClick={submitForm} disabled={submitFormBusy}>
                                             {t('doctorPanel.consultation.submitForm')}
                                         </Button>
                                     )}
@@ -605,6 +632,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    disabled={removingDiagnosis.has(d.id)}
                                                     onClick={() => removeDiagnosis(d.id)}
                                                 >
                                                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -718,6 +746,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
+                                                            disabled={removingItem.has(item.id)}
                                                             onClick={() =>
                                                                 removeItem(prescription.id, item.id)
                                                             }
@@ -751,13 +780,16 @@ export default function ConsultationPage({ consultation, history, forms }: Props
 
             <ConfirmDialog
                 open={completeOpen}
-                onOpenChange={setCompleteOpen}
+                onOpenChange={(open) => !completeBusy && setCompleteOpen(open)}
                 title={t('doctorPanel.consultation.confirmComplete')}
                 description={t('doctorPanel.consultation.confirmCompleteBody')}
                 confirmLabel={t('doctorPanel.consultation.complete')}
                 destructive={false}
+                busy={completeBusy}
                 onConfirm={() =>
-                    router.post(`/consultations/${consultation.id}/complete`)
+                    runComplete((opts) =>
+                        router.post(`/consultations/${consultation.id}/complete`, {}, opts),
+                    )
                 }
             />
         </AppLayout>

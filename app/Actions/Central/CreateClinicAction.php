@@ -88,7 +88,7 @@ class CreateClinicAction
                 'password' => Hash::make($tempPassword),
                 'phone' => $data['owner_phone'] ?? null,
                 'is_active' => true,
-                'preferred_language' => 'ar',
+                'preferred_language' => 'en',
             ]);
 
             $admin->assignRole(TenantRole::ClinicAdmin->value);

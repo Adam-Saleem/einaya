@@ -25,6 +25,7 @@ import { Switch } from '@/Components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Textarea } from '@/Components/ui/textarea';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
+import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import type { ClinicSettings } from '@/types/tenant';
 
@@ -75,10 +76,14 @@ export default function SettingsPage({ settings }: Props) {
             [section]: { ...data[section], [key]: value },
         }));
 
+    const [logoBusy, runLogoUpload] = usePending();
     const onLogoUpload = (file: File) => {
         const data = new FormData();
         data.append('logo', file);
-        router.post('/settings/branding/logo', data, { preserveScroll: true });
+        runLogoUpload(
+            (opts) => router.post('/settings/branding/logo', data, opts),
+            { preserveScroll: true },
+        );
     };
 
     return (
@@ -155,11 +160,18 @@ export default function SettingsPage({ settings }: Props) {
                                                 className="h-12 w-12 rounded-md border bg-muted object-contain"
                                             />
                                         )}
-                                        <label className="inline-flex">
+                                        <label
+                                            className={
+                                                logoBusy
+                                                    ? 'pointer-events-none inline-flex opacity-60'
+                                                    : 'inline-flex'
+                                            }
+                                        >
                                             <input
                                                 type="file"
                                                 accept="image/*"
                                                 className="sr-only"
+                                                disabled={logoBusy}
                                                 onChange={(e) => {
                                                     const file = e.target.files?.[0];
                                                     if (file) onLogoUpload(file);

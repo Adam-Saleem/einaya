@@ -78,8 +78,6 @@ return function (string $prefix): void {
             ->name($prefix.'.profile.edit');
         Route::patch('profile', [ProfileController::class, 'update'])
             ->name($prefix.'.profile.update');
-        Route::delete('profile', [ProfileController::class, 'destroy'])
-            ->name($prefix.'.profile.destroy');
 
         // Two-factor setup
         Route::get('two-factor', [TwoFactorSetupController::class, 'show'])

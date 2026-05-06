@@ -1,17 +1,26 @@
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { type FormEventHandler } from 'react';
+import { useTranslation } from 'react-i18next';
 
-type Props = {
+import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import { Button } from '@/Components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import AppLayout from '@/Layouts/AppLayout';
+import CentralLayout from '@/Layouts/CentralLayout';
+import type { PageProps } from '@/types';
+
+type Props = PageProps<{
     enabled: boolean;
     pendingConfirmation: boolean;
-};
+}>;
 
 type FlashTwoFactor = {
     qr_svg: string;
@@ -19,24 +28,24 @@ type FlashTwoFactor = {
     otpauth_url: string;
 };
 
-export default function TwoFactorSetup({
-    enabled,
-    pendingConfirmation,
-}: Props) {
-    const page = usePage<{
-        flash?: {
-            two_factor?: FlashTwoFactor;
-            recovery_codes?: string[];
-            status?: string;
-        };
-    }>();
+export default function TwoFactorSetup({ enabled, pendingConfirmation }: Props) {
+    const { t } = useTranslation('auth');
+    const page = usePage<
+        PageProps<{
+            flash?: {
+                two_factor?: FlashTwoFactor;
+                recovery_codes?: string[];
+                status?: string;
+            };
+        }>
+    >();
     const flash = page.props.flash ?? {};
+    const Layout = page.props.auth.isSuperAdmin ? CentralLayout : AppLayout;
 
     const confirm = useForm({ code: '' });
 
-    const startEnable = () => {
+    const startEnable = () =>
         router.post('/two-factor', {}, { preserveScroll: true });
-    };
 
     const submitConfirm: FormEventHandler = (e) => {
         e.preventDefault();
@@ -46,145 +55,147 @@ export default function TwoFactorSetup({
         });
     };
 
-    const regenerateCodes = () => {
+    const regenerateCodes = () =>
         router.post('/two-factor/recovery-codes', {}, { preserveScroll: true });
-    };
 
-    const disable = () => {
-        if (!confirm) return;
-        router.delete('/two-factor', { preserveScroll: true });
-    };
+    const disable = () => router.delete('/two-factor', { preserveScroll: true });
+
+    const statusLabel = enabled
+        ? t('twoFactorSetup.statusEnabled')
+        : pendingConfirmation
+            ? t('twoFactorSetup.statusPending')
+            : t('twoFactorSetup.statusDisabled');
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Two-Factor Authentication
-                </h2>
-            }
+        <Layout
+            title={t('twoFactorSetup.title')}
+            pageTitle={t('twoFactorSetup.title')}
+            description={t('twoFactorSetup.subtitle')}
         >
-            <Head title="Two-Factor Authentication" />
+            <Head title={t('twoFactorSetup.title')} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-6 shadow sm:rounded-lg dark:bg-gray-800">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                            Status:{' '}
+            <div className="space-y-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-h4">
+                            <span className="text-muted-foreground">
+                                {t('twoFactorSetup.status')}:
+                            </span>
                             <span
                                 className={
                                     enabled
-                                        ? 'text-green-600'
-                                        : 'text-yellow-600'
+                                        ? 'text-success'
+                                        : pendingConfirmation
+                                            ? 'text-warning'
+                                            : 'text-muted-foreground'
                                 }
                             >
-                                {enabled
-                                    ? 'Enabled'
-                                    : pendingConfirmation
-                                      ? 'Pending Confirmation'
-                                      : 'Disabled'}
+                                {statusLabel}
                             </span>
-                        </h3>
+                        </CardTitle>
+                        <CardDescription>{t('twoFactorSetup.subtitle')}</CardDescription>
+                    </CardHeader>
+                    {!enabled && !pendingConfirmation && (
+                        <CardContent>
+                            <Button onClick={startEnable}>
+                                {t('twoFactorSetup.enable')}
+                            </Button>
+                        </CardContent>
+                    )}
+                </Card>
 
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Two-factor authentication adds a second step to
-                            sign-in using an authenticator app such as Google
-                            Authenticator, Authy, or 1Password.
-                        </p>
-
-                        {!enabled && !pendingConfirmation && (
-                            <div className="mt-4">
-                                <PrimaryButton onClick={startEnable}>
-                                    Enable Two-Factor
-                                </PrimaryButton>
-                            </div>
-                        )}
-                    </div>
-
-                    {flash.two_factor && (
-                        <div className="bg-white p-6 shadow sm:rounded-lg dark:bg-gray-800">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                Scan the QR code
-                            </h3>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Scan with your authenticator app, or enter the
-                                secret manually:
-                            </p>
-
-                            <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
+                {flash.two_factor && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('twoFactorSetup.qrTitle')}</CardTitle>
+                            <CardDescription>
+                                {t('twoFactorSetup.qrSubtitle')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="flex flex-col items-start gap-4 sm:flex-row">
                                 <img
                                     src={flash.two_factor.qr_svg}
                                     alt="2FA QR code"
-                                    className="h-60 w-60 rounded bg-white p-2"
+                                    className="h-56 w-56 rounded-md border bg-white p-2"
                                 />
-                                <div>
-                                    <p className="font-mono text-sm text-gray-700 dark:text-gray-200">
-                                        {flash.two_factor.secret}
+                                <div className="space-y-1">
+                                    <p className="text-xs uppercase text-muted-foreground">
+                                        Secret
                                     </p>
+                                    <code className="block rounded-md border bg-muted px-3 py-2 font-mono text-sm">
+                                        {flash.two_factor.secret}
+                                    </code>
                                 </div>
                             </div>
 
                             <form
                                 onSubmit={submitConfirm}
-                                className="mt-6 max-w-sm space-y-3"
+                                className="max-w-sm space-y-3"
                             >
-                                <InputLabel htmlFor="code" value="Enter the 6-digit code" />
-                                <TextInput
-                                    id="code"
-                                    inputMode="numeric"
-                                    value={confirm.data.code}
-                                    onChange={(e) =>
-                                        confirm.setData('code', e.target.value)
-                                    }
-                                    className="block w-full"
-                                    autoComplete="one-time-code"
-                                />
-                                <InputError
-                                    message={confirm.errors.code}
-                                    className="mt-2"
-                                />
-                                <PrimaryButton disabled={confirm.processing}>
-                                    Confirm
-                                </PrimaryButton>
+                                <div className="space-y-2">
+                                    <Label htmlFor="code">
+                                        {t('twoFactorSetup.codeLabel')}
+                                    </Label>
+                                    <Input
+                                        id="code"
+                                        inputMode="numeric"
+                                        autoComplete="one-time-code"
+                                        value={confirm.data.code}
+                                        onChange={(e) =>
+                                            confirm.setData('code', e.target.value)
+                                        }
+                                        className="text-center font-mono text-lg tracking-widest"
+                                    />
+                                    {confirm.errors.code && (
+                                        <p className="text-xs text-destructive">
+                                            {confirm.errors.code}
+                                        </p>
+                                    )}
+                                </div>
+                                <Button type="submit" disabled={confirm.processing}>
+                                    {t('twoFactorSetup.confirm')}
+                                </Button>
                             </form>
-                        </div>
-                    )}
+                        </CardContent>
+                    </Card>
+                )}
 
-                    {Array.isArray(flash.recovery_codes) &&
-                        flash.recovery_codes.length > 0 && (
-                            <div className="bg-yellow-50 p-6 shadow sm:rounded-lg dark:bg-yellow-900/30">
-                                <h3 className="text-lg font-medium text-yellow-900 dark:text-yellow-200">
-                                    Save your recovery codes
-                                </h3>
-                                <p className="mt-2 text-sm text-yellow-800 dark:text-yellow-200">
-                                    These codes are shown only once. Each code
-                                    can be used a single time if you lose access
-                                    to your authenticator.
-                                </p>
-                                <pre className="mt-4 rounded bg-yellow-100 p-4 font-mono text-sm dark:bg-yellow-900/50">
+                {Array.isArray(flash.recovery_codes) &&
+                    flash.recovery_codes.length > 0 && (
+                        <Alert>
+                            <AlertTitle>
+                                {t('twoFactorSetup.recoveryTitle')}
+                            </AlertTitle>
+                            <AlertDescription className="space-y-3">
+                                <p>{t('twoFactorSetup.recoverySubtitle')}</p>
+                                <pre className="rounded-md border bg-muted p-3 font-mono text-sm">
                                     {flash.recovery_codes.join('\n')}
                                 </pre>
-                            </div>
-                        )}
-
-                    {(enabled || pendingConfirmation) && (
-                        <div className="bg-white p-6 shadow sm:rounded-lg dark:bg-gray-800">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                Manage
-                            </h3>
-                            <div className="mt-4 flex flex-wrap gap-3">
-                                {enabled && (
-                                    <SecondaryButton onClick={regenerateCodes}>
-                                        Regenerate Recovery Codes
-                                    </SecondaryButton>
-                                )}
-                                <DangerButton onClick={disable}>
-                                    Disable Two-Factor
-                                </DangerButton>
-                            </div>
-                        </div>
+                            </AlertDescription>
+                        </Alert>
                     )}
-                </div>
+
+                {(enabled || pendingConfirmation) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('twoFactorSetup.manage')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-3">
+                                {enabled && (
+                                    <Button variant="outline" onClick={regenerateCodes}>
+                                        {t('twoFactorSetup.regenerate')}
+                                    </Button>
+                                )}
+                                <Button variant="destructive" onClick={disable}>
+                                    {t('twoFactorSetup.disable')}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
-        </AuthenticatedLayout>
+        </Layout>
     );
 }

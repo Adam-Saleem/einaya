@@ -32,6 +32,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/Components/ui/table';
+import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import CentralLayout from '@/Layouts/CentralLayout';
 import type {
@@ -95,6 +96,10 @@ export default function ClinicsIndex({ clinics, plans, statuses, filters }: Prop
         );
     };
 
+    const [search, setSearch] = useDebouncedFilter(filters.search, (v) =>
+        applyFilters({ search: v }),
+    );
+
     const handleConfirm = () => {
         if (!confirmTarget) return;
         const { kind, clinic } = confirmTarget;
@@ -122,13 +127,8 @@ export default function ClinicsIndex({ clinics, plans, statuses, filters }: Prop
                     <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr]">
                         <Input
                             placeholder={t('clinics.search')}
-                            defaultValue={filters.search}
-                            onBlur={(event) => applyFilters({ search: event.target.value })}
-                            onKeyDown={(event) => {
-                                if (event.key === 'Enter') {
-                                    applyFilters({ search: event.currentTarget.value });
-                                }
-                            }}
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
                         />
                         <Select
                             value={filters.status || 'all'}

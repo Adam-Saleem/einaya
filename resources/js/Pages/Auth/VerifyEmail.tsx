@@ -1,50 +1,45 @@
-import PrimaryButton from '@/Components/PrimaryButton';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { type FormEventHandler } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { Button } from '@/Components/ui/button';
+import GuestLayout from '@/Layouts/GuestLayout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const { t } = useTranslation('auth');
     const { post, processing } = useForm({});
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post('/email/verification-notification');
     };
 
     return (
-        <GuestLayout>
-            <Head title="Email Verification" />
-
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
-            </div>
+        <GuestLayout title={t('verifyEmail.title')} subtitle={t('verifyEmail.body')}>
+            <Head title={t('verifyEmail.title')} />
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-sm font-medium text-green-600 dark:text-green-400">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
-                </div>
+                <Alert>
+                    <AlertDescription>{t('verifyEmail.sent')}</AlertDescription>
+                </Alert>
             )}
 
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>
-                        Resend Verification Email
-                    </PrimaryButton>
+            <form onSubmit={submit} className="space-y-4">
+                <Button type="submit" className="w-full" disabled={processing}>
+                    {t('verifyEmail.resend')}
+                </Button>
 
+                <p className="text-center">
                     <Link
                         href="/logout"
                         method="post"
                         as="button"
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
+                        className="text-xs text-muted-foreground hover:text-foreground hover:underline"
                     >
-                        Log Out
+                        {t('logout')}
                     </Link>
-                </div>
+                </p>
             </form>
         </GuestLayout>
     );

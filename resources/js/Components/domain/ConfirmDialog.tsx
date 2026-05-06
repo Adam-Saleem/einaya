@@ -25,6 +25,7 @@ type Props = {
     cancelLabel?: ReactNode;
     onConfirm: () => void;
     destructive?: boolean;
+    busy?: boolean;
 };
 
 export function ConfirmDialog({
@@ -37,6 +38,7 @@ export function ConfirmDialog({
     cancelLabel,
     onConfirm,
     destructive = true,
+    busy = false,
 }: Props) {
     const { t } = useTranslation('common');
 
@@ -49,13 +51,25 @@ export function ConfirmDialog({
                     {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>{cancelLabel ?? t('actions.cancel')}</AlertDialogCancel>
+                    <AlertDialogCancel disabled={busy}>
+                        {cancelLabel ?? t('actions.cancel')}
+                    </AlertDialogCancel>
                     <AlertDialogAction
                         className={cn(
                             destructive &&
                                 buttonVariants({ variant: 'destructive' }),
                         )}
-                        onClick={onConfirm}
+                        disabled={busy}
+                        onClick={(e) => {
+                            // Block the default close-on-click while busy so a
+                            // double-click can't fire onConfirm twice before
+                            // the parent flips the dialog open prop closed.
+                            if (busy) {
+                                e.preventDefault();
+                                return;
+                            }
+                            onConfirm();
+                        }}
                     >
                         {confirmLabel ?? t('actions.confirm')}
                     </AlertDialogAction>

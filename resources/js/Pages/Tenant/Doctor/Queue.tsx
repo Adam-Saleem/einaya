@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/Components/ui/button';
@@ -62,11 +62,16 @@ export default function Queue({ queue }: Props) {
         return () => clearInterval(id);
     }, []);
 
-    const start = (patientId: number, appointmentId: number) =>
-        router.post('/consultations', {
-            patient_id: patientId,
-            appointment_id: appointmentId,
-        });
+    const [startingId, setStartingId] = useState<number | null>(null);
+    const start = (patientId: number, appointmentId: number) => {
+        if (startingId !== null) return;
+        setStartingId(appointmentId);
+        router.post(
+            '/consultations',
+            { patient_id: patientId, appointment_id: appointmentId },
+            { onFinish: () => setStartingId(null) },
+        );
+    };
 
     return (
         <AppLayout
@@ -123,6 +128,7 @@ export default function Queue({ queue }: Props) {
                                                 ) : (
                                                     <Button
                                                         size="sm"
+                                                        disabled={startingId !== null}
                                                         onClick={() =>
                                                             row.patient &&
                                                             start(row.patient.id, row.id)

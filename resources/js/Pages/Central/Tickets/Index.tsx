@@ -20,6 +20,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/Components/ui/table';
+import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import CentralLayout from '@/Layouts/CentralLayout';
 import type { Paginated, Ticket, TicketStatus } from '@/types/central';
@@ -54,6 +55,10 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
         );
     };
 
+    const [search, setSearch] = useDebouncedFilter(filters.search, (v) =>
+        applyFilters({ search: v }),
+    );
+
     return (
         <CentralLayout
             title={t('tickets.title')}
@@ -65,13 +70,8 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
                     <div className="grid gap-3 md:grid-cols-[2fr_1fr]">
                         <Input
                             placeholder={tc('actions.search')}
-                            defaultValue={filters.search}
-                            onKeyDown={(event) => {
-                                if (event.key === 'Enter') {
-                                    applyFilters({ search: event.currentTarget.value });
-                                }
-                            }}
-                            onBlur={(event) => applyFilters({ search: event.target.value })}
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
                         />
                         <Select
                             value={filters.status || 'all'}

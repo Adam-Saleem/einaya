@@ -86,6 +86,18 @@ export default {
                     cancelled: 'rgb(var(--status-cancelled) / <alpha-value>)',
                     'no-show': 'rgb(var(--status-no-show) / <alpha-value>)',
                 },
+                badge: {
+                    'success-bg': 'rgb(var(--badge-success-bg) / <alpha-value>)',
+                    'success-fg': 'rgb(var(--badge-success-fg) / <alpha-value>)',
+                    'warning-bg': 'rgb(var(--badge-warning-bg) / <alpha-value>)',
+                    'warning-fg': 'rgb(var(--badge-warning-fg) / <alpha-value>)',
+                    'info-bg': 'rgb(var(--badge-info-bg) / <alpha-value>)',
+                    'info-fg': 'rgb(var(--badge-info-fg) / <alpha-value>)',
+                    'danger-bg': 'rgb(var(--badge-danger-bg) / <alpha-value>)',
+                    'danger-fg': 'rgb(var(--badge-danger-fg) / <alpha-value>)',
+                    'neutral-bg': 'rgb(var(--badge-neutral-bg) / <alpha-value>)',
+                    'neutral-fg': 'rgb(var(--badge-neutral-fg) / <alpha-value>)',
+                },
             },
             fontFamily: {
                 sans: ['Manrope', 'system-ui', 'sans-serif'],
@@ -115,7 +127,7 @@ export default {
                 DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
                 md: '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
                 lg: '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
-                focus: '0 0 0 3px rgb(0 102 255 / 0.25)',
+                focus: '0 0 0 3px rgb(53 99 201 / 0.30)',
             },
             spacing: {
                 sidebar: '260px',

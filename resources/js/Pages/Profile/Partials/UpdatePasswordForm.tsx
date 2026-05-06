@@ -1,11 +1,13 @@
 import { useForm } from '@inertiajs/react';
 import { type FormEventHandler, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 
 export default function UpdatePasswordForm({ className = '' }: { className?: string }) {
+    const { t } = useTranslation('auth');
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -34,17 +36,10 @@ export default function UpdatePasswordForm({ className = '' }: { className?: str
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-h4 text-foreground">Update password</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Ensure your account uses a long, random password.
-                </p>
-            </header>
-
-            <form onSubmit={updatePassword} className="mt-6 space-y-4">
+        <form onSubmit={updatePassword} className={`space-y-4 ${className}`}>
+            <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                    <Label htmlFor="current_password">Current password</Label>
+                    <Label htmlFor="current_password">{t('profile.password.current')}</Label>
                     <Input
                         id="current_password"
                         ref={currentPasswordInput}
@@ -59,7 +54,7 @@ export default function UpdatePasswordForm({ className = '' }: { className?: str
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password">New password</Label>
+                    <Label htmlFor="password">{t('profile.password.new')}</Label>
                     <Input
                         id="password"
                         ref={passwordInput}
@@ -74,7 +69,9 @@ export default function UpdatePasswordForm({ className = '' }: { className?: str
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password_confirmation">Confirm password</Label>
+                    <Label htmlFor="password_confirmation">
+                        {t('profile.password.confirm')}
+                    </Label>
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -83,19 +80,23 @@ export default function UpdatePasswordForm({ className = '' }: { className?: str
                         autoComplete="new-password"
                     />
                     {errors.password_confirmation && (
-                        <p className="text-xs text-destructive">{errors.password_confirmation}</p>
+                        <p className="text-xs text-destructive">
+                            {errors.password_confirmation}
+                        </p>
                     )}
                 </div>
+            </div>
 
-                <div className="flex items-center gap-3">
-                    <Button type="submit" disabled={processing}>
-                        Save
-                    </Button>
-                    {recentlySuccessful && (
-                        <p className="text-sm text-muted-foreground">Saved.</p>
-                    )}
-                </div>
-            </form>
-        </section>
+            <div className="flex items-center gap-3">
+                <Button type="submit" disabled={processing}>
+                    {t('profile.password.save')}
+                </Button>
+                {recentlySuccessful && (
+                    <p className="text-sm text-muted-foreground">
+                        {t('profile.info.saved')}
+                    </p>
+                )}
+            </div>
+        </form>
     );
 }

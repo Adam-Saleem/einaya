@@ -1,5 +1,6 @@
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { type FormEventHandler } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -15,6 +16,7 @@ export default function UpdateProfileInformation({
     status?: string;
     className?: string;
 }) {
+    const { t } = useTranslation('auth');
     const user = usePage<PageProps>().props.auth.user!;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
@@ -24,74 +26,71 @@ export default function UpdateProfileInformation({
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        patch('/profile');
+        patch('/profile', { preserveScroll: true });
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-h4 text-foreground">Profile Information</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Update your account's profile information and email address.
-                </p>
-            </header>
-
-            <form onSubmit={submit} className="mt-6 space-y-4">
+        <form onSubmit={submit} className={`space-y-4 ${className}`}>
+            <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">{t('profile.info.name')}</Label>
                     <Input
                         id="name"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
-                        required
                         autoComplete="name"
                     />
-                    {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                    {errors.name && (
+                        <p className="text-xs text-destructive">{errors.name}</p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('profile.info.email')}</Label>
                     <Input
                         id="email"
                         type="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        required
                         autoComplete="username"
                     />
-                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-                </div>
-
-                {mustVerifyEmail && user.email_verified_at === null && (
-                    <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">
-                            Your email address is unverified.{' '}
-                            <Link
-                                href="/email/verification-notification"
-                                method="post"
-                                as="button"
-                                className="text-primary underline hover:no-underline"
-                            >
-                                Click here to re-send.
-                            </Link>
-                        </p>
-                        {status === 'verification-link-sent' && (
-                            <p className="text-sm font-medium text-success">
-                                A new verification link has been sent to your email address.
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                <div className="flex items-center gap-3">
-                    <Button type="submit" disabled={processing}>
-                        Save
-                    </Button>
-                    {recentlySuccessful && (
-                        <p className="text-sm text-muted-foreground">Saved.</p>
+                    {errors.email && (
+                        <p className="text-xs text-destructive">{errors.email}</p>
                     )}
                 </div>
-            </form>
-        </section>
+            </div>
+
+            {mustVerifyEmail && user.email_verified_at === null && (
+                <div className="rounded-md border border-warning/40 bg-warning/10 p-3 text-sm">
+                    <p className="text-foreground">
+                        {t('profile.info.unverified')}{' '}
+                        <Link
+                            href="/email/verification-notification"
+                            method="post"
+                            as="button"
+                            className="text-primary underline hover:no-underline"
+                        >
+                            {t('profile.info.resend')}
+                        </Link>
+                    </p>
+                    {status === 'verification-link-sent' && (
+                        <p className="mt-1 font-medium text-success">
+                            {t('profile.info.verificationSent')}
+                        </p>
+                    )}
+                </div>
+            )}
+
+            <div className="flex items-center gap-3">
+                <Button type="submit" disabled={processing}>
+                    {t('profile.info.save')}
+                </Button>
+                {recentlySuccessful && (
+                    <p className="text-sm text-muted-foreground">
+                        {t('profile.info.saved')}
+                    </p>
+                )}
+            </div>
+        </form>
     );
 }

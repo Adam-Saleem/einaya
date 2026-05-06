@@ -3,7 +3,8 @@
         ?? (auth()->check() && method_exists(auth()->user(), 'getAttribute') ? auth()->user()->preferred_language : null)
         ?? app()->getLocale();
     $direction = $locale === 'ar' ? 'rtl' : 'ltr';
-    $theme = auth()->check() ? (auth()->user()->theme_preference ?? 'system') : 'system';
+    // Default theme is `light` per product decision — users opt into dark or system explicitly.
+    $theme = auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $direction }}">
