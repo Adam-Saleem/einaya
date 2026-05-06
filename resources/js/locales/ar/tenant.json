@@ -331,6 +331,81 @@
             "mixed": "مختلط"
         }
     },
+    "doctorPanel": {
+        "dashboard": {
+            "title": "الطبيب",
+            "subtitle": "طابور اليوم والنشاط الأخير",
+            "stats": {
+                "todayTotal": "مواعيد اليوم",
+                "patientsSeenToday": "مرضى اليوم",
+                "pendingFollowups": "متابعات معلّقة",
+                "monthConsultations": "هذا الشهر"
+            },
+            "nowServing": "الجلسة الحالية",
+            "resume": "استئناف",
+            "queue": "طابور اليوم",
+            "noQueue": "لا يوجد مرضى في الانتظار.",
+            "startConsultation": "بدء استشارة",
+            "todaySchedule": "جدول اليوم",
+            "recentPatients": "أحدث المرضى"
+        },
+        "queue": {
+            "title": "الطابور",
+            "subtitle": "قائمة بالمرضى الحاضرين تتحدّث ذاتيًا",
+            "queue": "#",
+            "patient": "المريض",
+            "scheduled": "الموعد",
+            "arrived": "وقت الحضور",
+            "waited": "وقت الانتظار",
+            "actions": "إجراءات"
+        },
+        "consultation": {
+            "title": "استشارة",
+            "history": "سجل الزيارات",
+            "noHistory": "لا توجد زيارات سابقة.",
+            "tabs": {
+                "overview": "نظرة عامة",
+                "form": "النموذج الطبي",
+                "diagnoses": "التشخيصات",
+                "prescription": "الوصفة",
+                "files": "الملفات"
+            },
+            "chiefComplaint": "الشكوى الرئيسية",
+            "notes": "ملاحظات",
+            "followUpDays": "متابعة بعد (أيام)",
+            "savingState": {
+                "saving": "جارٍ الحفظ…",
+                "saved": "تم الحفظ",
+                "unsaved": "تغييرات غير محفوظة"
+            },
+            "saveDraft": "حفظ مسوّدة",
+            "complete": "إنهاء الاستشارة",
+            "confirmComplete": "إنهاء هذه الاستشارة؟",
+            "selectForm": "اختر نموذجًا",
+            "submitForm": "إرسال النموذج",
+            "addDiagnosis": "إضافة تشخيص",
+            "addMedication": "إضافة دواء",
+            "medication": "الدواء",
+            "dosage": "الجرعة",
+            "frequency": "التواتر",
+            "duration": "المدة",
+            "instructions": "تعليمات",
+            "printPrescription": "طباعة الوصفة",
+            "prescriptionLocked": "الوصفة مغلقة (تمت الطباعة)."
+        },
+        "history": {
+            "title": "سجل المريض",
+            "noVisits": "لا توجد زيارات سابقة."
+        },
+        "print": {
+            "title": "وصفة طبية",
+            "diagnoses": "التشخيصات",
+            "medications": "الأدوية",
+            "signature": "توقيع الطبيب",
+            "back": "رجوع",
+            "doPrint": "طباعة"
+        }
+    },
     "builder": {
         "publish": "نشر",
         "unpublish": "إلغاء النشر",

@@ -14,6 +14,13 @@ use App\Models\Tenant\User as TenantUser;
 use App\Http\Controllers\Tenant\AppointmentController;
 use App\Http\Controllers\Tenant\AuditController;
 use App\Http\Controllers\Tenant\DashboardController;
+use App\Http\Controllers\Tenant\Doctor\ConsultationController as DoctorConsultationController;
+use App\Http\Controllers\Tenant\Doctor\DashboardController as DoctorDashboardController;
+use App\Http\Controllers\Tenant\Doctor\DiagnosisController as DoctorDiagnosisController;
+use App\Http\Controllers\Tenant\Doctor\FormSubmissionController as DoctorFormSubmissionController;
+use App\Http\Controllers\Tenant\Doctor\PatientHistoryController as DoctorPatientHistoryController;
+use App\Http\Controllers\Tenant\Doctor\PrescriptionController as DoctorPrescriptionController;
+use App\Http\Controllers\Tenant\Doctor\QueueController as DoctorQueueController;
 use App\Http\Controllers\Tenant\DoctorProfileController;
 use App\Http\Controllers\Tenant\FormQuestionController;
 use App\Http\Controllers\Tenant\FormSectionController;
@@ -29,9 +36,13 @@ use App\Http\Controllers\Tenant\SettingsController;
 use App\Http\Controllers\Tenant\StaffController;
 use App\Http\Controllers\Tenant\WorkingHoursController;
 use App\Models\Tenant\Appointment;
+use App\Models\Tenant\Consultation;
+use App\Models\Tenant\Diagnosis;
 use App\Models\Tenant\Patient;
 use App\Models\Tenant\PatientFile;
 use App\Models\Tenant\Payment;
+use App\Models\Tenant\Prescription;
+use App\Models\Tenant\PrescriptionItem;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -64,6 +75,10 @@ Route::bind('patient', fn ($id) => Patient::query()->findOrFail($id));
 Route::bind('appointment', fn ($id) => Appointment::query()->findOrFail($id));
 Route::bind('payment', fn ($id) => Payment::query()->findOrFail($id));
 Route::bind('file', fn ($id) => PatientFile::query()->findOrFail($id));
+Route::bind('consultation', fn ($id) => Consultation::query()->findOrFail($id));
+Route::bind('diagnosis', fn ($id) => Diagnosis::query()->findOrFail($id));
+Route::bind('prescription', fn ($id) => Prescription::query()->findOrFail($id));
+Route::bind('item', fn ($id) => PrescriptionItem::query()->findOrFail($id));
 
 Route::middleware([
     'web',
@@ -236,5 +251,51 @@ Route::middleware([
             ->name('tenant.payments.store');
         Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])
             ->name('tenant.payments.receipt');
+
+        // Doctor module
+        Route::get('/doctor', [DoctorDashboardController::class, 'index'])
+            ->name('tenant.doctor.dashboard');
+        Route::get('/doctor/queue', [DoctorQueueController::class, 'index'])
+            ->name('tenant.doctor.queue');
+
+        // Consultations
+        Route::post('/consultations', [DoctorConsultationController::class, 'store'])
+            ->name('tenant.consultations.store');
+        Route::get('/consultations/{consultation}', [DoctorConsultationController::class, 'show'])
+            ->name('tenant.consultations.show');
+        Route::patch('/consultations/{consultation}', [DoctorConsultationController::class, 'update'])
+            ->name('tenant.consultations.update');
+        Route::post('/consultations/{consultation}/complete', [DoctorConsultationController::class, 'complete'])
+            ->name('tenant.consultations.complete');
+
+        // Form submissions during consultation
+        Route::post('/consultations/{consultation}/submissions', [DoctorFormSubmissionController::class, 'store'])
+            ->name('tenant.consultations.submissions.store');
+
+        // Diagnoses
+        Route::post('/consultations/{consultation}/diagnoses', [DoctorDiagnosisController::class, 'store'])
+            ->name('tenant.consultations.diagnoses.store');
+        Route::patch('/diagnoses/{diagnosis}', [DoctorDiagnosisController::class, 'update'])
+            ->name('tenant.diagnoses.update');
+        Route::delete('/diagnoses/{diagnosis}', [DoctorDiagnosisController::class, 'destroy'])
+            ->name('tenant.diagnoses.destroy');
+
+        // Prescriptions
+        Route::post('/consultations/{consultation}/prescription', [DoctorPrescriptionController::class, 'ensure'])
+            ->name('tenant.consultations.prescription.ensure');
+        Route::post('/prescriptions/{prescription}/items', [DoctorPrescriptionController::class, 'storeItem'])
+            ->name('tenant.prescriptions.items.store');
+        Route::patch('/prescriptions/{prescription}/items/{item}', [DoctorPrescriptionController::class, 'updateItem'])
+            ->name('tenant.prescriptions.items.update');
+        Route::delete('/prescriptions/{prescription}/items/{item}', [DoctorPrescriptionController::class, 'destroyItem'])
+            ->name('tenant.prescriptions.items.destroy');
+        Route::get('/prescriptions/{prescription}/print', [DoctorPrescriptionController::class, 'print'])
+            ->name('tenant.prescriptions.print');
+        Route::get('/api/medication-suggestions', [DoctorPrescriptionController::class, 'suggestions'])
+            ->name('tenant.prescriptions.suggestions');
+
+        // Patient history
+        Route::get('/patients/{patient}/history', [DoctorPatientHistoryController::class, 'show'])
+            ->name('tenant.patients.history');
     });
 });

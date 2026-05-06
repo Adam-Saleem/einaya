@@ -74,10 +74,16 @@ const sections: NavSection[] = [
         labelKey: 'nav.medical',
         items: [
             {
-                href: '/consultations',
-                labelKey: 'nav.consultations',
+                href: '/doctor',
+                labelKey: 'nav.doctor',
                 icon: Stethoscope,
-                permission: 'consultations.view',
+                permission: 'consultations.create',
+            },
+            {
+                href: '/doctor/queue',
+                labelKey: 'nav.queue',
+                icon: Stethoscope,
+                permission: 'consultations.create',
             },
             {
                 href: '/forms',

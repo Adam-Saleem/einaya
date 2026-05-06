@@ -414,6 +414,87 @@
             "thankYou": "Thank you"
         }
     },
+    "doctorPanel": {
+        "dashboard": {
+            "title": "Doctor",
+            "subtitle": "Today's queue and recent activity",
+            "stats": {
+                "todayTotal": "Today's appointments",
+                "patientsSeenToday": "Patients seen today",
+                "pendingFollowups": "Pending follow-ups",
+                "monthConsultations": "This month"
+            },
+            "nowServing": "Now serving",
+            "resume": "Resume",
+            "queue": "Today's queue",
+            "noQueue": "No arrived patients waiting.",
+            "startConsultation": "Start consultation",
+            "todaySchedule": "Today's schedule",
+            "recentPatients": "Recent patients"
+        },
+        "queue": {
+            "title": "Queue",
+            "subtitle": "Auto-refreshing list of arrived patients",
+            "queue": "#",
+            "patient": "Patient",
+            "scheduled": "Scheduled",
+            "arrived": "Arrived",
+            "waited": "Waited",
+            "actions": "Actions"
+        },
+        "consultation": {
+            "title": "Consultation",
+            "history": "Visit history",
+            "noHistory": "No previous visits.",
+            "tabs": {
+                "overview": "Overview",
+                "form": "Medical form",
+                "diagnoses": "Diagnoses",
+                "prescription": "Prescription",
+                "files": "Files"
+            },
+            "chiefComplaint": "Chief complaint",
+            "notes": "Notes",
+            "followUpDays": "Follow-up in (days)",
+            "savingState": {
+                "saving": "Saving…",
+                "saved": "Saved",
+                "unsaved": "Unsaved changes"
+            },
+            "saveDraft": "Save draft",
+            "complete": "Complete consultation",
+            "confirmComplete": "Complete this consultation?",
+            "confirmCompleteBody": "The appointment moves to completed and the consultation is locked.",
+            "selectForm": "Select a form",
+            "submitForm": "Submit form",
+            "addDiagnosis": "Add diagnosis",
+            "diagnosisDescription": "Description",
+            "diagnosisCode": "Code (optional)",
+            "diagnosisNotes": "Notes",
+            "addMedication": "Add medication",
+            "medication": "Medication",
+            "dosage": "Dosage",
+            "frequency": "Frequency",
+            "duration": "Duration",
+            "instructions": "Instructions",
+            "printPrescription": "Print prescription",
+            "prescriptionLocked": "Prescription locked (printed)."
+        },
+        "history": {
+            "title": "Patient history",
+            "subtitle": "Every consultation, snapshot-rendered",
+            "noVisits": "No previous visits."
+        },
+        "print": {
+            "title": "Prescription",
+            "patient": "Patient",
+            "diagnoses": "Diagnoses",
+            "medications": "Medications",
+            "signature": "Doctor signature",
+            "back": "Back",
+            "doPrint": "Print"
+        }
+    },
     "builder": {
         "publish": "Publish",
         "unpublish": "Unpublish",

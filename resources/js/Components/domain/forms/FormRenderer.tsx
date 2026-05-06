@@ -20,20 +20,20 @@ type Props = {
     snapshot: FormSnapshot;
     answers?: Record<string, unknown>;
     readOnly?: boolean;
+    onChange?: (key: string, value: unknown) => void;
 };
 
 /**
  * Renders a frozen form snapshot. Shared by:
  *   - the form-builder preview dialog (no answers, all fields disabled),
  *   - the submission detail view (answers filled in, all fields disabled),
- *   - Phase 10's consultation submit flow (live form with react-hook-form
- *     binding — TODO when that phase ships, this component will gain a
- *     `register`/`onChange` API).
+ *   - the consultation flow (Phase 10 — pass `onChange` and `readOnly={false}`
+ *     to collect answers as the doctor types).
  *
- * The snapshot shape is the same JSON FormSnapshotService::snapshot()
+ * Snapshot shape is the canonical one `FormSnapshotService::snapshot()`
  * produces server-side.
  */
-export function FormRenderer({ snapshot, answers = {}, readOnly = true }: Props) {
+export function FormRenderer({ snapshot, answers = {}, readOnly = true, onChange }: Props) {
     const { t } = useTranslation('common');
 
     return (
@@ -66,6 +66,7 @@ export function FormRenderer({ snapshot, answers = {}, readOnly = true }: Props)
                                 question={question}
                                 value={answers[question.key]}
                                 readOnly={readOnly}
+                                onChange={onChange}
                             />
                         ))}
                     </CardContent>
@@ -79,10 +80,12 @@ type FieldProps = {
     question: FormSnapshot['sections'][number]['questions'][number];
     value: unknown;
     readOnly: boolean;
+    onChange?: (key: string, value: unknown) => void;
 };
 
-function FieldFor({ question, value, readOnly }: FieldProps) {
+function FieldFor({ question, value, readOnly, onChange }: FieldProps) {
     const id = `q-${question.id}`;
+    const set = (v: unknown) => onChange?.(question.key, v);
     const labelEl = (
         <Label htmlFor={id}>
             {question.label}
@@ -100,7 +103,8 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                     {labelEl}
                     <Input
                         id={id}
-                        defaultValue={(value as string) ?? ''}
+                        value={(value as string) ?? ''}
+                        onChange={(e) => set(e.target.value)}
                         disabled={readOnly}
                     />
                     {help}
@@ -113,7 +117,8 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                     <Textarea
                         id={id}
                         rows={4}
-                        defaultValue={(value as string) ?? ''}
+                        value={(value as string) ?? ''}
+                        onChange={(e) => set(e.target.value)}
                         disabled={readOnly}
                     />
                     {help}
@@ -126,7 +131,8 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                     <Input
                         id={id}
                         type="number"
-                        defaultValue={value !== undefined && value !== null ? String(value) : ''}
+                        value={value !== undefined && value !== null ? String(value) : ''}
+                        onChange={(e) => set(e.target.value === '' ? null : Number(e.target.value))}
                         disabled={readOnly}
                     />
                     {help}
@@ -139,7 +145,8 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                     <Input
                         id={id}
                         type="date"
-                        defaultValue={(value as string) ?? ''}
+                        value={(value as string) ?? ''}
+                        onChange={(e) => set(e.target.value)}
                         disabled={readOnly}
                     />
                     {help}
@@ -151,6 +158,7 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                     {labelEl}
                     <RadioGroup
                         value={(value as string) ?? ''}
+                        onValueChange={(v) => set(v)}
                         disabled={readOnly}
                         className="flex flex-col gap-2"
                     >
@@ -178,6 +186,12 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                                     id={`${id}-${opt.value}`}
                                     checked={arr.includes(opt.value)}
                                     disabled={readOnly}
+                                    onCheckedChange={(checked) => {
+                                        const next = checked
+                                            ? [...arr, opt.value]
+                                            : arr.filter((v) => v !== opt.value);
+                                        set(next);
+                                    }}
                                 />
                                 <Label htmlFor={`${id}-${opt.value}`} className="font-normal">
                                     {opt.label}
@@ -193,7 +207,11 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
             return (
                 <div className="space-y-1.5">
                     {labelEl}
-                    <Select value={(value as string) ?? ''} disabled={readOnly}>
+                    <Select
+                        value={(value as string) ?? ''}
+                        onValueChange={(v) => set(v)}
+                        disabled={readOnly}
+                    >
                         <SelectTrigger id={id}>
                             <SelectValue placeholder="—" />
                         </SelectTrigger>
@@ -229,7 +247,7 @@ function FieldFor({ question, value, readOnly }: FieldProps) {
                     {labelEl}
                     <div className="flex h-24 items-center justify-center rounded-md border border-dashed bg-muted/40 text-xs text-muted-foreground">
                         <PenLine className="me-2 h-4 w-4" />
-                        Signature pad — Phase 10
+                        Signature pad — v2
                     </div>
                     {help}
                 </div>

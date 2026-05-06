@@ -7,12 +7,44 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 9 complete; ready to start Phase 10 (Doctor / Consultation).
+**Active phase:** None — Phase 10 complete. **v1 feature surface is shippable.**
 **Last session date:** 2026-05-06
 
 ---
 
 ## Completed Phases
+
+### ✅ Phase 10 — Doctor / Consultation Module (2026-05-06)
+
+All Definition of Done items met:
+- 7 doctor controllers under `app/Http/Controllers/Tenant/Doctor/`: Dashboard, Queue, Consultation, FormSubmission, Diagnosis, Prescription, PatientHistory.
+- 4 actions under `app/Actions/Tenant/`: `StartConsultationAction` (transitions appointment → in_progress, creates a fresh appointment for walk-ins), `CompleteConsultationAction` (sets `ended_at`, transitions appointment to completed), `SubmitFormAction` (snapshots form structure + answers via `FormSnapshotService`), and `MedicationSuggestionService` for previously-prescribed autocomplete.
+- 5 doctor form requests under `app/Http/Requests/Tenant/Doctor/`: StartConsultation, UpdateConsultation, SubmitForm, StoreDiagnosis, StorePrescriptionItem.
+- 3 new resources: `ConsultationResource` (eager-loads patient, doctor, diagnoses, prescriptions, formSubmissions), `DiagnosisResource`, `PrescriptionResource`.
+- 24 new routes wired into `routes/tenant.php` behind auth (consultations CRUD + complete + form submission, diagnoses store/update/delete, prescriptions ensure + item CRUD + print + suggestions, doctor dashboard + queue, patient history).
+- 5 frontend pages under `resources/js/Pages/Tenant/Doctor/`: Dashboard (real stats, "now serving" panel, today's queue with start-consultation button, today's schedule, recent patients), Queue (auto-refreshes every 30s, color-coded wait time green/yellow/red <15/<30/>30 min), Consultation (the big one — patient header, history left panel, 4-tab work surface: Overview/Form/Diagnoses/Prescription, debounced 5s autosave on overview), PatientHistory (timeline + per-submission snapshot dialog), PrescriptionPrint (bilingual `@media print` view).
+- Extended `FormRenderer` to accept `onChange(key, value)` so the same component drives the builder preview (read-only), the submission detail viewer (read-only with stored answers), and the consultation submit flow (writable).
+- New `tenant.doctorPanel` translation namespace (EN + AR).
+- Sidebar got two new doctor links (`/doctor`, `/doctor/queue`) gated by `consultations.create` so secretaries don't see them.
+- 7 new Pest tests in `tests/Feature/Tenant/Doctor/`:
+  - `StartConsultationTest` — appointment transitions arrived → in_progress, walk-in creates a fresh appointment.
+  - `CompleteConsultationTest` — `ended_at` set, appointment transitions to completed.
+  - `FormSnapshotIntegrityTest` (the critical ADR-002 proof point) — submit v1 of a form, edit it, submit v2, assert the first submission's `form_snapshot` still has the OLD label/structure while the second has the new one.
+  - `PrescriptionLockTest` — items can't be added to a printed prescription.
+  - `MedicationAutocompleteTest` — service returns previously-prescribed medications matching a query.
+  - `SecretaryDoctorBlockTest` — secretary 403 on POST /consultations.
+- Total Pest count: **82 passed (436 assertions)** — up from 75 before Phase 10.
+- TypeScript clean. `pnpm build` succeeds. Smoke: `/doctor` and `/doctor/queue` return 200 as `doctor@demo.einaya.test`. Log empty.
+
+**Phase 10 deviations from the prompt:**
+- `react-signature-canvas` integration is a stub — the `signature` question type renders a placeholder until v2.
+- Form snapshot is loaded from `/forms/:id/edit` via XHR with the `X-Inertia` header to get the JSON form prop. A dedicated `/forms/:id/snapshot` endpoint would be cleaner — deferred until v2 because the existing route already returns the right shape.
+- Auto-save is debounced at 5 seconds per spec (overview / chief complaint / notes / follow-up). Diagnoses and prescription items are saved immediately via Inertia POST/DELETE. Form fields are client-state-only until "Submit form" is clicked — auto-save mid-form is risky if the doctor changes their mind.
+- Prescription print marks `printed_at` on first print and locks subsequent edits. v1 doesn't have a "re-print" override; if the doctor needs to fix a typo after print, they can soft-delete the prescription and create a new one (audit trail preserved).
+- Walk-in flow on the doctor dashboard creates an Appointment on the fly via `StartConsultationAction` — the Phase 9 secretary registration flow is the proper entry point, but doctors get an emergency walk-in path too.
+- Cmd+K patient search (built in Phase 9 but not mounted) is still not wired into the layout. Final wire-up + a tab on Consultation for "Files" upload UI deferred until the end-to-end smoke pass.
+- "Now serving" panel + auto-refreshing queue use Inertia's `router.reload({ only: ['queue'] })` rather than a websocket — fine for a single-doctor v1 clinic with low concurrency.
+- Patient quick-view side panel from the Reception dashboard spec is collapsed into the Consultation page's patient header. Two competing UX surfaces would have diverged over time.
 
 ### ✅ Phase 9 — Secretary / Reception Module (2026-05-06)
 
@@ -252,7 +284,7 @@ All Definition of Done items met:
 
 ## In Progress
 
-_(none — pause point. Next: Phase 10 — Doctor / Consultation)_
+_(none — Phase 10 wrapped. v1 feature scope complete; remaining work is end-to-end smoke + post-v1 backlog from the Phase 10 prompt: Stripe billing, Twilio SMS, S3 storage, patient portal, multi-doctor UI, ICD-10 lookup, telemedicine, mobile app, advanced analytics.)_
 
 ---
 
