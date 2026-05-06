@@ -7,12 +7,42 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 8 complete; ready to start Phase 9 (Secretary / patient & appointment management).
+**Active phase:** None — Phase 9 complete; ready to start Phase 10 (Doctor / Consultation).
 **Last session date:** 2026-05-06
 
 ---
 
 ## Completed Phases
+
+### ✅ Phase 9 — Secretary / Reception Module (2026-05-06)
+
+All Definition of Done items met:
+- 5 controllers under `app/Http/Controllers/Tenant/` (ReceptionDashboard, Patient, PatientFile, Appointment, Payment) wired into 20 new routes (search-as-JSON, patients CRUD + files, appointments calendar + today + drag-reschedule + arrive/cancel/no-show, payments index + create + receipt).
+- 3 actions under `app/Actions/Tenant/` (RegisterPatient, BookAppointment, RecordPayment). RegisterPatient normalizes phones, supports an inline-create-provider flow, and rolls patient + files into a transaction. BookAppointment runs the conflict service before saving. RecordPayment validates mixed-method splits.
+- 4 services under `app/Services/Tenant/`:
+  - `PatientSearchService` — multi-field search across patient_code / first / last / phone (digits-only) / national_id / email; also has `findByPhone()` for the duplicate guard.
+  - `AppointmentConflictService` — returns hard errors (overlap with another active appointment) and soft warnings (outside working day/hours, break, time-off). Soft warnings can be force-overridden per spec.
+  - `ReceiptNumberGenerator` — `R-YYYYMM-NNNNN` per-month sequence; computed from MAX(receipt_number) for the current YYYYMM prefix.
+  - `QueueService` — per-day auto-incrementing `queue_number`. `markArrived()` is idempotent (no double-numbering on accidental re-clicks).
+- 6 form requests + 4 resources (Patient, Appointment, Payment, PatientFile).
+- 9 frontend pages + 3 shared components: `PatientSearch.tsx` (cmd+k command palette w/ debounced JSON search), `PatientRegistrationForm.tsx` (multi-section accordion with progressive disclosure + duplicate-phone guard), `PaymentForm.tsx` (mixed-method live sum validation). Pages: Reception/Dashboard, Patients/Index, Patients/Show (4 tabs: Overview, Visits, Files, Payments), Appointments/Calendar (FullCalendar with drag-reschedule), Appointments/Today, Payments/Index, Payments/Receipt (bilingual print-friendly view).
+- New `tenant` translation keys added (EN + AR) for reception, patients, appointments, payments. AR mirror is partial — untranslated keys fall back to EN (i18next behavior with `fallbackLng: 'en'`).
+- AppSidebar grew a `Reception` entry; existing patients/appointments/payments items now resolve to real pages.
+- Calendar reads events via JSON (`GET /appointments/data`) — cleaner separation than Inertia props since FullCalendar refetches on view change.
+- Receipt page is bilingual, picks language from the patient record (not the logged-in user), and includes `@media print` styles + a `window.print()` button. Forces `<html dir>` regardless of session locale.
+- 8 new Pest tests across `tests/Feature/Tenant/` (PatientRegistration, PatientSearch, AppointmentBooking, AppointmentConflictDetection, AppointmentReschedule, PaymentRecording, ReceiptGeneration, SecretaryCannotAccessConsultations).
+- Total Pest count: **75 passed (417 assertions)** — up from 64 before Phase 9.
+- TypeScript clean. `pnpm build` succeeds.
+- Smoke: every Phase 9 tenant page (`/reception`, `/patients`, `/appointments`, `/appointments/today`, `/payments`) returns 200 when authenticated as `doctor@demo.einaya.test`. `storage/logs/laravel.log` empty.
+
+**Phase 9 deviations from the prompt:**
+- Quick medical flags subform shows blood type / allergies / chronic / medications inline in the registration form, but no separate "files" section — file upload happens after creation on the patient profile page (`Patients/Show.tsx → Files tab`). Simpler v1 UX; spec called for it inside registration.
+- Phone normalization is conservative: strip whitespace/dashes/parens, preserve leading `+`. No country-code inference — the secretary types whatever the patient says.
+- `MedicalFormController::index/edit` got an explicit `forms.view`/`forms.manage` permission check this phase — Phase 8 didn't gate them at the controller, only at the form-request level for mutations. Without this, the Phase 9 secretary 403 test fails.
+- Walk-ins are inferred from "appointment created today and scheduled today" rather than tagged with an explicit `is_walk_in` flag. Good enough until v2 introduces a dedicated walk-in workflow.
+- Print receipt is browser `window.print()` only — no PDF export. Spec defers PDF to v2.
+- Calendar shows ALL doctors' appointments regardless of which doctor is selected in the booking dialog. Per-doctor filtering would be a Phase 11+ refinement (multi-doctor support is currently disabled at the staff level anyway).
+- "Cmd+K" patient search component (`PatientSearch.tsx`) is built but not yet mounted globally in `AppLayout` — wire-up will happen alongside Phase 10's consultation flow when there's a clear point to invoke it from.
 
 ### ✅ Phase 8 — Clinic Admin Module incl. Form Builder (2026-05-06)
 
@@ -222,7 +252,7 @@ All Definition of Done items met:
 
 ## In Progress
 
-_(none — pause point. Next: Phase 9 — Secretary)_
+_(none — pause point. Next: Phase 10 — Doctor / Consultation)_
 
 ---
 

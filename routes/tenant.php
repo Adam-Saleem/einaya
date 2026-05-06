@@ -11,6 +11,7 @@ use App\Models\Tenant\FormSubmission;
 use App\Models\Tenant\InsuranceProvider;
 use App\Models\Tenant\MedicalForm;
 use App\Models\Tenant\User as TenantUser;
+use App\Http\Controllers\Tenant\AppointmentController;
 use App\Http\Controllers\Tenant\AuditController;
 use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\DoctorProfileController;
@@ -19,10 +20,18 @@ use App\Http\Controllers\Tenant\FormSectionController;
 use App\Http\Controllers\Tenant\FormSubmissionController;
 use App\Http\Controllers\Tenant\InsuranceProviderController;
 use App\Http\Controllers\Tenant\MedicalFormController;
+use App\Http\Controllers\Tenant\PatientController;
+use App\Http\Controllers\Tenant\PatientFileController;
+use App\Http\Controllers\Tenant\PaymentController;
+use App\Http\Controllers\Tenant\ReceptionDashboardController;
 use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\SettingsController;
 use App\Http\Controllers\Tenant\StaffController;
 use App\Http\Controllers\Tenant\WorkingHoursController;
+use App\Models\Tenant\Appointment;
+use App\Models\Tenant\Patient;
+use App\Models\Tenant\PatientFile;
+use App\Models\Tenant\Payment;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -51,6 +60,10 @@ Route::bind('submission', fn ($id) => FormSubmission::query()->findOrFail($id));
 Route::bind('break', fn ($id) => DoctorBreak::query()->findOrFail($id));
 Route::bind('time_off', fn ($id) => DoctorTimeOff::query()->findOrFail($id));
 Route::bind('insurance_provider', fn ($id) => InsuranceProvider::query()->findOrFail($id));
+Route::bind('patient', fn ($id) => Patient::query()->findOrFail($id));
+Route::bind('appointment', fn ($id) => Appointment::query()->findOrFail($id));
+Route::bind('payment', fn ($id) => Payment::query()->findOrFail($id));
+Route::bind('file', fn ($id) => PatientFile::query()->findOrFail($id));
 
 Route::middleware([
     'web',
@@ -175,5 +188,53 @@ Route::middleware([
             ->name('tenant.forms.submissions.index');
         Route::get('/submissions/{submission}', [FormSubmissionController::class, 'show'])
             ->name('tenant.forms.submissions.show');
+
+        // Reception dashboard
+        Route::get('/reception', [ReceptionDashboardController::class, 'index'])
+            ->name('tenant.reception');
+
+        // Patients
+        Route::get('/patients/search', [PatientController::class, 'search'])
+            ->name('tenant.patients.search');
+        Route::get('/patients', [PatientController::class, 'index'])
+            ->name('tenant.patients.index');
+        Route::post('/patients', [PatientController::class, 'store'])
+            ->name('tenant.patients.store');
+        Route::get('/patients/{patient}', [PatientController::class, 'show'])
+            ->name('tenant.patients.show');
+        Route::patch('/patients/{patient}', [PatientController::class, 'update'])
+            ->name('tenant.patients.update');
+        Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])
+            ->name('tenant.patients.destroy');
+        Route::post('/patients/{patient}/files', [PatientFileController::class, 'store'])
+            ->name('tenant.patients.files.store');
+        Route::delete('/patients/{patient}/files/{file}', [PatientFileController::class, 'destroy'])
+            ->name('tenant.patients.files.destroy');
+
+        // Appointments
+        Route::get('/appointments', [AppointmentController::class, 'index'])
+            ->name('tenant.appointments.index');
+        Route::get('/appointments/today', [AppointmentController::class, 'today'])
+            ->name('tenant.appointments.today');
+        Route::get('/appointments/data', [AppointmentController::class, 'data'])
+            ->name('tenant.appointments.data');
+        Route::post('/appointments', [AppointmentController::class, 'store'])
+            ->name('tenant.appointments.store');
+        Route::patch('/appointments/{appointment}', [AppointmentController::class, 'update'])
+            ->name('tenant.appointments.update');
+        Route::post('/appointments/{appointment}/arrive', [AppointmentController::class, 'arrive'])
+            ->name('tenant.appointments.arrive');
+        Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
+            ->name('tenant.appointments.cancel');
+        Route::post('/appointments/{appointment}/no-show', [AppointmentController::class, 'noShow'])
+            ->name('tenant.appointments.no-show');
+
+        // Payments
+        Route::get('/payments', [PaymentController::class, 'index'])
+            ->name('tenant.payments.index');
+        Route::post('/payments', [PaymentController::class, 'store'])
+            ->name('tenant.payments.store');
+        Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])
+            ->name('tenant.payments.receipt');
     });
 });

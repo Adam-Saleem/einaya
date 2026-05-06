@@ -26,6 +26,10 @@ class MedicalFormController extends Controller
 
     public function index(Request $request): Response
     {
+        if (! $request->user()?->can('forms.view')) {
+            abort(403);
+        }
+
         $forms = MedicalForm::query()
             ->withCount(['sections', 'submissions'])
             ->orderByDesc('updated_at')
@@ -55,6 +59,10 @@ class MedicalFormController extends Controller
 
     public function edit(MedicalForm $form): Response
     {
+        if (! request()->user()?->can('forms.manage')) {
+            abort(403);
+        }
+
         $form->load(['sections.questions.options']);
 
         return Inertia::render('Tenant/Forms/Builder', [

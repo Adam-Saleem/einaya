@@ -35,6 +35,7 @@
     "nav": {
         "main": "Main",
         "dashboard": "Dashboard",
+        "reception": "Reception",
         "patients": "Patients",
         "appointments": "Appointments",
         "medical": "Medical",

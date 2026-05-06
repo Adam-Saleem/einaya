@@ -35,6 +35,7 @@
     "nav": {
         "main": "الرئيسية",
         "dashboard": "لوحة التحكم",
+        "reception": "الاستقبال",
         "patients": "المرضى",
         "appointments": "المواعيد",
         "medical": "طبي",

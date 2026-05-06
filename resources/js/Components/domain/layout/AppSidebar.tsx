@@ -51,6 +51,12 @@ const sections: NavSection[] = [
         items: [
             { href: '/', labelKey: 'nav.dashboard', icon: LayoutDashboard },
             {
+                href: '/reception',
+                labelKey: 'nav.reception',
+                icon: Users,
+                permission: 'appointments.view',
+            },
+            {
                 href: '/patients',
                 labelKey: 'nav.patients',
                 icon: UsersRound,

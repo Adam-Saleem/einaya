@@ -242,6 +242,178 @@
         "confirmDelete": "Archive this form?",
         "confirmDeleteBody": "If any submissions reference it, the form is kept and only deactivated."
     },
+    "reception": {
+        "title": "Reception",
+        "subtitle": "Today's queue and walk-ins",
+        "stats": {
+            "todayTotal": "Today's appointments",
+            "walkIns": "Walk-ins today",
+            "pendingPayments": "Pending payments"
+        },
+        "queue": "Today's queue",
+        "noAppointments": "No appointments today.",
+        "actions": {
+            "addWalkIn": "Add walk-in",
+            "searchPatient": "Search patient",
+            "bookAppointment": "Book appointment",
+            "markArrived": "Mark arrived",
+            "cancel": "Cancel",
+            "noShow": "No show"
+        }
+    },
+    "patients": {
+        "title": "Patients",
+        "subtitle": "Registered patients with their contact and clinical summary",
+        "create": "Register patient",
+        "search": "Search by name, phone, ID, or code",
+        "filters": {
+            "allGenders": "All genders",
+            "anyInsurance": "Any insurance"
+        },
+        "columns": {
+            "code": "Code",
+            "name": "Name",
+            "phone": "Phone",
+            "age": "Age",
+            "gender": "Gender",
+            "registeredAt": "Registered",
+            "actions": "Actions"
+        },
+        "noResults": "No patients found.",
+        "form": {
+            "createTitle": "Register a new patient",
+            "editTitle": "Edit patient",
+            "section1": "Basic info",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "phone": "Phone",
+            "phoneAlt": "Alternative phone",
+            "dob": "Date of birth",
+            "ageHint": "Age: {{age}}",
+            "gender": "Gender",
+            "section2": "More details",
+            "nationalId": "National ID",
+            "email": "Email",
+            "maritalStatus": "Marital status",
+            "occupation": "Occupation",
+            "preferredLanguage": "Preferred language",
+            "address": "Address",
+            "city": "City",
+            "referredBy": "Referred by",
+            "section3": "Emergency contact",
+            "emergencyName": "Name",
+            "emergencyPhone": "Phone",
+            "emergencyRelation": "Relation",
+            "section4": "Quick medical flags",
+            "bloodType": "Blood type",
+            "allergies": "Allergies",
+            "chronic": "Chronic conditions",
+            "medications": "Current medications",
+            "section5": "Insurance",
+            "hasInsurance": "Has insurance",
+            "provider": "Provider",
+            "policyNumber": "Policy number",
+            "section7": "Notes",
+            "notesHint": "Free-text notes from secretary"
+        },
+        "duplicatePhone": {
+            "title": "{{count}} patient(s) found with this phone",
+            "body": "Is one of them the patient you want to register?",
+            "useExisting": "Use existing",
+            "createAnyway": "Create anyway"
+        },
+        "tabs": {
+            "overview": "Overview",
+            "visits": "Visit history",
+            "files": "Files",
+            "payments": "Payments"
+        },
+        "noFiles": "No files uploaded yet.",
+        "noPayments": "No payments yet.",
+        "noVisits": "No appointments or consultations yet.",
+        "uploadFile": "Upload file",
+        "fileCategory": "Category",
+        "addPayment": "Add payment",
+        "bookAppointment": "Book appointment"
+    },
+    "appointments": {
+        "title": "Appointments",
+        "subtitle": "Calendar of consultations and walk-ins",
+        "today": "Today",
+        "book": "Book appointment",
+        "form": {
+            "patient": "Patient",
+            "doctor": "Doctor",
+            "scheduledFor": "Scheduled for",
+            "duration": "Duration (minutes)",
+            "reason": "Reason",
+            "notes": "Notes",
+            "status": "Status",
+            "force": "I understand the conflicts. Book anyway."
+        },
+        "warnings": {
+            "outside_working_day": "Doctor isn't working that day.",
+            "outside_working_hours": "Outside working hours.",
+            "break": "Falls inside a recurring break.",
+            "time_off": "Doctor is on time off.",
+            "overlap": "Overlaps another appointment."
+        },
+        "queue": {
+            "columns": {
+                "queue": "#",
+                "patient": "Patient",
+                "scheduled": "Scheduled",
+                "status": "Status",
+                "actions": "Actions"
+            }
+        }
+    },
+    "payments": {
+        "title": "Payments",
+        "subtitle": "All recorded payments",
+        "create": "Add payment",
+        "columns": {
+            "receipt": "Receipt",
+            "patient": "Patient",
+            "amount": "Amount",
+            "method": "Method",
+            "status": "Status",
+            "paidAt": "Paid at",
+            "collectedBy": "Collected by",
+            "actions": "Actions"
+        },
+        "form": {
+            "createTitle": "Record payment",
+            "patient": "Patient",
+            "appointment": "Linked appointment (optional)",
+            "amount": "Amount",
+            "method": "Method",
+            "cash": "Cash",
+            "card": "Card",
+            "insurance": "Insurance",
+            "mixed": "Mixed",
+            "cashAmount": "Cash amount",
+            "cardAmount": "Card amount",
+            "insuranceAmount": "Insurance amount",
+            "notes": "Notes",
+            "mixedSumWarning": "Cash + Card + Insurance must equal Amount.",
+            "submit": "Record payment"
+        },
+        "totals": {
+            "amount": "Total: {{amount}}",
+            "count": "{{count}} payments"
+        },
+        "receipt": {
+            "title": "Receipt",
+            "print": "Print",
+            "patient": "Patient",
+            "amount": "Amount",
+            "method": "Method",
+            "paidAt": "Paid at",
+            "collectedBy": "Collected by",
+            "thankYou": "Thank you"
+        }
+    },
     "builder": {
         "publish": "Publish",
         "unpublish": "Unpublish",

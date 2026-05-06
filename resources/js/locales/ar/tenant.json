@@ -242,6 +242,95 @@
         "confirmDelete": "أرشفة هذا النموذج؟",
         "confirmDeleteBody": "إن كانت هناك إجابات مرتبطة، يُحتفظ بالنموذج ويُلغى نشره فقط."
     },
+    "reception": {
+        "title": "الاستقبال",
+        "subtitle": "طابور اليوم وحالات الحضور المباشر",
+        "stats": {
+            "todayTotal": "مواعيد اليوم",
+            "walkIns": "حضور مباشر اليوم",
+            "pendingPayments": "مدفوعات معلّقة"
+        },
+        "queue": "طابور اليوم",
+        "noAppointments": "لا توجد مواعيد لهذا اليوم.",
+        "actions": {
+            "addWalkIn": "إضافة حضور مباشر",
+            "searchPatient": "بحث عن مريض",
+            "bookAppointment": "حجز موعد",
+            "markArrived": "تأكيد الحضور",
+            "cancel": "إلغاء",
+            "noShow": "لم يحضر"
+        }
+    },
+    "patients": {
+        "title": "المرضى",
+        "subtitle": "المرضى المسجّلون مع بياناتهم وملخّصهم السريري",
+        "create": "تسجيل مريض",
+        "search": "ابحث بالاسم أو الهاتف أو الهوية أو الرمز",
+        "columns": {
+            "code": "الرمز",
+            "name": "الاسم",
+            "phone": "الهاتف",
+            "age": "العمر",
+            "gender": "الجنس",
+            "registeredAt": "تاريخ التسجيل",
+            "actions": "إجراءات"
+        },
+        "noResults": "لا يوجد مرضى مطابقون.",
+        "form": {
+            "createTitle": "تسجيل مريض جديد",
+            "editTitle": "تعديل بيانات المريض",
+            "section1": "البيانات الأساسية",
+            "firstName": "الاسم الأول",
+            "lastName": "اسم العائلة",
+            "phone": "الهاتف",
+            "phoneAlt": "هاتف بديل",
+            "dob": "تاريخ الميلاد",
+            "ageHint": "العمر: {{age}}",
+            "gender": "الجنس",
+            "section2": "تفاصيل أكثر",
+            "section3": "جهة اتصال للطوارئ",
+            "section4": "ملاحظات طبية سريعة",
+            "section5": "التأمين",
+            "section7": "ملاحظات"
+        },
+        "duplicatePhone": {
+            "title": "تم العثور على {{count}} مريض بنفس الهاتف",
+            "body": "هل أحدهم هو المريض الذي تريد تسجيله؟",
+            "useExisting": "استخدام الموجود",
+            "createAnyway": "إنشاء على أي حال"
+        },
+        "tabs": {
+            "overview": "نظرة عامة",
+            "visits": "سجل الزيارات",
+            "files": "الملفات",
+            "payments": "المدفوعات"
+        }
+    },
+    "appointments": {
+        "title": "المواعيد",
+        "today": "اليوم",
+        "book": "حجز موعد",
+        "warnings": {
+            "outside_working_day": "الطبيب لا يعمل في هذا اليوم.",
+            "outside_working_hours": "خارج ساعات العمل.",
+            "break": "يصادف وقت استراحة.",
+            "time_off": "الطبيب في إجازة.",
+            "overlap": "يتداخل مع موعد آخر."
+        }
+    },
+    "payments": {
+        "title": "المدفوعات",
+        "create": "إضافة دفعة",
+        "form": {
+            "createTitle": "تسجيل دفعة",
+            "amount": "المبلغ",
+            "method": "طريقة الدفع",
+            "cash": "نقدًا",
+            "card": "بطاقة",
+            "insurance": "تأمين",
+            "mixed": "مختلط"
+        }
+    },
     "builder": {
         "publish": "نشر",
         "unpublish": "إلغاء النشر",
