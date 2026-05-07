@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Central\AuditController;
 use App\Http\Controllers\Central\ClinicController;
+use App\Http\Controllers\Central\CouponController;
 use App\Http\Controllers\Central\DashboardController;
 use App\Http\Controllers\Central\DemoRequestController;
 use App\Http\Controllers\Central\PlanController;
@@ -78,6 +79,11 @@ foreach (['app.einaya.ps', 'app.einaya.test'] as $domain) {
             Route::get('/demo-requests', [DemoRequestController::class, 'index'])->name('central.demo-requests.index');
             Route::patch('/demo-requests/{demoRequest}', [DemoRequestController::class, 'update'])
                 ->name('central.demo-requests.update');
+
+            Route::get('/coupons', [CouponController::class, 'index'])->name('central.coupons.index');
+            Route::post('/coupons', [CouponController::class, 'store'])->name('central.coupons.store');
+            Route::patch('/coupons/{coupon}', [CouponController::class, 'update'])->name('central.coupons.update');
+            Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])->name('central.coupons.destroy');
 
             Route::get('/audit', [AuditController::class, 'index'])->name('central.audit.index');
 

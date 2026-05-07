@@ -108,6 +108,26 @@ export type PlatformStats = {
     generated_at: string | null;
 };
 
+export type CouponStatus = 'active' | 'expired' | 'exhausted' | 'disabled';
+
+export type CouponRow = {
+    id: number;
+    code: string;
+    duration_days: number;
+    expires_at: string | null;
+    max_uses: number;
+    used_count: number;
+    remaining_uses: number;
+    description: string | null;
+    is_active: boolean;
+    is_expired: boolean;
+    is_exhausted: boolean;
+    status: CouponStatus;
+    created_at: string | null;
+    plan: { id: number; name: string; slug: string } | null;
+    creator: { id: number; name: string; email: string } | null;
+};
+
 export type DemoRequestRow = {
     id: number;
     clinic_name: string;

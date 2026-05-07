@@ -239,6 +239,71 @@
         "confirmPlanDelete": "أرشفة هذه الخطّة؟",
         "confirmPlanDeleteBody": "ستختفي من قوائم الاختيار. الاشتراكات الحالية تحتفظ بمرجع الخطّة."
     },
+    "coupons": {
+        "title": "الكوبونات",
+        "subtitle": "أنشئ أكواد استرداد لتمديد أو ترقية اشتراك عيادة.",
+        "empty": "لا توجد كوبونات مطابقة للفلاتر.",
+        "never": "أبدًا",
+        "daysCount_zero": "بدون أيام",
+        "daysCount_one": "يوم واحد",
+        "daysCount_two": "يومان",
+        "daysCount_few": "{{count}} أيام",
+        "daysCount_many": "{{count}} يومًا",
+        "daysCount_other": "{{count}} يوم",
+        "status": {
+            "active": "نشط",
+            "expired": "منتهي",
+            "exhausted": "مستنفد",
+            "disabled": "معطّل"
+        },
+        "filters": {
+            "searchPlaceholder": "كود أو وصف",
+            "status": "الحالة",
+            "all": "الكل",
+            "plan": "الباقة",
+            "allPlans": "كل الباقات"
+        },
+        "columns": {
+            "code": "الكود",
+            "plan": "الباقة",
+            "duration": "يضيف",
+            "uses": "الاستخدام",
+            "expiresAt": "ينتهي",
+            "status": "الحالة",
+            "actions": "إجراءات"
+        },
+        "actions": {
+            "create": "كوبون جديد",
+            "edit": "تعديل",
+            "copy": "نسخ الكود",
+            "enable": "تفعيل",
+            "disable": "تعطيل",
+            "delete": "أرشفة"
+        },
+        "form": {
+            "createTitle": "إنشاء كوبون",
+            "editTitle": "تعديل الكوبون",
+            "code": "الكود",
+            "generate": "توليد",
+            "plan": "الباقة",
+            "choosePlan": "اختَر باقة",
+            "durationDays": "الأيام الممنوحة",
+            "maxUses": "حد الاستخدام",
+            "expiresAt": "ينتهي في (اختياري)",
+            "description": "وصف داخلي (اختياري)",
+            "isActive": "مفعّل",
+            "isActiveHint": "أوقف التفعيل لتعليق الاسترداد دون حذف."
+        },
+        "confirmDelete": {
+            "title": "أرشفة هذا الكوبون؟",
+            "body": "يختفي من قوائم الاسترداد. تُحفظ عمليات الاسترداد السابقة للمراجعة.",
+            "usedBody": "هذا الكوبون استُخدم {{count}} مرة. الأرشفة تُبقي السجل لكن لا يعود قابلًا للاستخدام."
+        },
+        "toast": {
+            "copied": "تم نسخ الكود.",
+            "copyFailed": "تعذّر الوصول إلى الحافظة. انسخ الكود يدويًا."
+        }
+    },
     "demoRequests": {
         "title": "طلبات العروض",
         "subtitle_zero": "لا طلبات بانتظار المعالجة",

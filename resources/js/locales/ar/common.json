@@ -247,6 +247,7 @@
         "staff": "الموظفون",
         "settings": "الإعدادات",
         "branding": "الهوية البصرية",
+        "subscription": "الاشتراك",
         "platform": "المنصة",
         "clinics": "العيادات",
         "subscriptions": "الاشتراكات",
@@ -255,6 +256,7 @@
         "supportTickets": "تذاكر الدعم",
         "auditLogs": "سجل التدقيق",
         "plans": "الخطط",
+        "coupons": "الكوبونات",
         "globalSettings": "الإعدادات العامة"
     },
     "topbar": {

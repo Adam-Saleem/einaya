@@ -239,6 +239,67 @@
         "confirmPlanDelete": "Archive this plan?",
         "confirmPlanDeleteBody": "Plan disappears from selection lists. Existing subscriptions keep their plan reference."
     },
+    "coupons": {
+        "title": "Coupons",
+        "subtitle": "Create redemption codes that extend or upgrade a clinic's subscription.",
+        "empty": "No coupons match your filters.",
+        "never": "Never",
+        "daysCount_one": "{{count}} day",
+        "daysCount_other": "{{count}} days",
+        "status": {
+            "active": "Active",
+            "expired": "Expired",
+            "exhausted": "Exhausted",
+            "disabled": "Disabled"
+        },
+        "filters": {
+            "searchPlaceholder": "Code or description",
+            "status": "Status",
+            "all": "All",
+            "plan": "Plan",
+            "allPlans": "All plans"
+        },
+        "columns": {
+            "code": "Code",
+            "plan": "Plan",
+            "duration": "Adds",
+            "uses": "Uses",
+            "expiresAt": "Expires",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "actions": {
+            "create": "New coupon",
+            "edit": "Edit",
+            "copy": "Copy code",
+            "enable": "Enable",
+            "disable": "Disable",
+            "delete": "Archive"
+        },
+        "form": {
+            "createTitle": "Create coupon",
+            "editTitle": "Edit coupon",
+            "code": "Code",
+            "generate": "Generate",
+            "plan": "Plan",
+            "choosePlan": "Choose a plan",
+            "durationDays": "Days granted",
+            "maxUses": "Max uses",
+            "expiresAt": "Expires at (optional)",
+            "description": "Internal description (optional)",
+            "isActive": "Active",
+            "isActiveHint": "Disable to suspend redemption without deleting."
+        },
+        "confirmDelete": {
+            "title": "Archive this coupon?",
+            "body": "It disappears from the redeem list. Past redemptions are kept for the audit trail.",
+            "usedBody": "This coupon has already been used {{count}} time(s). Archiving keeps the redemption history but the code can no longer be used."
+        },
+        "toast": {
+            "copied": "Code copied to clipboard.",
+            "copyFailed": "Couldn't access the clipboard. Copy the code manually."
+        }
+    },
     "demoRequests": {
         "title": "Demo requests",
         "subtitle_one": "{{count}} unhandled lead",

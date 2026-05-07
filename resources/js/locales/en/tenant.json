@@ -188,6 +188,41 @@
             "total": "{{unique}} unique · {{total}} total instances"
         }
     },
+    "subscription": {
+        "title": "Subscription",
+        "subtitle": "Your clinic's plan, status, and coupon redemptions.",
+        "noPlan": "No active plan",
+        "noPlanBody": "Apply a coupon below to activate your subscription.",
+        "noEnd": "—",
+        "month": "month",
+        "endsAt": "Ends on",
+        "daysRemaining": "Days left",
+        "startedAt": "Started",
+        "planPrice": "{{amount}} per month",
+        "daysCount_one": "{{count}} day",
+        "daysCount_other": "{{count}} days",
+        "coupon": {
+            "title": "Apply a coupon",
+            "body": "Enter a code from your account manager to extend your plan or switch to another one.",
+            "code": "Coupon code",
+            "apply": "Apply coupon",
+            "applying": "Applying…"
+        },
+        "catalogue": {
+            "title": "What else is available",
+            "body": "Tier comparison. Contact your account manager for a coupon to upgrade.",
+            "current": "Current",
+            "contact": "Need a different plan? Email hello@einaya.io and we'll send you a coupon."
+        },
+        "history": {
+            "title": "Redemption history",
+            "code": "Code",
+            "transition": "Plan",
+            "appliedDays": "Days added",
+            "newEndsAt": "New end date",
+            "redeemedAt": "Applied at"
+        }
+    },
     "audit": {
         "title": "Audit log",
         "subtitle": "Every staff action with old/new values",

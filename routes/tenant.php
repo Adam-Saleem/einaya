@@ -35,6 +35,7 @@ use App\Http\Controllers\Tenant\PaymentController;
 use App\Http\Controllers\Tenant\ReceptionDashboardController;
 use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\SettingsController;
+use App\Http\Controllers\Tenant\SubscriptionController;
 use App\Http\Controllers\Tenant\StaffController;
 use App\Http\Controllers\Tenant\WorkingHoursController;
 use App\Models\Tenant\Appointment;
@@ -148,6 +149,10 @@ Route::middleware([
         // Settings
         Route::get('/settings', [SettingsController::class, 'show'])->name('tenant.settings.show');
         Route::patch('/settings', [SettingsController::class, 'update'])->name('tenant.settings.update');
+
+        Route::get('/subscription', [SubscriptionController::class, 'show'])->name('tenant.subscription.show');
+        Route::post('/subscription/redeem', [SubscriptionController::class, 'redeem'])
+            ->name('tenant.subscription.redeem');
         Route::post('/settings/branding/logo', [SettingsController::class, 'uploadLogo'])
             ->name('tenant.settings.branding.logo');
 

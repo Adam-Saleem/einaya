@@ -188,6 +188,45 @@
             "total": "{{unique}} فريد · {{total}} إجمالي"
         }
     },
+    "subscription": {
+        "title": "الاشتراك",
+        "subtitle": "باقة عيادتك وحالتها وعمليات استرداد الكوبونات.",
+        "noPlan": "لا توجد باقة نشطة",
+        "noPlanBody": "طبّق كوبونًا أدناه لتفعيل اشتراكك.",
+        "noEnd": "—",
+        "month": "شهر",
+        "endsAt": "ينتهي في",
+        "daysRemaining": "الأيام المتبقّية",
+        "startedAt": "بدأ في",
+        "planPrice": "{{amount}} شهريًا",
+        "daysCount_zero": "بدون أيام",
+        "daysCount_one": "يوم واحد",
+        "daysCount_two": "يومان",
+        "daysCount_few": "{{count}} أيام",
+        "daysCount_many": "{{count}} يومًا",
+        "daysCount_other": "{{count}} يوم",
+        "coupon": {
+            "title": "تطبيق كوبون",
+            "body": "أدخل كودًا من مدير حسابك لتمديد باقتك أو الانتقال إلى باقة أخرى.",
+            "code": "كود الكوبون",
+            "apply": "تطبيق الكوبون",
+            "applying": "جارٍ التطبيق…"
+        },
+        "catalogue": {
+            "title": "الباقات المتاحة",
+            "body": "مقارنة بين الباقات. تواصل مع مدير حسابك للحصول على كوبون ترقية.",
+            "current": "الحالية",
+            "contact": "هل تحتاج باقة مختلفة؟ راسلنا على hello@einaya.io وسنُرسل لك كوبونًا."
+        },
+        "history": {
+            "title": "سجل عمليات الاسترداد",
+            "code": "الكود",
+            "transition": "الباقة",
+            "appliedDays": "الأيام المضافة",
+            "newEndsAt": "تاريخ الانتهاء الجديد",
+            "redeemedAt": "وقت التطبيق"
+        }
+    },
     "audit": {
         "title": "سجل التدقيق",
         "subtitle": "كل إجراء مع القيم السابقة والجديدة",

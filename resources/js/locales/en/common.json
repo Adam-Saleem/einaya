@@ -239,6 +239,7 @@
         "staff": "Staff",
         "settings": "Settings",
         "branding": "Branding",
+        "subscription": "Subscription",
         "platform": "Platform",
         "clinics": "Clinics",
         "subscriptions": "Subscriptions",
@@ -247,6 +248,7 @@
         "supportTickets": "Support Tickets",
         "auditLogs": "Audit Logs",
         "plans": "Plans",
+        "coupons": "Coupons",
         "globalSettings": "Global Settings"
     },
     "topbar": {

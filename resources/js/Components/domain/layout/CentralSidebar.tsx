@@ -8,6 +8,7 @@ import {
     Package,
     ScrollText,
     Settings,
+    TicketPercent,
 } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +59,7 @@ const sections: NavSection[] = [
         labelKey: 'nav.settings',
         items: [
             { href: '/plans', labelKey: 'nav.plans', icon: Package },
+            { href: '/coupons', labelKey: 'nav.coupons', icon: TicketPercent },
             { href: '/global-settings', labelKey: 'nav.globalSettings', icon: Settings },
         ],
     },

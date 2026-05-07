@@ -48,6 +48,7 @@ export type Permission =
     | 'clinic.view_settings'
     | 'clinic.update_settings'
     | 'clinic.update_branding'
+    | 'clinic.manage_subscription'
     | 'reports.view'
     | 'reports.export'
     | 'audit.view';

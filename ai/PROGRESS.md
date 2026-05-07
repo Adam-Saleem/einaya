@@ -7,12 +7,31 @@
 
 ## Current Status
 
-**Active phase:** Phase 18 — marketing site expansion shipped. Apex (einaya.test) now has /, /about, /pricing pages on a shared MarketingLayout; theme + language toggles work on the apex; landing has a hero dashboard SVG mockup + 3 feature illustrations + curated Unsplash photos on About; pricing pulls plans from the central DB.
+**Active phase:** Phase 20 — coupons & subscription self-service shipped. Super admin CRUD at `app.einaya.test/coupons`; clinic admins on tenant subdomains see `/subscription` with a current-plan card, coupon redemption form, plan catalogue, and redemption history. Pest 100/100.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### 🎟️ Phase 20 — Coupons & tenant self-service subscription (2026-05-07)
+
+Super admins can issue redemption codes that extend or upgrade a clinic's subscription; clinic admins on tenant subdomains can apply codes themselves to keep their access live. Without Stripe wired up, coupons are the only mechanism that moves a subscription forward in v1.
+
+- **20.1 Schema.** Two central migrations: `coupons` (code unique, plan_id FK, duration_days, expires_at nullable, max_uses + used_count, description, is_active, created_by, soft-deletes) and `coupon_redemptions` (append-only audit row per redemption with snapshots of prior/new plan + ends_at, unique on `(coupon_id, clinic_id)` so a clinic can't redeem the same coupon twice).
+- **20.2 Models + permission.** `App\Models\Central\Coupon` with `CentralConnection` exposes `active()` scope, `status()` (one of `active|expired|exhausted|disabled`), and `isRedeemable()`. `CouponRedemption` carries `belongsTo` to `Coupon`, `Clinic`, `priorPlan`, `newPlan`. New `clinic.manage_subscription` permission added to `Permission` enum + `auth.ts`; auto-granted to `clinic_admin` (which gets all permissions). Demo tenant re-seeded via `SeedTenantRolesPermissions`.
+- **20.3 Central admin CRUD.** `Central\CouponController` (index/store/update/destroy) inside the existing `auth + super_admin` group. `StoreCouponRequest` + `UpdateCouponRequest` regex-validate the code, normalise to upper-case in `prepareForValidation` so the unique check is case-insensitive. `CouponResource` exposes derived `status`, `is_expired`, `is_exhausted`, `remaining_uses`. Sidebar entry under Settings (`TicketPercent` lucide). New `Pages/Central/Coupons/Index.tsx` — DataTable with search/status/plan filters, create/edit `<FormModal>`s with a "Generate" button for random 8-char codes, copy-to-clipboard, toggle-active, soft-delete confirm. Audit-log entries for `coupon.{created,updated,deleted}`.
+- **20.4 RedeemCouponAction.** The only piece touching central DB from inside a tenant context. Wraps everything in a `DB::connection(tenancy.database.central_connection)->transaction(fn () => …)` with `lockForUpdate()` on the coupon row, so two clinic admins can't race the last slot. Three outcomes by current state:
+  - **extend** — coupon's `plan_id` matches the active subscription's plan: adds `duration_days` to `ends_at`, preserving any unused future time.
+  - **switch** — coupon's `plan_id` differs: cancels the current subscription (status=cancelled, ends_at=now), opens a fresh subscription on the coupon's plan with `ends_at = now + duration_days`. Unused time on the prior plan is forfeited.
+  - **activate** — clinic has no active subscription (post-trial / suspended): opens a new subscription on the coupon's plan.
+  Throws `ValidationException` for unknown / expired / exhausted / disabled codes and for the same clinic redeeming twice. Writes a `CouponRedemption` snapshot + central audit row `coupon.redeemed`.
+- **20.5 Tenant subscription page.** `Tenant\SubscriptionController` (`show` + `redeem`) gated by `clinic.manage_subscription`. Two new routes inside the tenant `auth` group: `GET /subscription`, `POST /subscription/redeem`. New `RedeemCouponRequest` re-checks the regex and the permission. `Pages/Tenant/Subscription/Index.tsx` — current-plan card with status badge + "ends on" + "X days left" countdown (turns warning ≤14d, danger ≤3d) + "started" date; coupon-apply form with toast on success/error; plan catalogue card showing all active plans with feature checklists and a "current" pill; redemption-history table (last 10 entries). New AppSidebar entry under Admin (`TicketPercent` icon) gated by the new permission.
+- **20.6 i18n.** `central.coupons.*` (admin) + `tenant.subscription.*` (clinic side) + nav entries for `coupons` (central) and `subscription` (tenant) on both languages. AR plurals for `daysCount_*`.
+- **20.7 Tests.** New `tests/Feature/Central/CouponTest.php` (5 cases — create normalises code, duplicate-case rejected, 403 for non-super-admin, status scope behaviour, update + soft-delete) and `tests/Feature/Tenant/SubscriptionRedeemTest.php` (6 cases — extend, switch, double-redemption blocked, exhausted, expired, doctor/secretary 403). Both files added to `tests/Pest.php`. Full suite **100/100 passing** (was 89, +11 net).
+- **Verification.** `pnpm exec tsc --noEmit` clean, `pnpm build` green (main 351 kB / 114 kB gz), smoke 200 across `app.einaya.test/coupons`, `/demo-requests`, `/clinics` and `demo.einaya.test/`, `/subscription`, `/settings`; `storage/logs/laravel.log` empty.
+
+**Out of scope.** No public redemption (codes are entered after the clinic exists); no auto-renew when `ends_at` passes (existing `EnsureClinicActive` middleware will suspend the clinic — they need a fresh coupon); no Stripe / Cashier yet (when billing lands, coupons translate to Stripe coupon objects and the redemption action delegates).
 
 ### 🌐 Phase 18 — Marketing site expansion (2026-05-07)
 

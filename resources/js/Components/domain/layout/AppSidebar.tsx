@@ -8,6 +8,7 @@ import {
     PieChart,
     Settings,
     Stethoscope,
+    TicketPercent,
     Users,
     UsersRound,
 } from 'lucide-react';
@@ -128,6 +129,12 @@ const sections: NavSection[] = [
                 labelKey: 'nav.settings',
                 icon: Settings,
                 permission: 'clinic.view_settings',
+            },
+            {
+                href: '/subscription',
+                labelKey: 'nav.subscription',
+                icon: TicketPercent,
+                permission: 'clinic.manage_subscription',
             },
         ],
     },
