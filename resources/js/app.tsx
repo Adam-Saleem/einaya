@@ -6,6 +6,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
+import { ErrorBoundary } from '@/Components/domain/ErrorBoundary';
 import { Toaster } from '@/Components/ui/sonner';
 import { TooltipProvider } from '@/Components/ui/tooltip';
 
@@ -22,10 +23,12 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
-            <TooltipProvider delayDuration={150}>
-                <App {...props} />
-                <Toaster richColors closeButton />
-            </TooltipProvider>,
+            <ErrorBoundary>
+                <TooltipProvider delayDuration={150}>
+                    <App {...props} />
+                    <Toaster richColors closeButton />
+                </TooltipProvider>
+            </ErrorBoundary>,
         );
     },
     progress: {

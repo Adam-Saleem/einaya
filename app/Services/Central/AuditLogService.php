@@ -11,6 +11,17 @@ use Illuminate\Http\Request;
 
 class AuditLogService
 {
+    /** @see \App\Services\Tenant\AuditLogService — same redaction list. */
+    private const SENSITIVE_KEYS = [
+        'password',
+        'password_confirmation',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'api_token',
+    ];
+
     public function __construct(private ?Request $request = null)
     {
     }
@@ -22,6 +33,9 @@ class AuditLogService
         array $oldValues = [],
         array $newValues = [],
     ): CentralAuditLog {
+        $oldValues = $this->scrub($oldValues);
+        $newValues = $this->scrub($newValues);
+
         return CentralAuditLog::create([
             'user_id' => $user?->getKey(),
             'action' => $action,
@@ -33,6 +47,21 @@ class AuditLogService
             'user_agent' => $this->trimUserAgent($this->request?->userAgent()),
             'created_at' => now(),
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function scrub(array $values): array
+    {
+        foreach ($values as $key => $_) {
+            if (in_array(strtolower((string) $key), self::SENSITIVE_KEYS, true)) {
+                $values[$key] = '[redacted]';
+            }
+        }
+
+        return $values;
     }
 
     private function trimUserAgent(?string $agent): ?string

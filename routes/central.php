@@ -38,6 +38,9 @@ foreach (['app.einaya.ps', 'app.einaya.test'] as $domain) {
         Route::post('/api/preferences/language/guest', [PreferenceController::class, 'language'])
             ->name('central.preferences.language.guest');
 
+        Route::post('/api/client-errors', [ClientErrorController::class, 'store'])
+            ->name('central.client-errors');
+
         Route::middleware(['auth', 'super_admin'])->group(function () {
             Route::get('/', [DashboardController::class, 'index'])->name('central.dashboard');
             Route::post('/api/aggregate-stats', [DashboardController::class, 'refreshStats'])

@@ -11,6 +11,22 @@ use Illuminate\Http\Request;
 
 class AuditLogService
 {
+    /**
+     * Field names whose values must never reach the audit log. Matched
+     * case-insensitively against the top-level keys of old/new value
+     * arrays — controllers always pass `$model->only([...])`, so
+     * top-level coverage is sufficient.
+     */
+    private const SENSITIVE_KEYS = [
+        'password',
+        'password_confirmation',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'api_token',
+    ];
+
     public function __construct(private ?Request $request = null)
     {
     }
@@ -22,6 +38,9 @@ class AuditLogService
         array $oldValues = [],
         array $newValues = [],
     ): TenantAuditLog {
+        $oldValues = $this->scrub($oldValues);
+        $newValues = $this->scrub($newValues);
+
         return TenantAuditLog::create([
             'user_id' => $user?->getKey(),
             'action' => $action,
@@ -33,6 +52,21 @@ class AuditLogService
             'user_agent' => $this->trimUserAgent($this->request?->userAgent()),
             'created_at' => now(),
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function scrub(array $values): array
+    {
+        foreach ($values as $key => $_) {
+            if (in_array(strtolower((string) $key), self::SENSITIVE_KEYS, true)) {
+                $values[$key] = '[redacted]';
+            }
+        }
+
+        return $values;
     }
 
     private function trimUserAgent(?string $agent): ?string

@@ -7,14 +7,22 @@
 
 ## Current Status
 
-**Active phase:** Phase 14 (a11y) — labels + required ARIA shipped; remaining items (color contrast, builder dnd focus rings, Calendar RTL spot-check) noted as v2 polish.
+**Active phase:** Phase 15 (DX & observability) — error boundary + sensitive-field redaction + CI workflow + backup runbook shipped. Remaining items (15.3 toast nuance, 15.4 fast-tenant test infra, 15.6 Playwright E2E) noted as v2 polish.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
 
-### 🚧 Phase 14 — Accessibility (in progress, 2026-05-07)
+### 🚧 Phase 15 — Observability & DX (in progress, 2026-05-07)
+
+- **15.1 Global ErrorBoundary.** New `Components/domain/ErrorBoundary.tsx` mounts at `app.tsx` root and renders a centred destructive-icon panel with a "Reload page" button when any descendant throws. The boundary fires a best-effort POST to `/api/client-errors` carrying message + stack + component_stack + URL + user-agent. Both central and tenant route groups expose the new endpoint via `App\Http\Controllers\ClientErrorController` (validates payload max-lengths, writes a `client.error` warning log line including the user id and tenant id where applicable). Failed reports are swallowed so the fallback UI is always shown.
+- **15.7 Sensitive-field audit log redaction.** `App\Services\Tenant\AuditLogService::log()` and the central twin now run every `oldValues`/`newValues` array through a `scrub()` step that replaces values for keys in `password`, `password_confirmation`, `remember_token`, `two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`, `api_token` with the literal `[redacted]`. Belt-and-braces — current callers always go through `$model->only([...])`, but a future controller passing a full `$user->toArray()` won't leak.
+- **15.5 GitHub Actions CI.** New `.github/workflows/ci.yml` with two jobs: `backend` runs Pest against a MySQL service container (root/root), points the `.env` at `127.0.0.1:3306` + `einaya_central_testing`, and waits on `mysqladmin ping` before kicking off `./vendor/bin/pest`; `frontend` installs JS deps via pnpm, runs `pnpm exec tsc --noEmit`, then `pnpm build`. Both jobs trigger on push to `master` / `dev` and on every pull request. The original Laravel-stub `tests.yml` (sqlite, no MySQL) is left in place but is mostly decorative now.
+- **15.8 Backup / restore runbook.** New `docs/runbooks/backup-restore.md` documents what to back up (central DB + every tenant DB + per-tenant `storage/`), an mysqldump-based hourly snapshot script, restore commands, post-restore checklist, and quarterly fire-drill discipline. Calls out what is intentionally not covered (binlog point-in-time recovery, encrypted archives, cross-region failover, GDPR deletion requests).
+- **15.3 / 15.4 / 15.6 deferred:** validation-error toasts (a polish refactor), fast tenant test infra (a Pest perf project), and Playwright E2E (a separate test stack) all need more scope than v1 polish allows.
+
+### 🚧 Phase 14 — Accessibility (shipped 2026-05-07)
 
 - **14.3 Aria labels on icon-only buttons.** Audited every `<Button variant="ghost" size="icon">` across `resources/js/Pages` and added `aria-label`s to the missing ones: dropdown triggers in Forms/Index + Staff/Index, in-place section editor in Forms/Builder, question-row edit/delete + option remove buttons, diagnosis + prescription-item delete buttons in Doctor/Consultation, working-hours break + time-off delete buttons, audit-row "view diff" buttons (tenant + central), insurance-provider edit/delete. Plans/Index, Clinics/Index, ThemeToggle, LanguageSwitcher, UserMenu, AppTopbar were already labelled. (FullCalendar event titles and other nested icon-bearing elements not in scope here.)
 - **14.6 aria-required on form inputs.** `Components/domain/forms/FormRenderer.tsx` now passes `aria-required={question.required || undefined}` on text/textarea/number/date inputs so the asterisk shown next to required labels is also announced by screen readers.

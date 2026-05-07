@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Pest + tenancy
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: einaya_central_testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, mysql, pdo_mysql, intl, bcmath
+          coverage: none
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install composer deps
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          # Point Laravel at the GH Actions MySQL service.
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env || true
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env || true
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env || true
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=einaya_central_testing/' .env || true
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env || true
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env || true
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h127.0.0.1 -uroot -proot --silent; then exit 0; fi
+            sleep 1
+          done
+          echo "MySQL never came up" >&2
+          exit 1
+
+      - name: Run Pest
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: einaya_central_testing
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: ./vendor/bin/pest
+
+  frontend:
+    name: tsc + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install JS deps
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript check
+        run: pnpm exec tsc --noEmit
+
+      - name: Vite build
+        run: pnpm build

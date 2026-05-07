@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ClientErrorController;
 use App\Http\Controllers\PreferenceController;
 use App\Models\Tenant\DoctorBreak;
 use App\Models\Tenant\DoctorTimeOff;
@@ -96,6 +97,9 @@ Route::middleware([
 
     Route::post('/api/preferences/language/guest', [PreferenceController::class, 'language'])
         ->name('tenant.preferences.language.guest');
+
+    Route::post('/api/client-errors', [ClientErrorController::class, 'store'])
+        ->name('tenant.client-errors');
 
     // Pre-auth: tenant landing page renders Welcome for guests; the auth
     // group below short-circuits with the Dashboard for logged-in users.
