@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Can } from '@/Components/domain/Can';
 import { ConfirmDialog } from '@/Components/domain/ConfirmDialog';
+import { MedicalFlagsBanner } from '@/Components/domain/MedicalFlagsBanner';
 import { NewAppointmentDialog } from '@/Components/domain/NewAppointmentDialog';
 import { StatusBadge } from '@/Components/domain/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
@@ -189,16 +190,16 @@ export default function PatientShow({ patient, appointments, payments, files, do
                             {patient.has_insurance && (
                                 <Badge variant="secondary">Insurance</Badge>
                             )}
-                            {patient.allergies_summary && (
-                                <Badge variant="destructive">Allergies</Badge>
-                            )}
-                            {patient.chronic_summary && (
-                                <Badge variant="outline">Chronic</Badge>
-                            )}
                         </div>
                     </div>
                 </CardContent>
             </Card>
+
+            <MedicalFlagsBanner
+                patientId={patient.id}
+                allergies={patient.allergies_summary}
+                chronic={patient.chronic_summary}
+            />
 
             <Tabs defaultValue="overview">
                 <TabsList>

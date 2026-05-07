@@ -33,6 +33,8 @@ class AppointmentResource extends JsonResource
                 'patient_code' => $this->patient->patient_code,
                 'name' => trim($this->patient->first_name.' '.$this->patient->last_name),
                 'phone' => $this->patient->phone,
+                'has_allergies' => ! empty($this->patient->allergies_summary),
+                'has_chronic' => ! empty($this->patient->chronic_summary),
             ]),
             'doctor' => $this->whenLoaded('doctor', fn () => [
                 'id' => $this->doctor->id,

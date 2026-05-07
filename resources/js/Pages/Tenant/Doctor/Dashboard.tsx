@@ -17,7 +17,14 @@ type QueueRow = {
     scheduled_for: string | null;
     status: string;
     status_label: string;
-    patient: { id: number; patient_code: string; name: string; phone: string } | null;
+    patient: {
+        id: number;
+        patient_code: string;
+        name: string;
+        phone: string;
+        has_allergies?: boolean;
+        has_chronic?: boolean;
+    } | null;
 };
 
 type Props = {
@@ -146,7 +153,23 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
                                                 {row.queue_number ?? '?'}
                                             </span>
                                             <div>
-                                                <p className="font-medium">{row.patient?.name ?? '—'}</p>
+                                                <p className="flex items-center gap-2 font-medium">
+                                                    {row.patient?.name ?? '—'}
+                                                    {row.patient?.has_allergies && (
+                                                        <span
+                                                            title={t('visit.flags.allergies')}
+                                                            className="inline-block h-2 w-2 rounded-full bg-destructive"
+                                                            aria-label={t('visit.flags.allergies')}
+                                                        />
+                                                    )}
+                                                    {row.patient?.has_chronic && (
+                                                        <span
+                                                            title={t('visit.flags.chronic')}
+                                                            className="inline-block h-2 w-2 rounded-full bg-warning"
+                                                            aria-label={t('visit.flags.chronic')}
+                                                        />
+                                                    )}
+                                                </p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {formatTime(row.scheduled_for)}
                                                     {row.patient?.phone && ` · ${row.patient.phone}`}

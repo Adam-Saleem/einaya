@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@/Components/domain/ConfirmDialog';
+import { MedicalFlagsBanner } from '@/Components/domain/MedicalFlagsBanner';
 import { FormRenderer } from '@/Components/domain/forms/FormRenderer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Badge } from '@/Components/ui/badge';
@@ -48,13 +49,6 @@ import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import { formatDate, formatDateTime } from '@/lib/dates';
 import type { FormSnapshot } from '@/types/tenant';
-
-type Diagnosis = {
-    id: number;
-    description: string;
-    code: string | null;
-    notes: string | null;
-};
 
 type PrescriptionItem = {
     id: number;
@@ -106,7 +100,6 @@ type Consultation = {
         preferred_language: string;
     };
     doctor: { id: number; name: string | null; specialty: string };
-    diagnoses: Diagnosis[];
     prescriptions: Prescription[];
     form_submissions: FormSubmission[];
 };
@@ -150,7 +143,7 @@ export default function ConsultationPage({
     );
     const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const [completeOpen, setCompleteOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'record' | 'prescription' | 'complete'>('record');
     const [completeBusy, runComplete] = usePending();
     const [visitType, setVisitType] = useState<'first' | 'review'>('first');
     const [selectedServices, setSelectedServices] = useState<Set<number>>(new Set());
@@ -175,20 +168,12 @@ export default function ConsultationPage({
             return next;
         });
     const [submitFormBusy, runSubmitForm] = usePending();
-    const [removingDiagnosis, setRemovingDiagnosis] = useState<Set<number>>(new Set());
     const [removingItem, setRemovingItem] = useState<Set<number>>(new Set());
 
-    // Selected form for the Medical Form tab
+    // Selected form for the Medical Record tab
     const [selectedFormId, setSelectedFormId] = useState<string>(forms[0]?.id ? String(forms[0].id) : '');
     const [formAnswers, setFormAnswers] = useState<Record<string, unknown>>({});
     const [formSnapshot, setFormSnapshot] = useState<FormSnapshot | null>(null);
-
-    // Diagnosis form state
-    const diagForm = useForm({
-        description: '',
-        code: '',
-        notes: '',
-    });
 
     // Prescription item form state
     const itemForm = useForm({
@@ -288,28 +273,6 @@ export default function ConsultationPage({
         );
     };
 
-    const submitDiagnosis = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        diagForm.post(`/consultations/${consultation.id}/diagnoses`, {
-            preserveScroll: true,
-            onSuccess: () => diagForm.reset(),
-        });
-    };
-
-    const removeDiagnosis = (id: number) => {
-        if (removingDiagnosis.has(id)) return;
-        setRemovingDiagnosis((s) => new Set(s).add(id));
-        router.delete(`/diagnoses/${id}`, {
-            preserveScroll: true,
-            onFinish: () =>
-                setRemovingDiagnosis((s) => {
-                    const next = new Set(s);
-                    next.delete(id);
-                    return next;
-                }),
-        });
-    };
-
     const submitItem = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const prescription = consultation.prescriptions[0];
@@ -363,7 +326,7 @@ export default function ConsultationPage({
                         </Link>
                     </Button>
                     {!consultation.is_completed && (
-                        <Button onClick={() => setCompleteOpen(true)}>
+                        <Button onClick={() => setActiveTab('complete')}>
                             <CheckCircle2 className="me-2 h-4 w-4" />
                             {t('doctorPanel.consultation.complete')}
                         </Button>
@@ -395,19 +358,6 @@ export default function ConsultationPage({
                             {consultation.patient.gender_label && ` · ${consultation.patient.gender_label}`}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
-                            {consultation.patient.allergies_summary && (
-                                <Badge variant="destructive" className="text-xs">
-                                    Allergies: {consultation.patient.allergies_summary.slice(0, 30)}
-                                </Badge>
-                            )}
-                            {consultation.patient.chronic_summary && (
-                                <Badge
-                                    variant="outline"
-                                    className="border-warning/40 bg-warning/10 text-xs"
-                                >
-                                    Chronic: {consultation.patient.chronic_summary.slice(0, 30)}
-                                </Badge>
-                            )}
                             {consultation.patient.blood_type && (
                                 <Badge variant="outline">{consultation.patient.blood_type}</Badge>
                             )}
@@ -418,6 +368,13 @@ export default function ConsultationPage({
                     </div>
                 </CardContent>
             </Card>
+
+            <MedicalFlagsBanner
+                patientId={consultation.patient.id}
+                allergies={consultation.patient.allergies_summary}
+                chronic={consultation.patient.chronic_summary}
+                compact
+            />
 
             <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
                 {/* History panel */}
@@ -459,85 +416,83 @@ export default function ConsultationPage({
                 {/* Center tabs */}
                 <Card>
                     <CardContent className="p-4">
-                        <Tabs defaultValue="overview">
+                        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'record' | 'prescription' | 'complete')}>
                             <TabsList>
-                                <TabsTrigger value="overview">
-                                    <ClipboardList className="me-2 h-4 w-4" />
-                                    {t('doctorPanel.consultation.tabs.overview')}
-                                </TabsTrigger>
-                                <TabsTrigger value="form">
+                                <TabsTrigger value="record">
                                     <FileText className="me-2 h-4 w-4" />
-                                    {t('doctorPanel.consultation.tabs.form')}
-                                </TabsTrigger>
-                                <TabsTrigger value="diagnoses">
-                                    <Stethoscope className="me-2 h-4 w-4" />
-                                    {t('doctorPanel.consultation.tabs.diagnoses')}
+                                    {t('doctorPanel.consultation.tabs.record')}
                                 </TabsTrigger>
                                 <TabsTrigger value="prescription">
                                     <Pill className="me-2 h-4 w-4" />
                                     {t('doctorPanel.consultation.tabs.prescription')}
                                 </TabsTrigger>
+                                <TabsTrigger value="complete">
+                                    <CheckCircle2 className="me-2 h-4 w-4" />
+                                    {t('doctorPanel.consultation.tabs.complete')}
+                                </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="overview" className="mt-4 space-y-4">
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <Label htmlFor="chief">{t('doctorPanel.consultation.chiefComplaint')}</Label>
-                                        <span className="text-xs text-muted-foreground">
-                                            {overviewState === 'saving' &&
-                                                t('doctorPanel.consultation.savingState.saving')}
-                                            {overviewState === 'saved' &&
-                                                t('doctorPanel.consultation.savingState.saved')}
-                                        </span>
+                            <TabsContent value="record" className="mt-4 space-y-6">
+                                <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label htmlFor="chief">{t('doctorPanel.consultation.chiefComplaint')}</Label>
+                                            <span className="text-xs text-muted-foreground">
+                                                {overviewState === 'saving' &&
+                                                    t('doctorPanel.consultation.savingState.saving')}
+                                                {overviewState === 'saved' &&
+                                                    t('doctorPanel.consultation.savingState.saved')}
+                                            </span>
+                                        </div>
+                                        <Textarea
+                                            id="chief"
+                                            rows={2}
+                                            value={chiefComplaint}
+                                            disabled={consultation.is_completed}
+                                            onChange={(e) => {
+                                                setChiefComplaint(e.target.value);
+                                                persistOverview({ chief_complaint: e.target.value });
+                                            }}
+                                        />
                                     </div>
-                                    <Textarea
-                                        id="chief"
-                                        rows={2}
-                                        value={chiefComplaint}
-                                        disabled={consultation.is_completed}
-                                        onChange={(e) => {
-                                            setChiefComplaint(e.target.value);
-                                            persistOverview({ chief_complaint: e.target.value });
-                                        }}
-                                    />
+                                    <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="notes">
+                                                {t('doctorPanel.consultation.notes')}
+                                            </Label>
+                                            <Textarea
+                                                id="notes"
+                                                rows={4}
+                                                value={notes}
+                                                disabled={consultation.is_completed}
+                                                onChange={(e) => {
+                                                    setNotes(e.target.value);
+                                                    persistOverview({ notes: e.target.value });
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="follow_up">
+                                                {t('doctorPanel.consultation.followUpDays')}
+                                            </Label>
+                                            <Input
+                                                id="follow_up"
+                                                type="number"
+                                                min={0}
+                                                max={365}
+                                                value={followUp}
+                                                disabled={consultation.is_completed}
+                                                onChange={(e) => {
+                                                    setFollowUp(e.target.value);
+                                                    persistOverview({
+                                                        follow_up_in_days: e.target.value === '' ? null : Number(e.target.value),
+                                                    });
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="notes">
-                                        {t('doctorPanel.consultation.notes')}
-                                    </Label>
-                                    <Textarea
-                                        id="notes"
-                                        rows={6}
-                                        value={notes}
-                                        disabled={consultation.is_completed}
-                                        onChange={(e) => {
-                                            setNotes(e.target.value);
-                                            persistOverview({ notes: e.target.value });
-                                        }}
-                                    />
-                                </div>
-                                <div className="space-y-2 max-w-xs">
-                                    <Label htmlFor="follow_up">
-                                        {t('doctorPanel.consultation.followUpDays')}
-                                    </Label>
-                                    <Input
-                                        id="follow_up"
-                                        type="number"
-                                        min={0}
-                                        max={365}
-                                        value={followUp}
-                                        disabled={consultation.is_completed}
-                                        onChange={(e) => {
-                                            setFollowUp(e.target.value);
-                                            persistOverview({
-                                                follow_up_in_days: e.target.value === '' ? null : Number(e.target.value),
-                                            });
-                                        }}
-                                    />
-                                </div>
-                            </TabsContent>
-
-                            <TabsContent value="form" className="mt-4 space-y-4">
+                                {/* form selector + form fill below */}
                                 <div className="flex flex-wrap items-end gap-3">
                                     <div className="space-y-2 min-w-[240px]">
                                         <Label>{t('doctorPanel.consultation.selectForm')}</Label>
@@ -610,74 +565,6 @@ export default function ConsultationPage({
                                             ))}
                                         </ul>
                                     </div>
-                                )}
-                            </TabsContent>
-
-                            <TabsContent value="diagnoses" className="mt-4 space-y-4">
-                                <form onSubmit={submitDiagnosis} className="grid gap-3 md:grid-cols-[2fr_1fr_auto] rounded-md border bg-muted/30 p-3">
-                                    <div className="space-y-1">
-                                        <Label>{t('doctorPanel.consultation.diagnosisDescription')}</Label>
-                                        <Input
-                                            value={diagForm.data.description}
-                                            onChange={(e) =>
-                                                diagForm.setData('description', e.target.value)
-                                            }
-                                            placeholder="e.g. Acute pharyngitis"
-                                        />
-                                        {diagForm.errors.description && (
-                                            <p className="text-xs text-destructive">
-                                                {diagForm.errors.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label>{t('doctorPanel.consultation.diagnosisCode')}</Label>
-                                        <Input
-                                            value={diagForm.data.code}
-                                            onChange={(e) =>
-                                                diagForm.setData('code', e.target.value)
-                                            }
-                                            placeholder="J02.9"
-                                            className="font-mono"
-                                        />
-                                    </div>
-                                    <div className="self-end">
-                                        <Button type="submit" disabled={diagForm.processing}>
-                                            <Plus className="me-2 h-4 w-4" />
-                                            {t('doctorPanel.consultation.addDiagnosis')}
-                                        </Button>
-                                    </div>
-                                </form>
-
-                                {consultation.diagnoses.length === 0 ? (
-                                    <p className="text-sm text-muted-foreground">—</p>
-                                ) : (
-                                    <ul className="space-y-2">
-                                        {consultation.diagnoses.map((d) => (
-                                            <li
-                                                key={d.id}
-                                                className="flex items-center justify-between rounded-md border p-3"
-                                            >
-                                                <div>
-                                                    <p className="font-medium">{d.description}</p>
-                                                    {d.code && (
-                                                        <p className="text-xs font-mono text-muted-foreground">
-                                                            {d.code}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    aria-label={t('actions.delete', { defaultValue: 'Delete' })}
-                                                    disabled={removingDiagnosis.has(d.id)}
-                                                    onClick={() => removeDiagnosis(d.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                </Button>
-                                            </li>
-                                        ))}
-                                    </ul>
                                 )}
                             </TabsContent>
 
@@ -812,125 +699,115 @@ export default function ConsultationPage({
                                     </>
                                 )}
                             </TabsContent>
+
+                            <TabsContent value="complete" className="mt-4 space-y-5">
+                                {consultation.is_completed ? (
+                                    <div className="rounded-lg border bg-success/5 p-4 text-sm text-success">
+                                        <p className="font-medium">
+                                            {t('doctorPanel.consultation.completedHeading')}
+                                        </p>
+                                        <p className="mt-1 text-muted-foreground">
+                                            {t('doctorPanel.consultation.completedBody')}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label>{t('doctorPanel.complete.visitType')}</Label>
+                                            <RadioGroup
+                                                value={visitType}
+                                                onValueChange={(v) => setVisitType(v as 'first' | 'review')}
+                                                className="grid grid-cols-2 gap-3"
+                                            >
+                                                <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                                    <RadioGroupItem value="first" id="visit-first" />
+                                                    <span className="flex-1">
+                                                        <span className="block text-sm font-medium">
+                                                            {t('doctorPanel.complete.firstVisit')}
+                                                        </span>
+                                                        <span className="block text-xs text-muted-foreground">
+                                                            {formatPrice(pricing.first_visit_price)}
+                                                        </span>
+                                                    </span>
+                                                </label>
+                                                <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                                    <RadioGroupItem value="review" id="visit-review" />
+                                                    <span className="flex-1">
+                                                        <span className="block text-sm font-medium">
+                                                            {t('doctorPanel.complete.reviewVisit')}
+                                                        </span>
+                                                        <span className="block text-xs text-muted-foreground">
+                                                            {formatPrice(pricing.review_visit_price)}
+                                                        </span>
+                                                    </span>
+                                                </label>
+                                            </RadioGroup>
+                                        </div>
+
+                                        {services.length > 0 && (
+                                            <div className="space-y-2">
+                                                <Label>{t('doctorPanel.complete.services')}</Label>
+                                                <div className="space-y-1.5 rounded-md border p-2">
+                                                    {services.map((s) => (
+                                                        <label
+                                                            key={s.id}
+                                                            className="flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 hover:bg-accent"
+                                                        >
+                                                            <span className="flex items-center gap-2">
+                                                                <Checkbox
+                                                                    checked={selectedServices.has(s.id)}
+                                                                    onCheckedChange={() => toggleService(s.id)}
+                                                                />
+                                                                <span className="text-sm font-medium">{s.name}</span>
+                                                            </span>
+                                                            <span className="text-sm font-mono text-muted-foreground">
+                                                                {formatPrice(s.price)}
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="rounded-md border bg-muted/40 p-3">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-muted-foreground">
+                                                    {t('doctorPanel.complete.total')}
+                                                </span>
+                                                <span className="font-mono text-h4 font-semibold">
+                                                    {formatPrice(completeTotal)}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            size="lg"
+                                            className="w-full"
+                                            disabled={completeBusy}
+                                            onClick={() =>
+                                                runComplete((opts) =>
+                                                    router.post(
+                                                        `/consultations/${consultation.id}/complete`,
+                                                        {
+                                                            visit_type: visitType,
+                                                            service_ids: Array.from(selectedServices),
+                                                        },
+                                                        opts,
+                                                    ),
+                                                )
+                                            }
+                                        >
+                                            {t('doctorPanel.consultation.complete')}
+                                        </Button>
+                                    </>
+                                )}
+                            </TabsContent>
                         </Tabs>
                     </CardContent>
                 </Card>
             </div>
 
-            <Dialog
-                open={completeOpen}
-                onOpenChange={(open) => !completeBusy && setCompleteOpen(open)}
-            >
-                <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {t('doctorPanel.consultation.confirmComplete')}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {t('doctorPanel.consultation.confirmCompleteBody')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>{t('doctorPanel.complete.visitType')}</Label>
-                            <RadioGroup
-                                value={visitType}
-                                onValueChange={(v) => setVisitType(v as 'first' | 'review')}
-                                className="grid grid-cols-2 gap-3"
-                            >
-                                <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                    <RadioGroupItem value="first" id="visit-first" />
-                                    <span className="flex-1">
-                                        <span className="block text-sm font-medium">
-                                            {t('doctorPanel.complete.firstVisit')}
-                                        </span>
-                                        <span className="block text-xs text-muted-foreground">
-                                            {formatPrice(pricing.first_visit_price)}
-                                        </span>
-                                    </span>
-                                </label>
-                                <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                    <RadioGroupItem value="review" id="visit-review" />
-                                    <span className="flex-1">
-                                        <span className="block text-sm font-medium">
-                                            {t('doctorPanel.complete.reviewVisit')}
-                                        </span>
-                                        <span className="block text-xs text-muted-foreground">
-                                            {formatPrice(pricing.review_visit_price)}
-                                        </span>
-                                    </span>
-                                </label>
-                            </RadioGroup>
-                        </div>
-
-                        {services.length > 0 && (
-                            <div className="space-y-2">
-                                <Label>{t('doctorPanel.complete.services')}</Label>
-                                <div className="space-y-1.5 rounded-md border p-2">
-                                    {services.map((s) => (
-                                        <label
-                                            key={s.id}
-                                            className="flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 hover:bg-accent"
-                                        >
-                                            <span className="flex items-center gap-2">
-                                                <Checkbox
-                                                    checked={selectedServices.has(s.id)}
-                                                    onCheckedChange={() => toggleService(s.id)}
-                                                />
-                                                <span className="text-sm font-medium">{s.name}</span>
-                                            </span>
-                                            <span className="text-sm font-mono text-muted-foreground">
-                                                {formatPrice(s.price)}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="rounded-md border bg-muted/40 p-3">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                    {t('doctorPanel.complete.total')}
-                                </span>
-                                <span className="font-mono text-h4 font-semibold">
-                                    {formatPrice(completeTotal)}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setCompleteOpen(false)}
-                            disabled={completeBusy}
-                        >
-                            {tc('actions.cancel')}
-                        </Button>
-                        <Button
-                            type="button"
-                            disabled={completeBusy}
-                            onClick={() =>
-                                runComplete((opts) =>
-                                    router.post(
-                                        `/consultations/${consultation.id}/complete`,
-                                        {
-                                            visit_type: visitType,
-                                            service_ids: Array.from(selectedServices),
-                                        },
-                                        opts,
-                                    ),
-                                )
-                            }
-                        >
-                            {t('doctorPanel.consultation.complete')}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </AppLayout>
     );
 }

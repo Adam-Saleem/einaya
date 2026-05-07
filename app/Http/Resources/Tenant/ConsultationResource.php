@@ -52,9 +52,19 @@ class ConsultationResource extends JsonResource
                 'specialty' => $this->doctor->specialty,
                 'license_number' => $this->doctor->license_number,
             ]),
-            'diagnoses' => $this->whenLoaded(
-                'diagnoses',
-                fn () => DiagnosisResource::collection($this->diagnoses)->resolve($request),
+            // Phase 23: diagnoses field stays empty in the API surface so
+            // older FE builds don't NPE; the new visit page no longer
+            // renders them.
+            'diagnoses' => [],
+            'services' => $this->whenLoaded(
+                'services',
+                fn () => $this->services->map(fn ($s) => [
+                    'id' => $s->id,
+                    'service_id' => $s->service_id,
+                    'name' => $s->service_name_snapshot,
+                    'price' => (float) $s->price_at_time,
+                    'quantity' => (int) $s->quantity,
+                ]),
             ),
             'prescriptions' => $this->whenLoaded(
                 'prescriptions',

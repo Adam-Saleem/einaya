@@ -240,6 +240,8 @@ Route::middleware([
             ->name('tenant.patients.show');
         Route::patch('/patients/{patient}', [PatientController::class, 'update'])
             ->name('tenant.patients.update');
+        Route::patch('/patients/{patient}/medical-flags', [PatientController::class, 'updateMedicalFlags'])
+            ->name('tenant.patients.medical-flags');
         Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])
             ->name('tenant.patients.destroy');
         Route::post('/patients/{patient}/files', [PatientFileController::class, 'store'])

@@ -7,12 +7,30 @@
 
 ## Current Status
 
-**Active phase:** Phase 22 — services catalogue + visit-type billing + 3-section reception shipped. Reception splits into Scheduled / In progress / Pending payment; doctor's complete dialog records visit type + services; reception bills with the calculated total. Pest 108/108.
+**Active phase:** Phase 23 — doctor surface consolidation + simpler visit flow shipped. Visit page collapses to 3 tabs (Medical record / Prescription / Complete); diagnoses tab + queue page + past-consultations index removed; allergies + chronic conditions surface on every patient view with inline-edit. Pest 110/110.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### 🩺 Phase 23 — Doctor surface consolidation + simpler visit flow (2026-05-07)
+
+The doctor side had three pages doing overlapping work — `/doctor`, `/doctor/queue`, `/consultations`. Phase 23 collapses to **one** doctor home (`/doctor`) and a simpler visit page where the work is shaped like a real visit: **medical record → prescription → complete**. Diagnoses come out entirely. Allergies and chronic conditions, which already live on the patient row, get surfaced on every patient view with an inline-edit affordance so they actually shape clinical decisions.
+
+- **23.1 Backend.** New `PatientController::updateMedicalFlags` (PATCH `/patients/{patient}/medical-flags`) accepts `allergies_summary` + `chronic_summary` only; gated by `patients.update`; audit-logged. `Doctor\ConsultationController::show` stops eager-loading `diagnoses`. `ConsultationResource` now returns `diagnoses: []` (kept on the wire so older builds don't NPE) and adds a `services` block sourced from the Phase 22 pivot.
+- **23.2 Sidebar.** Dropped the `/doctor/queue` and `/consultations` entries from `AppSidebar`. The doctor section is now a single `/doctor` link.
+- **23.3 Patient profile banners.** New `Components/domain/MedicalFlagsBanner.tsx` — two stacked alert cards (red Allergies, amber Chronic conditions) with an inline pencil → small dialog → `PATCH /patients/{id}/medical-flags`. Empty state shows "Add allergies / Add chronic conditions" with a `+` icon. Mounted near the top of `Pages/Tenant/Patients/Show.tsx`. The old badges in the patient header (literally rendering "Allergies" / "Chronic" badges) are gone — the banner replaces them.
+- **23.4 Visit page restructure.** `Pages/Tenant/Doctor/Consultation.tsx` collapses from 4 tabs to 3:
+  - **Medical record** — chief complaint + notes + follow-up days at the top, then the form picker + form filler. Replaces the old `overview` + `form` tabs.
+  - **Prescription** — unchanged.
+  - **Complete** — visit-type radio cards with prices, services checklist, live total preview, and the **Complete visit** button. Inlines the dialog from Phase 22 — no more modal interrupt.
+  The diagnoses tab + form + delete handlers + state are removed entirely. The header "Complete consultation" button switches the tab to Complete instead of opening a dialog. The `MedicalFlagsBanner` (compact variant) sits between the patient header and the work area, so the doctor sees allergies + chronic on every tab. Tabs are now a controlled component so the header button can switch them programmatically.
+- **23.5 Doctor dashboard absorb queue extras.** `Doctor\DashboardController` eager-loads `allergies_summary` + `chronic_summary` on the patient. `AppointmentResource` exposes derived `has_allergies` + `has_chronic` booleans. The dashboard queue list shows a **red dot** next to the patient name when allergies exist and an **amber dot** for chronic, so the doctor is alerted before opening the visit. The standalone Queue page (`/doctor/queue`) stays in code but is unreferenced from the sidebar.
+- **23.6 i18n + tests.** New keys: `tenant.visit.flags.{allergies,chronic,addAllergies,addChronic,editAllergies,editChronic,allergiesHint,chronicHint}`, `tenant.doctorPanel.consultation.tabs.{record,prescription,complete}`, `tenant.doctorPanel.consultation.completedHeading/Body`. Existing `tenant.doctorPanel.complete.*` (Phase 22) reused. Old `tabs.{overview,form,diagnoses}` keys removed. EN ↔ AR mirrored. New `tests/Feature/Tenant/PatientMedicalFlagsTest.php` (2 cases): doctor + secretary both PATCH the endpoint successfully (the v1 contract is "anyone with patients.update can record flags" — both roles need fast access). Full Pest **110/110** (was 108, +2 net).
+- **Verification.** `pnpm exec tsc --noEmit` clean, `pnpm build` green (main 359 kB / 117 kB gz), smoke 200 across the seven authed routes; `storage/logs/laravel.log` empty.
+
+**Out of scope.** The diagnoses table + Diagnosis model + DiagnosisController stay in code so existing consultations with diagnoses don't error on read; nothing in the FE renders them. Drop the schema in a future cleanup if no clinic ever asks for it back.
 
 ### 💵 Phase 22 — Services catalogue + visit-type billing + 3-section reception (2026-05-07)
 

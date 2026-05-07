@@ -52,16 +52,16 @@ class ConsultationController extends Controller
         $consultation->load([
             'patient.insuranceProvider',
             'doctor.user',
-            'diagnoses',
             'prescriptions.items',
             'formSubmissions',
+            'services',
         ]);
 
         $pastConsultations = Consultation::query()
             ->where('patient_id', $consultation->patient_id)
             ->where('id', '!=', $consultation->id)
             ->whereNotNull('ended_at')
-            ->with(['diagnoses', 'formSubmissions'])
+            ->with(['formSubmissions'])
             ->orderByDesc('ended_at')
             ->limit(20)
             ->get();
@@ -73,7 +73,6 @@ class ConsultationController extends Controller
                 'started_at' => $c->started_at?->toIso8601String(),
                 'ended_at' => $c->ended_at?->toIso8601String(),
                 'chief_complaint' => $c->chief_complaint,
-                'diagnoses_count' => $c->diagnoses->count(),
                 'submissions_count' => $c->formSubmissions->count(),
             ])->values(),
             'forms' => MedicalForm::query()

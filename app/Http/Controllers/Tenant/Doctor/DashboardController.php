@@ -25,7 +25,10 @@ class DashboardController extends Controller
         $followUpEnd = Carbon::now()->addDays(7);
 
         $todayAppointments = Appointment::query()
-            ->with(['patient:id,first_name,last_name,patient_code,phone', 'doctor.user:id,name'])
+            ->with([
+                'patient:id,first_name,last_name,patient_code,phone,allergies_summary,chronic_summary',
+                'doctor.user:id,name',
+            ])
             ->whereDate('scheduled_for', $today)
             ->orderBy('scheduled_for')
             ->get();

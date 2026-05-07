@@ -202,6 +202,34 @@ class PatientController extends Controller
         return redirect('/patients')->with('success', 'Patient archived.');
     }
 
+    /**
+     * Phase 23: narrow endpoint for the inline allergies / chronic edit
+     * banners. Doctors and clinic admins both need to update these
+     * without going through the comprehensive registration form.
+     */
+    public function updateMedicalFlags(Request $request, Patient $patient): RedirectResponse
+    {
+        $this->ensureCan($request->user(), 'patients.update');
+
+        $data = $request->validate([
+            'allergies_summary' => ['nullable', 'string', 'max:2000'],
+            'chronic_summary' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $original = $patient->only(['allergies_summary', 'chronic_summary']);
+        $patient->fill($data)->save();
+
+        $this->audit->log(
+            $request->user(),
+            'patient.medical_flags_updated',
+            $patient,
+            $original,
+            $patient->only(['allergies_summary', 'chronic_summary']),
+        );
+
+        return back()->with('success', __('Patient updated.'));
+    }
+
     private function ensureCan(?User $user, string $permission): void
     {
         if ($user === null || ! $user->can($permission)) {

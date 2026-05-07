@@ -599,6 +599,18 @@
             "body": "It disappears from selection lists. Past consultation bills keep the snapshot price."
         }
     },
+    "visit": {
+        "flags": {
+            "allergies": "Allergies",
+            "chronic": "Chronic conditions",
+            "addAllergies": "Add allergies",
+            "addChronic": "Add chronic conditions",
+            "editAllergies": "Edit allergies",
+            "editChronic": "Edit chronic conditions",
+            "allergiesHint": "Drug, food, or environmental allergies. Visible to every clinician on this patient.",
+            "chronicHint": "Diabetes, hypertension, asthma — anything ongoing that affects future visits."
+        }
+    },
     "doctorPanel": {
         "dashboard": {
             "title": "Doctor",
@@ -632,12 +644,13 @@
             "history": "Visit history",
             "noHistory": "No previous visits.",
             "tabs": {
-                "overview": "Overview",
-                "form": "Medical form",
-                "diagnoses": "Diagnoses",
+                "record": "Medical record",
                 "prescription": "Prescription",
+                "complete": "Complete",
                 "files": "Files"
             },
+            "completedHeading": "Visit completed",
+            "completedBody": "This visit is locked. Reception will pick it up for billing.",
             "chiefComplaint": "Chief complaint",
             "notes": "Notes",
             "followUpDays": "Follow-up in (days)",
