@@ -158,11 +158,22 @@ class PatientController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        $doctors = \App\Models\Tenant\Doctor::query()
+            ->with('user:id,name')
+            ->where('is_active', true)
+            ->get(['id', 'user_id', 'consultation_duration_minutes'])
+            ->map(fn ($d) => [
+                'id' => $d->id,
+                'name' => $d->user?->name,
+                'consultation_duration_minutes' => $d->consultation_duration_minutes,
+            ]);
+
         return Inertia::render('Tenant/Patients/Show', [
             'patient' => (new PatientResource($patient))->toArray($request),
             'appointments' => AppointmentResource::collection($appointments)->resolve($request),
             'payments' => PaymentResource::collection($payments)->resolve($request),
             'files' => PatientFileResource::collection($files)->resolve($request),
+            'doctors' => $doctors,
             'insuranceProviders' => InsuranceProvider::where('is_active', true)
                 ->orderBy('name')
                 ->get(['id', 'name']),

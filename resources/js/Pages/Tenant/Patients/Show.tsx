@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Can } from '@/Components/domain/Can';
 import { ConfirmDialog } from '@/Components/domain/ConfirmDialog';
+import { NewAppointmentDialog } from '@/Components/domain/NewAppointmentDialog';
 import { StatusBadge } from '@/Components/domain/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Badge } from '@/Components/ui/badge';
@@ -69,11 +70,18 @@ type PatientFile = {
     created_at: string | null;
 };
 
+type Doctor = {
+    id: number;
+    name: string | null;
+    consultation_duration_minutes: number;
+};
+
 type Props = {
     patient: Patient;
     appointments: Appointment[];
     payments: Payment[];
     files: PatientFile[];
+    doctors: Doctor[];
     insuranceProviders: { id: number; name: string }[];
 };
 
@@ -87,7 +95,7 @@ const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' |
     no_show: 'danger',
 };
 
-export default function PatientShow({ patient, appointments, payments, files }: Props) {
+export default function PatientShow({ patient, appointments, payments, files, doctors }: Props) {
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
@@ -96,6 +104,7 @@ export default function PatientShow({ patient, appointments, payments, files }: 
 
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteBusy, setDeleteBusy] = useState(false);
+    const [bookOpen, setBookOpen] = useState(false);
 
     const performDelete = () => {
         setDeleteBusy(true);
@@ -135,7 +144,7 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                             {patient.phone}
                         </a>
                     </Button>
-                    <Button onClick={() => router.visit(`/appointments?patient=${patient.id}`)}>
+                    <Button onClick={() => setBookOpen(true)}>
                         <Calendar className="me-2 h-4 w-4" />
                         {t('patients.bookAppointment')}
                     </Button>
@@ -417,6 +426,17 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                 description={t('patients.confirmDelete.body')}
                 busy={deleteBusy}
                 onConfirm={performDelete}
+            />
+
+            <NewAppointmentDialog
+                open={bookOpen}
+                onOpenChange={setBookOpen}
+                doctors={doctors}
+                lockedPatient={{
+                    id: patient.id,
+                    name: patient.name,
+                    phone: patient.phone || null,
+                }}
             />
         </AppLayout>
     );

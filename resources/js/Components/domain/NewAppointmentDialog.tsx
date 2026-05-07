@@ -39,6 +39,12 @@ type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     doctors: Doctor[];
+    /**
+     * When set, the dialog opens directly on step 2 with this patient
+     * pre-locked — used by the Patient profile's "Book appointment"
+     * action where the patient is already chosen.
+     */
+    lockedPatient?: { id: number; name: string; phone: string | null } | null;
 };
 
 type Step = 1 | 2;
@@ -90,7 +96,7 @@ function defaultDateTime() {
     )}:${pad(d.getMinutes())}`;
 }
 
-export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
+export function NewAppointmentDialog({ open, onOpenChange, doctors, lockedPatient }: Props) {
     const { t } = useTranslation('tenant');
     const { t: tc } = useTranslation('common');
     const direction = useDirection();
@@ -123,9 +129,17 @@ export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
     const wasOpen = useRef(false);
     useEffect(() => {
         if (open && !wasOpen.current) {
-            setStep(1);
-            setMode('existing');
-            setExistingPatient(null);
+            // If a patient is pre-locked (e.g. opened from Patients/Show),
+            // skip step 1 entirely and seed the existing-patient slot.
+            if (lockedPatient) {
+                setStep(2);
+                setMode('existing');
+                setExistingPatient(lockedPatient);
+            } else {
+                setStep(1);
+                setMode('existing');
+                setExistingPatient(null);
+            }
             setPatient(EMPTY_PATIENT);
             setAppointment({
                 doctor_id: defaultDoctor ? String(defaultDoctor.id) : '',
@@ -252,7 +266,7 @@ export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <Stepper step={step} t={t} />
+                {!lockedPatient && <Stepper step={step} t={t} />}
 
                 <form onSubmit={submit} className="space-y-5">
                     {step === 1 ? (
@@ -576,7 +590,7 @@ export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
                     )}
 
                     <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-4">
-                        {step === 2 ? (
+                        {step === 2 && !lockedPatient ? (
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -590,6 +604,7 @@ export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
                                 type="button"
                                 variant="ghost"
                                 onClick={() => onOpenChange(false)}
+                                disabled={submitting}
                             >
                                 {tc('actions.cancel')}
                             </Button>
