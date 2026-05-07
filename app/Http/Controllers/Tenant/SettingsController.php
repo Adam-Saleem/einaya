@@ -15,7 +15,7 @@ use Inertia\Response;
 
 class SettingsController extends Controller
 {
-    private const SECTIONS = ['general', 'branding', 'localization', 'receipt', 'notifications'];
+    private const SECTIONS = ['general', 'branding', 'localization', 'receipt', 'notifications', 'pricing'];
 
     public function __construct(private AuditLogService $audit)
     {

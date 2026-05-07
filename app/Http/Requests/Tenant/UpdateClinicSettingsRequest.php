@@ -33,6 +33,9 @@ class UpdateClinicSettingsRequest extends FormRequest
             'receipt.show_logo' => ['nullable', 'boolean'],
 
             'notifications.appointment_reminders' => ['nullable', 'boolean'],
+
+            'pricing.first_visit_price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'pricing.review_visit_price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
         ];
     }
 }

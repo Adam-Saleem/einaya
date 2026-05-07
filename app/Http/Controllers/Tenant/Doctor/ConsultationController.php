@@ -85,7 +85,33 @@ class ConsultationController extends Controller
                     'title' => $f->title,
                     'type' => is_object($f->type) ? $f->type->value : (string) $f->type,
                 ]),
+            'services' => \App\Models\Tenant\Service::active()
+                ->orderBy('display_order')
+                ->orderBy('name')
+                ->get(['id', 'name', 'price'])
+                ->map(fn ($s) => [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'price' => (float) $s->price,
+                ]),
+            'pricing' => $this->pricing(),
         ]);
+    }
+
+    /**
+     * @return array{first_visit_price: float, review_visit_price: float}
+     */
+    private function pricing(): array
+    {
+        $row = \App\Models\Tenant\ClinicSetting::query()
+            ->where('key', 'pricing')
+            ->first();
+        $value = $row?->value ?? [];
+
+        return [
+            'first_visit_price' => (float) ($value['first_visit_price'] ?? 0),
+            'review_visit_price' => (float) ($value['review_visit_price'] ?? 0),
+        ];
     }
 
     public function update(UpdateConsultationRequest $request, Consultation $consultation): RedirectResponse
@@ -107,7 +133,16 @@ class ConsultationController extends Controller
     ): RedirectResponse {
         $this->ensureCan($request->user(), 'consultations.update');
 
-        $action->execute($consultation, $request->user());
+        $billing = $request->validate([
+            'visit_type' => ['nullable', 'in:first,review'],
+            'service_ids' => ['nullable', 'array'],
+            'service_ids.*' => ['integer', 'exists:clinic_services,id'],
+        ]);
+
+        $action->execute($consultation, $request->user(), [
+            'visit_type' => $billing['visit_type'] ?? null,
+            'service_ids' => $billing['service_ids'] ?? [],
+        ]);
 
         return redirect('/doctor')->with('success', 'Consultation completed.');
     }

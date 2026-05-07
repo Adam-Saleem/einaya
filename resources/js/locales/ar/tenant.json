@@ -100,8 +100,14 @@
             "general": "عام",
             "branding": "الهوية",
             "localization": "اللغة",
+            "pricing": "الأسعار",
             "receipt": "الإيصال",
             "notifications": "الإشعارات"
+        },
+        "pricing": {
+            "body": "حدّد السعر الأساسي للزيارة الأولى وزيارة المتابعة. يختار الطبيب نوع الزيارة عند إنهاء الاستشارة، والاستقبال يضيفه إلى الإيصال تلقائيًا.",
+            "firstVisit": "سعر الزيارة الأولى",
+            "reviewVisit": "سعر زيارة المتابعة"
         },
         "general": {
             "name": "اسم العيادة",
@@ -296,6 +302,32 @@
         "title": "الاستقبال",
         "subtitle": "طابور اليوم",
         "summary": "{{done}} من {{total}} مكتملة",
+        "summary3": "{{scheduled}} بالانتظار · {{in_progress}} قيد الكشف · {{pending_payment}} بانتظار الدفع",
+        "sections": {
+            "scheduled": {
+                "title": "بالانتظار",
+                "empty": "لا توجد مواعيد بانتظار."
+            },
+            "inProgress": {
+                "title": "قيد الكشف",
+                "empty": "لا توجد زيارات قيد الكشف.",
+                "startedAt": "بدأت في"
+            },
+            "pendingPayment": {
+                "title": "بانتظار الدفع",
+                "empty": "لا توجد زيارات مكتملة بحاجة إلى فاتورة."
+            },
+            "payment": {
+                "visitType": "الزيارة",
+                "firstVisit": "زيارة أولى",
+                "reviewVisit": "زيارة متابعة",
+                "services": "خدمة(خدمات)",
+                "total": "الإجمالي",
+                "paid": "مدفوع",
+                "pending": "بانتظار",
+                "record": "تسجيل دفعة"
+            }
+        },
         "queue": "طابور اليوم",
         "noAppointments": "لا توجد مواعيد لهذا اليوم.",
         "confirmCancel": {
@@ -500,6 +532,7 @@
         "form": {
             "patient": "المريض",
             "appointment": "موعد مرتبط (اختياري)",
+            "breakdown": "محسوب من الزيارة + الخدمات",
             "createTitle": "تسجيل دفعة",
             "amount": "المبلغ",
             "method": "طريقة الدفع",
@@ -531,6 +564,43 @@
             "insurance": "تأمين",
             "total": "الإجمالي",
             "thankYou": "شكرًا لزيارتكم."
+        }
+    },
+    "services": {
+        "title": "الخدمات",
+        "subtitle": "كتالوج الخدمات والأسعار المستخدمة في فواتير الزيارات المكتملة.",
+        "empty": "لا توجد خدمات بعد. أنشئ أول خدمة لتبدأ الفوترة.",
+        "status": {
+            "active": "مفعّلة",
+            "disabled": "موقوفة"
+        },
+        "columns": {
+            "name": "الاسم",
+            "code": "الكود",
+            "price": "السعر",
+            "status": "الحالة",
+            "actions": "إجراءات"
+        },
+        "actions": {
+            "create": "خدمة جديدة",
+            "edit": "تعديل",
+            "enable": "تفعيل",
+            "disable": "تعطيل",
+            "delete": "أرشفة"
+        },
+        "form": {
+            "createTitle": "إنشاء خدمة",
+            "editTitle": "تعديل خدمة",
+            "name": "الاسم",
+            "code": "الكود",
+            "description": "وصف (اختياري)",
+            "price": "السعر",
+            "isActive": "مفعّلة",
+            "isActiveHint": "أوقف التفعيل لإخفاء الخدمة من حوار إنهاء الزيارة دون حذفها."
+        },
+        "confirmDelete": {
+            "title": "أرشفة هذه الخدمة؟",
+            "body": "تختفي من قوائم الاختيار. الفواتير السابقة تحتفظ بسعر اللقطة."
         }
     },
     "doctorPanel": {
@@ -583,7 +653,7 @@
             "saveDraft": "حفظ مسوّدة",
             "complete": "إنهاء الاستشارة",
             "confirmComplete": "إنهاء هذه الاستشارة؟",
-            "confirmCompleteBody": "سيُنقل الموعد إلى مكتمل وتُغلق الاستشارة.",
+            "confirmCompleteBody": "اختر نوع الزيارة والخدمات المُقدَّمة. الاستقبال سيستخدم ذلك للفوترة.",
             "diagnosisCode": "الكود (اختياري)",
             "diagnosisDescription": "الوصف",
             "diagnosisNotes": "ملاحظات",
@@ -598,6 +668,13 @@
             "instructions": "تعليمات",
             "printPrescription": "طباعة الوصفة",
             "prescriptionLocked": "الوصفة مغلقة (تمت الطباعة)."
+        },
+        "complete": {
+            "visitType": "نوع الزيارة",
+            "firstVisit": "زيارة أولى",
+            "reviewVisit": "زيارة متابعة",
+            "services": "الخدمات المُقدَّمة",
+            "total": "الإجمالي"
         },
         "history": {
             "title": "سجل المريض",

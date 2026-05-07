@@ -103,6 +103,10 @@ export type ClinicSettings = {
     notifications?: {
         appointment_reminders?: boolean;
     };
+    pricing?: {
+        first_visit_price?: number;
+        review_visit_price?: number;
+    };
 };
 
 export type FormQuestion = {

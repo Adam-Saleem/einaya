@@ -7,12 +7,30 @@
 
 ## Current Status
 
-**Active phase:** Phase 21 — reception simplification + 2-step appointment flow shipped. Reception dashboard reduced to one queue + one CTA; `<NewAppointmentDialog>` walks the user through patient → time slot in two steps; simple patient form (full_name only required) supports both new and existing patients. Pest 104/104.
+**Active phase:** Phase 22 — services catalogue + visit-type billing + 3-section reception shipped. Reception splits into Scheduled / In progress / Pending payment; doctor's complete dialog records visit type + services; reception bills with the calculated total. Pest 108/108.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### 💵 Phase 22 — Services catalogue + visit-type billing + 3-section reception (2026-05-07)
+
+Reception splits into three buckets — *Scheduled & waiting*, *In consultation*, *Pending payment*. Each clinic owns a service catalogue with prices. The doctor picks a visit type (first / review) and any services performed when completing a consultation; the reception then sees the calculated total in section 3 and records payment with that figure pre-filled.
+
+- **22.1 Schema.** Tenant migration adds `clinic_services` (name, code unique, price decimal(10,2), is_active, soft-deletes), `consultation_service` join (service_id nullable + service_name_snapshot + price_at_time + quantity so editing the catalogue later doesn't rewrite past bills — same pattern as `form_snapshot`), and `consultations.visit_type` enum nullable. Settings JSON gets a new `pricing` section.
+- **22.2 Models + permission.** `Service` with `active()` scope, `ConsultationService` carrying snapshots, `Consultation::services()`. New `services.manage` permission added; clinic_admin gets it automatically.
+- **22.3 BillingCalculator.** `BillingCalculator::summary($consultation)` returns `{ base_price, services[…line_total], services_total, total }`. `CompleteConsultationAction` accepts a billing array and snapshots services into the pivot inside a transaction; audit row picks up visit_type + services_count.
+- **22.4 Service CRUD.** `Tenant\ServiceController` index/store/update/destroy gated by `services.manage`. `StoreServiceRequest` slugifies name into `code` automatically. Sidebar entry under Admin → Services. New `Pages/Tenant/Services/Index.tsx` with create/edit FormModals, toggle-active, soft-delete confirm.
+- **22.5 Reception 3-section rewrite.** `ReceptionDashboardController` returns three buckets driven off `appointment.status`. Each completed row carries its `BillingCalculator::summary` and an `is_paid` flag (single payments lookup). Section 3 **Record payment** action opens `PaymentForm` with new `prefill={amount, breakdown}` so the form arrives with the right total + a breakdown card above the amount input.
+- **22.6 Doctor complete dialog.** Inline ConfirmDialog replaced with a richer Dialog: visit-type radio cards (showing each visit's price), services checkbox list, live total preview. Submit posts `visit_type` + `service_ids[]` to the existing complete endpoint.
+- **22.7 Settings Pricing tab.** New tab with first-visit + review-visit number inputs. UpdateClinicSettingsRequest accepts the new `pricing.*` keys; SECTIONS constant grows by one.
+- **22.8 i18n + tests.** New keys: `tenant.services.*`, `tenant.reception.sections.*`, `tenant.doctorPanel.complete.*`, `tenant.settings.pricing.*`, `tenant.payments.form.breakdown`, `common.nav.services`. EN ↔ AR mirrored. Tests:
+  - `ServiceCrudTest` — clinic admin create/update/soft-delete; secretary 403.
+  - `CompleteConsultationWithServicesTest` — services snapshot into pivot at write time; editing the catalogue later doesn't rewrite snapshot; `BillingCalculator` returns base + services total correctly.
+- **Verification.** tsc clean, build green (main 358 kB / 116 kB gz), Pest **108/108** (was 104), smoke 200 across the 7 authed routes + `/services`, log empty.
+
+**Out of scope** (intentional): per-visit discounts / promo codes; service unit pricing tiers; auto-detect first vs review (doctor picks); service-category grouping; usage analytics dashboard.
 
 ### 📋 Phase 21 — Reception simplification + 2-step appointment flow (2026-05-07)
 

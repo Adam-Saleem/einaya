@@ -59,6 +59,10 @@ export default function SettingsPage({ settings }: Props) {
                 settings.notifications?.appointment_reminders ?? false,
             ),
         },
+        pricing: {
+            first_visit_price: Number(settings.pricing?.first_visit_price ?? 0),
+            review_visit_price: Number(settings.pricing?.review_visit_price ?? 0),
+        },
     });
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -67,7 +71,7 @@ export default function SettingsPage({ settings }: Props) {
     };
 
     const set = (
-        section: 'general' | 'branding' | 'localization' | 'receipt' | 'notifications',
+        section: 'general' | 'branding' | 'localization' | 'receipt' | 'notifications' | 'pricing',
         key: string,
         value: unknown,
     ) =>
@@ -100,6 +104,7 @@ export default function SettingsPage({ settings }: Props) {
                         <TabsTrigger value="localization">
                             {t('settings.tabs.localization')}
                         </TabsTrigger>
+                        <TabsTrigger value="pricing">{t('settings.tabs.pricing')}</TabsTrigger>
                         <TabsTrigger value="receipt">{t('settings.tabs.receipt')}</TabsTrigger>
                         <TabsTrigger value="notifications">
                             {t('settings.tabs.notifications')}
@@ -241,6 +246,52 @@ export default function SettingsPage({ settings }: Props) {
                                             <SelectItem value="en">English</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="pricing" className="mt-4">
+                        <Card>
+                            <CardContent className="grid gap-4 p-6 md:grid-cols-2">
+                                <div className="md:col-span-2">
+                                    <p className="text-sm text-muted-foreground">
+                                        {t('settings.pricing.body')}
+                                    </p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="first_visit_price">
+                                        {t('settings.pricing.firstVisit')}
+                                    </Label>
+                                    <Input
+                                        id="first_visit_price"
+                                        type="number"
+                                        step="0.01"
+                                        min={0}
+                                        value={form.data.pricing.first_visit_price}
+                                        onChange={(e) =>
+                                            set('pricing', 'first_visit_price', Number(e.target.value))
+                                        }
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="review_visit_price">
+                                        {t('settings.pricing.reviewVisit')}
+                                    </Label>
+                                    <Input
+                                        id="review_visit_price"
+                                        type="number"
+                                        step="0.01"
+                                        min={0}
+                                        value={form.data.pricing.review_visit_price}
+                                        onChange={(e) =>
+                                            set(
+                                                'pricing',
+                                                'review_visit_price',
+                                                Number(e.target.value),
+                                            )
+                                        }
+                                    />
                                 </div>
                             </CardContent>
                         </Card>

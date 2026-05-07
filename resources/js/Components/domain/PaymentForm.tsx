@@ -23,21 +23,33 @@ import {
 } from '@/Components/ui/select';
 import { Textarea } from '@/Components/ui/textarea';
 
+type Prefill = {
+    amount?: number;
+    breakdown?: { label: string; value: number }[];
+};
+
 type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     patientId?: number;
     appointmentId?: number;
+    prefill?: Prefill;
 };
 
 type Method = 'cash' | 'card' | 'insurance' | 'mixed';
 
-export function PaymentForm({ open, onOpenChange, patientId, appointmentId }: Props) {
+export function PaymentForm({
+    open,
+    onOpenChange,
+    patientId,
+    appointmentId,
+    prefill,
+}: Props) {
     const { t } = useTranslation('tenant');
     const form = useForm({
         patient_id: patientId ? String(patientId) : '',
         appointment_id: appointmentId ? String(appointmentId) : '',
-        amount: '',
+        amount: prefill?.amount ? String(prefill.amount) : '',
         method: 'cash' as Method,
         cash_amount: '',
         card_amount: '',
@@ -85,6 +97,21 @@ export function PaymentForm({ open, onOpenChange, patientId, appointmentId }: Pr
                             {form.errors.patient_id && (
                                 <p className="text-xs text-destructive">{form.errors.patient_id}</p>
                             )}
+                        </div>
+                    )}
+                    {prefill?.breakdown && prefill.breakdown.length > 0 && (
+                        <div className="rounded-md border bg-muted/40 p-3 text-sm">
+                            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                                {t('payments.form.breakdown')}
+                            </p>
+                            <ul className="mt-1 space-y-0.5 text-xs">
+                                {prefill.breakdown.map((row) => (
+                                    <li key={row.label} className="flex justify-between">
+                                        <span>{row.label}</span>
+                                        <span className="font-mono">{row.value.toFixed(2)}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     )}
                     <div className="grid gap-3 md:grid-cols-2">

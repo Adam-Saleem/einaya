@@ -8,6 +8,7 @@ import {
     PieChart,
     Settings,
     Stethoscope,
+    Tag,
     TicketPercent,
     Users,
     UsersRound,
@@ -123,6 +124,12 @@ const sections: NavSection[] = [
                 labelKey: 'nav.staff',
                 icon: Users,
                 permission: 'staff.view',
+            },
+            {
+                href: '/services',
+                labelKey: 'nav.services',
+                icon: Tag,
+                permission: 'services.manage',
             },
             {
                 href: '/settings',

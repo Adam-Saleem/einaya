@@ -73,6 +73,7 @@ enum Permission: string
     case ClinicUpdateSettings = 'clinic.update_settings';
     case ClinicUpdateBranding = 'clinic.update_branding';
     case ClinicManageSubscription = 'clinic.manage_subscription';
+    case ServicesManage = 'services.manage';
 
     // Reports
     case ReportsView = 'reports.view';

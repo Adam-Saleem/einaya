@@ -22,8 +22,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
+import { Checkbox } from '@/Components/ui/checkbox';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/Components/ui/radio-group';
 import {
     Select,
     SelectContent,
@@ -110,14 +120,26 @@ type HistoryEntry = {
     submissions_count: number;
 };
 
+type ServiceOption = { id: number; name: string; price: number };
+type PricingOption = { first_visit_price: number; review_visit_price: number };
+
 type Props = {
     consultation: Consultation;
     history: HistoryEntry[];
     forms: { id: number; title: string; type: string }[];
+    services: ServiceOption[];
+    pricing: PricingOption;
 };
 
-export default function ConsultationPage({ consultation, history, forms }: Props) {
+export default function ConsultationPage({
+    consultation,
+    history,
+    forms,
+    services,
+    pricing,
+}: Props) {
     const { t } = useTranslation('tenant');
+    const { t: tc } = useTranslation('common');
     useFlashToasts();
 
     const [overviewState, setOverviewState] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -130,6 +152,28 @@ export default function ConsultationPage({ consultation, history, forms }: Props
 
     const [completeOpen, setCompleteOpen] = useState(false);
     const [completeBusy, runComplete] = usePending();
+    const [visitType, setVisitType] = useState<'first' | 'review'>('first');
+    const [selectedServices, setSelectedServices] = useState<Set<number>>(new Set());
+
+    const visitBasePrice =
+        visitType === 'first' ? pricing.first_visit_price : pricing.review_visit_price;
+    const servicesTotal = services
+        .filter((s) => selectedServices.has(s.id))
+        .reduce((sum, s) => sum + s.price, 0);
+    const completeTotal = visitBasePrice + servicesTotal;
+    const formatPrice = (n: number) =>
+        new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 2,
+        }).format(n);
+    const toggleService = (id: number) =>
+        setSelectedServices((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
     const [submitFormBusy, runSubmitForm] = usePending();
     const [removingDiagnosis, setRemovingDiagnosis] = useState<Set<number>>(new Set());
     const [removingItem, setRemovingItem] = useState<Set<number>>(new Set());
@@ -773,20 +817,120 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                 </Card>
             </div>
 
-            <ConfirmDialog
+            <Dialog
                 open={completeOpen}
                 onOpenChange={(open) => !completeBusy && setCompleteOpen(open)}
-                title={t('doctorPanel.consultation.confirmComplete')}
-                description={t('doctorPanel.consultation.confirmCompleteBody')}
-                confirmLabel={t('doctorPanel.consultation.complete')}
-                destructive={false}
-                busy={completeBusy}
-                onConfirm={() =>
-                    runComplete((opts) =>
-                        router.post(`/consultations/${consultation.id}/complete`, {}, opts),
-                    )
-                }
-            />
+            >
+                <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {t('doctorPanel.consultation.confirmComplete')}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {t('doctorPanel.consultation.confirmCompleteBody')}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>{t('doctorPanel.complete.visitType')}</Label>
+                            <RadioGroup
+                                value={visitType}
+                                onValueChange={(v) => setVisitType(v as 'first' | 'review')}
+                                className="grid grid-cols-2 gap-3"
+                            >
+                                <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                    <RadioGroupItem value="first" id="visit-first" />
+                                    <span className="flex-1">
+                                        <span className="block text-sm font-medium">
+                                            {t('doctorPanel.complete.firstVisit')}
+                                        </span>
+                                        <span className="block text-xs text-muted-foreground">
+                                            {formatPrice(pricing.first_visit_price)}
+                                        </span>
+                                    </span>
+                                </label>
+                                <label className="flex cursor-pointer items-center gap-2 rounded-md border p-3 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                    <RadioGroupItem value="review" id="visit-review" />
+                                    <span className="flex-1">
+                                        <span className="block text-sm font-medium">
+                                            {t('doctorPanel.complete.reviewVisit')}
+                                        </span>
+                                        <span className="block text-xs text-muted-foreground">
+                                            {formatPrice(pricing.review_visit_price)}
+                                        </span>
+                                    </span>
+                                </label>
+                            </RadioGroup>
+                        </div>
+
+                        {services.length > 0 && (
+                            <div className="space-y-2">
+                                <Label>{t('doctorPanel.complete.services')}</Label>
+                                <div className="space-y-1.5 rounded-md border p-2">
+                                    {services.map((s) => (
+                                        <label
+                                            key={s.id}
+                                            className="flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 hover:bg-accent"
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                <Checkbox
+                                                    checked={selectedServices.has(s.id)}
+                                                    onCheckedChange={() => toggleService(s.id)}
+                                                />
+                                                <span className="text-sm font-medium">{s.name}</span>
+                                            </span>
+                                            <span className="text-sm font-mono text-muted-foreground">
+                                                {formatPrice(s.price)}
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="rounded-md border bg-muted/40 p-3">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                    {t('doctorPanel.complete.total')}
+                                </span>
+                                <span className="font-mono text-h4 font-semibold">
+                                    {formatPrice(completeTotal)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setCompleteOpen(false)}
+                            disabled={completeBusy}
+                        >
+                            {tc('actions.cancel')}
+                        </Button>
+                        <Button
+                            type="button"
+                            disabled={completeBusy}
+                            onClick={() =>
+                                runComplete((opts) =>
+                                    router.post(
+                                        `/consultations/${consultation.id}/complete`,
+                                        {
+                                            visit_type: visitType,
+                                            service_ids: Array.from(selectedServices),
+                                        },
+                                        opts,
+                                    ),
+                                )
+                            }
+                        >
+                            {t('doctorPanel.consultation.complete')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

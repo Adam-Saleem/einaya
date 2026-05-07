@@ -100,8 +100,14 @@
             "general": "General",
             "branding": "Branding",
             "localization": "Localization",
+            "pricing": "Pricing",
             "receipt": "Receipt",
             "notifications": "Notifications"
+        },
+        "pricing": {
+            "body": "Set the base price for first visits and follow-up reviews. The doctor picks the visit type when completing a consultation, and reception adds it to the receipt automatically.",
+            "firstVisit": "First visit price",
+            "reviewVisit": "Review visit price"
         },
         "general": {
             "name": "Clinic name",
@@ -292,6 +298,32 @@
         "title": "Reception",
         "subtitle": "Today's queue and walk-ins",
         "summary": "{{done}} of {{total}} done",
+        "summary3": "{{scheduled}} scheduled · {{in_progress}} in progress · {{pending_payment}} pending payment",
+        "sections": {
+            "scheduled": {
+                "title": "Scheduled & waiting",
+                "empty": "No appointments waiting."
+            },
+            "inProgress": {
+                "title": "In consultation",
+                "empty": "No visits in progress.",
+                "startedAt": "started at"
+            },
+            "pendingPayment": {
+                "title": "Pending payment",
+                "empty": "No completed visits to bill."
+            },
+            "payment": {
+                "visitType": "Visit",
+                "firstVisit": "First visit",
+                "reviewVisit": "Review visit",
+                "services": "service(s)",
+                "total": "Total",
+                "paid": "Paid",
+                "pending": "Pending",
+                "record": "Record payment"
+            }
+        },
         "queue": "Today's queue",
         "noAppointments": "No appointments today.",
         "confirmCancel": {
@@ -493,6 +525,7 @@
             "createTitle": "Record payment",
             "patient": "Patient",
             "appointment": "Linked appointment (optional)",
+            "breakdown": "Calculated from visit + services",
             "amount": "Amount",
             "method": "Method",
             "cash": "Cash",
@@ -527,6 +560,43 @@
             "insurance": "Insurance",
             "total": "Total",
             "thankYou": "Thank you for visiting."
+        }
+    },
+    "services": {
+        "title": "Services",
+        "subtitle": "Service catalogue with prices used on completed-visit receipts.",
+        "empty": "No services yet. Create your first one to start billing.",
+        "status": {
+            "active": "Active",
+            "disabled": "Disabled"
+        },
+        "columns": {
+            "name": "Name",
+            "code": "Code",
+            "price": "Price",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "actions": {
+            "create": "New service",
+            "edit": "Edit",
+            "enable": "Enable",
+            "disable": "Disable",
+            "delete": "Archive"
+        },
+        "form": {
+            "createTitle": "Create service",
+            "editTitle": "Edit service",
+            "name": "Name",
+            "code": "Code",
+            "description": "Description (optional)",
+            "price": "Price",
+            "isActive": "Active",
+            "isActiveHint": "Disable to hide this service from the doctor's complete-visit dialog without deleting."
+        },
+        "confirmDelete": {
+            "title": "Archive this service?",
+            "body": "It disappears from selection lists. Past consultation bills keep the snapshot price."
         }
     },
     "doctorPanel": {
@@ -579,7 +649,7 @@
             "saveDraft": "Save draft",
             "complete": "Complete consultation",
             "confirmComplete": "Complete this consultation?",
-            "confirmCompleteBody": "The appointment moves to completed and the consultation is locked.",
+            "confirmCompleteBody": "Pick the visit type and any services performed. Reception will use this to bill.",
             "selectForm": "Select a form",
             "submitForm": "Submit form",
             "addDiagnosis": "Add diagnosis",
@@ -594,6 +664,13 @@
             "instructions": "Instructions",
             "printPrescription": "Print prescription",
             "prescriptionLocked": "Prescription locked (printed)."
+        },
+        "complete": {
+            "visitType": "Visit type",
+            "firstVisit": "First visit",
+            "reviewVisit": "Review visit",
+            "services": "Services performed",
+            "total": "Total"
         },
         "history": {
             "title": "Patient history",

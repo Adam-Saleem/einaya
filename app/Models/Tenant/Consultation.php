@@ -23,6 +23,7 @@ class Consultation extends Model
         'doctor_id',
         'started_at',
         'ended_at',
+        'visit_type',
         'chief_complaint',
         'notes',
         'follow_up_in_days',
@@ -62,6 +63,11 @@ class Consultation extends Model
     public function formSubmissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(ConsultationService::class);
     }
 
     protected static function newFactory(): ConsultationFactory

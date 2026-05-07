@@ -36,6 +36,7 @@ use App\Http\Controllers\Tenant\ReceptionDashboardController;
 use App\Http\Controllers\Tenant\ReportController;
 use App\Http\Controllers\Tenant\SettingsController;
 use App\Http\Controllers\Tenant\SubscriptionController;
+use App\Http\Controllers\Tenant\ServiceController;
 use App\Http\Controllers\Tenant\StaffController;
 use App\Http\Controllers\Tenant\WorkingHoursController;
 use App\Models\Tenant\Appointment;
@@ -155,6 +156,14 @@ Route::middleware([
             ->name('tenant.subscription.redeem');
         Route::post('/settings/branding/logo', [SettingsController::class, 'uploadLogo'])
             ->name('tenant.settings.branding.logo');
+
+        // Services catalogue (clinic admin)
+        Route::get('/services', [ServiceController::class, 'index'])->name('tenant.services.index');
+        Route::post('/services', [ServiceController::class, 'store'])->name('tenant.services.store');
+        Route::patch('/services/{service}', [ServiceController::class, 'update'])
+            ->name('tenant.services.update');
+        Route::delete('/services/{service}', [ServiceController::class, 'destroy'])
+            ->name('tenant.services.destroy');
 
         // Insurance providers
         Route::get('/insurance-providers', [InsuranceProviderController::class, 'index'])
