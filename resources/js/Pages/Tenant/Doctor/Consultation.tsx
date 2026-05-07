@@ -165,9 +165,8 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                 {
                     preserveScroll: true,
                     onFinish: () => {
-                        // After ensure, server returns updated consultation;
-                        // for simplicity refresh the whole page once.
                         router.reload({
+                            only: ['consultation'],
                             onSuccess: () => resolve(0),
                         });
                     },

@@ -11,9 +11,12 @@ use App\Models\Tenant\User as TenantUser;
 use App\Services\Tenant\AuditLogService;
 use App\Services\Tenant\FormSnapshotService;
 use Illuminate\Support\Carbon;
+use RuntimeException;
 
 class SubmitFormAction
 {
+    private const MAX_SNAPSHOT_BYTES = 512000;
+
     public function __construct(
         private AuditLogService $audit,
         private FormSnapshotService $snapshots,
@@ -35,6 +38,13 @@ class SubmitFormAction
         ?TenantUser $actor,
     ): FormSubmission {
         $snapshot = $this->snapshots->snapshot($form);
+
+        $size = strlen((string) json_encode($snapshot));
+        if ($size > self::MAX_SNAPSHOT_BYTES) {
+            throw new RuntimeException(
+                "Form structure too large to snapshot ({$size} bytes; max " . self::MAX_SNAPSHOT_BYTES . '). Trim sections, questions, or option labels.',
+            );
+        }
 
         $submission = FormSubmission::create([
             'medical_form_id' => $form->id,

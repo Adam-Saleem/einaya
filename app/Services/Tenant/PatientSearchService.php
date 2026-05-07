@@ -25,14 +25,24 @@ class PatientSearchService
 
         $like = '%'.$term.'%';
         $digits = preg_replace('/\D+/', '', $term);
+        $useFulltext = strlen($term) > 3 && ! str_contains($term, '%');
 
         return Patient::query()
-            ->where(function (Builder $q) use ($like, $digits) {
-                $q->where('patient_code', 'like', $like)
-                    ->orWhere('first_name', 'like', $like)
-                    ->orWhere('last_name', 'like', $like)
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like])
-                    ->orWhere('national_id', 'like', $like)
+            ->where(function (Builder $q) use ($term, $like, $digits, $useFulltext) {
+                $q->where('patient_code', 'like', $like);
+
+                if ($useFulltext) {
+                    $q->orWhereRaw(
+                        'MATCH(first_name, last_name) AGAINST (? IN BOOLEAN MODE)',
+                        [$term.'*'],
+                    );
+                } else {
+                    $q->orWhere('first_name', 'like', $like)
+                        ->orWhere('last_name', 'like', $like)
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
+                }
+
+                $q->orWhere('national_id', 'like', $like)
                     ->orWhere('email', 'like', $like);
 
                 if ($digits !== '' && strlen($digits) >= 4) {

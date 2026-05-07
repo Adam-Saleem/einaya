@@ -7,14 +7,27 @@
 
 ## Current Status
 
-**Active phase:** Phase 12 (UX & visual polish) — first batch (12.0–12.5) shipped in eae1612; second batch (12.6+) underway.
+**Active phase:** Phase 13 (perf) — bundle code-split + FULLTEXT patient search shipped; deferring 13.4/13.6 to v2.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
 
-### 🚧 Phase 12 — UX & Visual Polish (in progress, 2026-05-07)
+### 🚧 Phase 13 — Performance & Data Hygiene (in progress, 2026-05-07)
+
+- **13.1 Bundle code-splitting via vendor manualChunks.** `vite.config.js` now declares per-vendor chunks for `recharts`, `@fullcalendar`, `@dnd-kit`, `react-colorful`, `i18next`, `@radix-ui`, `@tanstack`, `lucide-react`. Result vs prior build:
+  - `app.js` 558 kB → 320 kB (gz 182 kB → 103 kB)
+  - `recharts` and `fullcalendar` (the big offenders) now ship as named vendor chunks loaded only by Dashboard / Calendar pages.
+  - The 500 kB chunk-size warning is gone for the main bundle. The remaining ones (recharts, fullcalendar, radix) are intentional vendor chunks and lazy-loaded per route.
+- **13.3 Patient search FULLTEXT.** New tenant migration `2026_05_07_000001_add_fulltext_index_to_patients` adds a MySQL FULLTEXT index on `(first_name, last_name)`. `PatientSearchService::search()` switches to `MATCH(first_name, last_name) AGAINST (? IN BOOLEAN MODE)` for terms longer than 3 chars (which is also the MySQL default `ft_min_word_len`). Shorter queries still use the `LIKE` fallback. `patient_code`, `national_id`, `email`, and digits-only `phone` paths unchanged. Demo tenant migrated cleanly; PatientSearchTest still passes.
+- **13.5 Inertia partial reloads.** `Doctor/Consultation::ensurePrescription()` reloaded the whole page after the POST; now it does `router.reload({ only: ['consultation'] })` so the heavy form/diagnosis/history props don't re-render. (Builder already used `only: ['form']`.)
+- **13.7 Form snapshot size cap.** `SubmitFormAction` rejects with a runtime error if the JSON-encoded snapshot exceeds 500 KB. Validates at write time so a pathological 200-question form with 50 long-labeled options each can't bloat backups.
+- **13.2 N+1 audit:** existing `with([...])` eager-loads in `ConsultationResource` already cover the diagnoses/prescriptions/formSubmissions chain. Spot-checked Patient History controller — same eager-load pattern. No regressions detected; deferred adding a query-count test (would change test infra and gain minimal coverage).
+- **13.4 Aggregate-stats job:** deferred. Refresh-now is still synchronous; converting to a polling pattern needs a "computing…" UX surface that's bigger than the perf win for v1's 1-clinic demo footprint.
+- **13.6 Storage URLs:** deferred. Local Herd setup uses the existing `public/storage` symlink, which works for the demo. Per-tenant signed URLs land with the v2 S3 swap.
+
+### 🚧 Phase 12 — UX & Visual Polish (shipped 2026-05-07)
 
 #### Batch 1 — Foundations (eae1612, 12.0–12.5)
 
