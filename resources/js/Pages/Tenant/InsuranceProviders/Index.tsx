@@ -108,6 +108,7 @@ export default function InsuranceProvidersIndex({ providers }: Props) {
                                         <Button
                                             variant="ghost"
                                             size="icon"
+                                            aria-label={t('actions.edit', { defaultValue: 'Edit' })}
                                             onClick={() => openEdit(row)}
                                         >
                                             <Pencil className="h-4 w-4" />
@@ -115,6 +116,7 @@ export default function InsuranceProvidersIndex({ providers }: Props) {
                                         <Button
                                             variant="ghost"
                                             size="icon"
+                                            aria-label={t('actions.delete', { defaultValue: 'Delete' })}
                                             onClick={() => setDeleting(row)}
                                         >
                                             <Trash2 className="h-4 w-4 text-destructive" />

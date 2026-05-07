@@ -588,6 +588,7 @@ function SectionEditor({
     formId: number;
     onSaved: () => void;
 }) {
+    const { t } = useTranslation('tenant');
     const [editing, setEditing] = useState(false);
     const form = useForm({
         title: section.title,
@@ -611,7 +612,12 @@ function SectionEditor({
                         <p className="text-sm text-muted-foreground">{section.description}</p>
                     )}
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setEditing(true)}>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditing(true)}
+                    aria-label={t('actions.edit', { defaultValue: 'Edit' })}
+                >
                     <Pencil className="h-4 w-4" />
                 </Button>
             </div>
@@ -707,10 +713,20 @@ function QuestionItem({
                         ` · ${t('builder.optionsCount', { count: question.options.length })}`}
                 </p>
             </div>
-            <Button variant="ghost" size="icon" onClick={onEdit}>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                aria-label={t('actions.edit', { defaultValue: 'Edit' })}
+            >
                 <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={onDelete}>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={onDelete}
+                aria-label={t('actions.delete', { defaultValue: 'Delete' })}
+            >
                 <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
         </div>
@@ -949,6 +965,7 @@ function QuestionDialog({
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => removeOption(idx)}
+                                            aria-label={t('actions.delete', { defaultValue: 'Delete' })}
                                         >
                                             <Trash2 className="h-4 w-4 text-destructive" />
                                         </Button>

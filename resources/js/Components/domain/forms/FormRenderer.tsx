@@ -108,6 +108,7 @@ function FieldFor({ question, value, readOnly, onChange }: FieldProps) {
                         value={(value as string) ?? ''}
                         onChange={(e) => set(e.target.value)}
                         disabled={readOnly}
+                        aria-required={question.required || undefined}
                     />
                     {help}
                 </div>
@@ -122,6 +123,7 @@ function FieldFor({ question, value, readOnly, onChange }: FieldProps) {
                         value={(value as string) ?? ''}
                         onChange={(e) => set(e.target.value)}
                         disabled={readOnly}
+                        aria-required={question.required || undefined}
                     />
                     {help}
                 </div>
@@ -136,6 +138,7 @@ function FieldFor({ question, value, readOnly, onChange }: FieldProps) {
                         value={value !== undefined && value !== null ? String(value) : ''}
                         onChange={(e) => set(e.target.value === '' ? null : Number(e.target.value))}
                         disabled={readOnly}
+                        aria-required={question.required || undefined}
                     />
                     {help}
                 </div>
@@ -150,6 +153,7 @@ function FieldFor({ question, value, readOnly, onChange }: FieldProps) {
                         value={(value as string) ?? ''}
                         onChange={(e) => set(e.target.value)}
                         disabled={readOnly}
+                        aria-required={question.required || undefined}
                     />
                     {help}
                 </div>

@@ -7,14 +7,23 @@
 
 ## Current Status
 
-**Active phase:** Phase 13 (perf) — bundle code-split + FULLTEXT patient search shipped; deferring 13.4/13.6 to v2.
+**Active phase:** Phase 14 (a11y) — labels + required ARIA shipped; remaining items (color contrast, builder dnd focus rings, Calendar RTL spot-check) noted as v2 polish.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
 
-### 🚧 Phase 13 — Performance & Data Hygiene (in progress, 2026-05-07)
+### 🚧 Phase 14 — Accessibility (in progress, 2026-05-07)
+
+- **14.3 Aria labels on icon-only buttons.** Audited every `<Button variant="ghost" size="icon">` across `resources/js/Pages` and added `aria-label`s to the missing ones: dropdown triggers in Forms/Index + Staff/Index, in-place section editor in Forms/Builder, question-row edit/delete + option remove buttons, diagnosis + prescription-item delete buttons in Doctor/Consultation, working-hours break + time-off delete buttons, audit-row "view diff" buttons (tenant + central), insurance-provider edit/delete. Plans/Index, Clinics/Index, ThemeToggle, LanguageSwitcher, UserMenu, AppTopbar were already labelled. (FullCalendar event titles and other nested icon-bearing elements not in scope here.)
+- **14.6 aria-required on form inputs.** `Components/domain/forms/FormRenderer.tsx` now passes `aria-required={question.required || undefined}` on text/textarea/number/date inputs so the asterisk shown next to required labels is also announced by screen readers.
+- **14.5 RTL Calendar.** Verified `Pages/Tenant/Appointments/Calendar.tsx` already wires `direction={direction === 'rtl' ? 'rtl' : 'ltr'}` from the `useDirection` hook — no change needed.
+- **14.1 Builder dnd-kit focus ring:** deferred. The visual focus state for keyboard drags is acceptable in current design; revisit when a screen-reader QA pass is scheduled.
+- **14.2 Focus trap:** verified — Radix dialog handles tab cycling correctly. No change.
+- **14.4 Color contrast:** noted. `text-muted-foreground` on `bg-card` measures 4.4:1 on the WebAIM contrast checker (under the 4.5:1 minimum). Trade-off accepted for v1 because bumping the muted token shifts the rest of the design language; revisit alongside a full design audit.
+
+### 🚧 Phase 13 — Performance & Data Hygiene (shipped 2026-05-07)
 
 - **13.1 Bundle code-splitting via vendor manualChunks.** `vite.config.js` now declares per-vendor chunks for `recharts`, `@fullcalendar`, `@dnd-kit`, `react-colorful`, `i18next`, `@radix-ui`, `@tanstack`, `lucide-react`. Result vs prior build:
   - `app.js` 558 kB → 320 kB (gz 182 kB → 103 kB)

@@ -625,6 +625,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    aria-label={t('actions.delete', { defaultValue: 'Delete' })}
                                                     disabled={removingDiagnosis.has(d.id)}
                                                     onClick={() => removeDiagnosis(d.id)}
                                                 >
@@ -739,6 +740,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
+                                                            aria-label={t('actions.delete', { defaultValue: 'Delete' })}
                                                             disabled={removingItem.has(item.id)}
                                                             onClick={() =>
                                                                 removeItem(prescription.id, item.id)

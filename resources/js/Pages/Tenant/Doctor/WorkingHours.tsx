@@ -222,6 +222,7 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
+                                    aria-label={t('actions.delete', { defaultValue: 'Delete' })}
                                     disabled={isPendingDelete(`break:${b.id}`)}
                                     onClick={() =>
                                         deleteRow('break', b.id, `/doctor/breaks/${b.id}`)
@@ -282,6 +283,7 @@ export default function WorkingHoursPage({ hours, breaks, timeOff }: Props) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
+                                    aria-label="Delete time-off"
                                     disabled={isPendingDelete(`timeoff:${t.id}`)}
                                     onClick={() =>
                                         deleteRow('timeoff', t.id, `/doctor/time-off/${t.id}`)

@@ -160,6 +160,7 @@ export default function TenantAuditIndex({ logs, filters, users, actions }: Prop
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
+                                                aria-label={t('audit.viewDiff', { defaultValue: 'View diff' })}
                                                 onClick={() => setSelected(log)}
                                             >
                                                 <Eye className="h-4 w-4" />
