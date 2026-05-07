@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
 import { formatDateTime } from '@/lib/dates';
+import { initialsFor, isArabicText } from '@/lib/initials';
 
 type Patient = {
     id: number;
@@ -88,12 +89,8 @@ export default function PatientShow({ patient, appointments, payments, files }: 
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
-    const initials = patient.name
-        .split(/\s+/)
-        .map((p) => p.charAt(0))
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
+    const initials = initialsFor(patient.name);
+    const initialsArabic = isArabicText(initials);
 
     const fileForm = useForm({
         file: null as File | null,
@@ -138,7 +135,11 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                         {patient.profile_photo_url && (
                             <AvatarImage src={patient.profile_photo_url} alt={patient.name} />
                         )}
-                        <AvatarFallback className="bg-primary text-primary-foreground text-h3">
+                        <AvatarFallback
+                            className="bg-primary text-primary-foreground text-h3"
+                            dir={initialsArabic ? 'rtl' : undefined}
+                            style={initialsArabic ? { fontFamily: 'var(--font-arabic)' } : undefined}
+                        >
                             {initials}
                         </AvatarFallback>
                     </Avatar>
@@ -306,14 +307,14 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                                     value={fileForm.data.category}
                                     onChange={(e) => fileForm.setData('category', e.target.value)}
                                 >
-                                    <option value="id_scan">ID scan</option>
-                                    <option value="insurance_card">Insurance card</option>
-                                    <option value="report">Prior report</option>
-                                    <option value="prescription">Prescription</option>
-                                    <option value="other">Other</option>
+                                    <option value="id_scan">{t('patients.fileCategory.id_scan')}</option>
+                                    <option value="insurance_card">{t('patients.fileCategory.insurance_card')}</option>
+                                    <option value="report">{t('patients.fileCategory.report')}</option>
+                                    <option value="prescription">{t('patients.fileCategory.prescription')}</option>
+                                    <option value="other">{t('patients.fileCategory.other')}</option>
                                 </select>
                                 <Input
-                                    placeholder="Notes (optional)"
+                                    placeholder={t('patients.notesOptional')}
                                     value={fileForm.data.notes}
                                     onChange={(e) => fileForm.setData('notes', e.target.value)}
                                 />
@@ -343,7 +344,7 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                                                     {f.original_name}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {f.category} · {(f.size_bytes / 1024).toFixed(0)} KB
+                                                    {t(`patients.fileCategory.${f.category}`, { defaultValue: f.category })} · {(f.size_bytes / 1024).toFixed(0)} KB
                                                 </p>
                                             </div>
                                         </a>

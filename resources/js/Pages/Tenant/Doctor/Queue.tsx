@@ -83,7 +83,9 @@ export default function Queue({ queue }: Props) {
                                 <TableHead>{t('doctorPanel.queue.queue')}</TableHead>
                                 <TableHead>{t('doctorPanel.queue.patient')}</TableHead>
                                 <TableHead>{t('doctorPanel.queue.scheduled')}</TableHead>
-                                <TableHead>{t('doctorPanel.queue.arrived')}</TableHead>
+                                <TableHead className="hidden md:table-cell">
+                                    {t('doctorPanel.queue.arrived')}
+                                </TableHead>
                                 <TableHead>{t('doctorPanel.queue.waited')}</TableHead>
                                 <TableHead className="text-end">
                                     {t('doctorPanel.queue.actions')}
@@ -112,7 +114,9 @@ export default function Queue({ queue }: Props) {
                                                 </p>
                                             </TableCell>
                                             <TableCell>{formatTime(row.scheduled_for)}</TableCell>
-                                            <TableCell>{formatTime(row.arrived_at)}</TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                {formatTime(row.arrived_at)}
+                                            </TableCell>
                                             <TableCell className={cn('font-mono', waitColor(wait))}>
                                                 {wait !== null ? `${wait}m` : '—'}
                                             </TableCell>

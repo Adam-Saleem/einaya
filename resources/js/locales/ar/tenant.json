@@ -239,6 +239,17 @@
             "description": "الوصف",
             "type": "نوع النموذج"
         },
+        "filters": {
+            "search": "بحث",
+            "searchPlaceholder": "ابحث بالعنوان أو الوصف",
+            "type": "النوع",
+            "allTypes": "كل الأنواع"
+        },
+        "types": {
+            "intake": "استقبال",
+            "follow_up": "متابعة",
+            "custom": "مخصّص"
+        },
         "confirmDelete": "أرشفة هذا النموذج؟",
         "confirmDeleteBody": "إن كانت هناك إجابات مرتبطة، يُحتفظ بالنموذج ويُلغى نشره فقط."
     },
@@ -267,6 +278,29 @@
         "subtitle": "المرضى المسجّلون مع بياناتهم وملخّصهم السريري",
         "create": "تسجيل مريض",
         "search": "ابحث بالاسم أو الهاتف أو الهوية أو الرمز",
+        "filters": {
+            "allGenders": "كل الأجناس",
+            "anyInsurance": "أي تأمين",
+            "male": "ذكر",
+            "female": "أنثى",
+            "other": "آخر",
+            "hasInsurance": "لديه تأمين",
+            "noInsurance": "بدون تأمين"
+        },
+        "fileCategory": {
+            "id_scan": "صورة الهوية",
+            "insurance_card": "بطاقة التأمين",
+            "report": "تقرير سابق",
+            "prescription": "وصفة طبية",
+            "other": "أخرى"
+        },
+        "notesOptional": "ملاحظات (اختياري)",
+        "noFiles": "لم يتم رفع ملفات بعد.",
+        "noPayments": "لا توجد دفعات بعد.",
+        "noVisits": "لا توجد مواعيد أو استشارات بعد.",
+        "uploadFile": "رفع ملف",
+        "addPayment": "إضافة دفعة",
+        "bookAppointment": "حجز موعد",
         "columns": {
             "code": "الرمز",
             "name": "الاسم",
@@ -289,10 +323,29 @@
             "ageHint": "العمر: {{age}}",
             "gender": "الجنس",
             "section2": "تفاصيل أكثر",
+            "nationalId": "رقم الهوية",
+            "email": "البريد الإلكتروني",
+            "maritalStatus": "الحالة الاجتماعية",
+            "occupation": "المهنة",
+            "preferredLanguage": "اللغة المفضّلة",
+            "address": "العنوان",
+            "city": "المدينة",
+            "referredBy": "أحاله",
             "section3": "جهة اتصال للطوارئ",
+            "emergencyName": "الاسم",
+            "emergencyPhone": "الهاتف",
+            "emergencyRelation": "صلة القرابة",
             "section4": "ملاحظات طبية سريعة",
+            "bloodType": "فصيلة الدم",
+            "allergies": "الحساسية",
+            "chronic": "أمراض مزمنة",
+            "medications": "الأدوية الحالية",
             "section5": "التأمين",
-            "section7": "ملاحظات"
+            "hasInsurance": "لديه تأمين",
+            "provider": "الجهة",
+            "policyNumber": "رقم البوليصة",
+            "section7": "ملاحظات",
+            "notesHint": "ملاحظات حرة من الاستقبال"
         },
         "duplicatePhone": {
             "title": "تم العثور على {{count}} مريض بنفس الهاتف",
@@ -309,8 +362,28 @@
     },
     "appointments": {
         "title": "المواعيد",
+        "subtitle": "تقويم الاستشارات والحضور دون حجز",
         "today": "اليوم",
         "book": "حجز موعد",
+        "form": {
+            "patient": "المريض",
+            "doctor": "الطبيب",
+            "scheduledFor": "موعد البدء",
+            "duration": "المدة (دقيقة)",
+            "reason": "سبب الزيارة",
+            "notes": "ملاحظات",
+            "status": "الحالة",
+            "force": "تأكيد رغم التحذيرات"
+        },
+        "queue": {
+            "columns": {
+                "queue": "الترتيب",
+                "patient": "المريض",
+                "scheduled": "الموعد",
+                "status": "الحالة",
+                "actions": "إجراءات"
+            }
+        },
         "warnings": {
             "outside_working_day": "الطبيب لا يعمل في هذا اليوم.",
             "outside_working_hours": "خارج ساعات العمل.",
@@ -321,8 +394,34 @@
     },
     "payments": {
         "title": "المدفوعات",
+        "subtitle": "كل الدفعات المسجّلة",
         "create": "إضافة دفعة",
+        "filters": {
+            "allMethods": "كل الطرق"
+        },
+        "method": {
+            "cash": "نقدًا",
+            "card": "بطاقة",
+            "insurance": "تأمين",
+            "mixed": "مختلط"
+        },
+        "columns": {
+            "receipt": "الفاتورة",
+            "patient": "المريض",
+            "amount": "المبلغ",
+            "method": "الطريقة",
+            "status": "الحالة",
+            "paidAt": "تاريخ الدفع",
+            "collectedBy": "من قِبَل",
+            "actions": "إجراءات"
+        },
+        "totals": {
+            "amount": "الإجمالي: {{amount}}",
+            "count": "{{count}} دفعة"
+        },
         "form": {
+            "patient": "المريض",
+            "appointment": "موعد مرتبط (اختياري)",
             "createTitle": "تسجيل دفعة",
             "amount": "المبلغ",
             "method": "طريقة الدفع",
@@ -406,6 +505,10 @@
             "saveDraft": "حفظ مسوّدة",
             "complete": "إنهاء الاستشارة",
             "confirmComplete": "إنهاء هذه الاستشارة؟",
+            "confirmCompleteBody": "سيُنقل الموعد إلى مكتمل وتُغلق الاستشارة.",
+            "diagnosisCode": "الكود (اختياري)",
+            "diagnosisDescription": "الوصف",
+            "diagnosisNotes": "ملاحظات",
             "selectForm": "اختر نموذجًا",
             "submitForm": "إرسال النموذج",
             "addDiagnosis": "إضافة تشخيص",
@@ -420,6 +523,7 @@
         },
         "history": {
             "title": "سجل المريض",
+            "subtitle": "كل استشارة معروضة بحسب لقطتها وقت الإرسال",
             "noVisits": "لا توجد زيارات سابقة."
         },
         "print": {
@@ -437,6 +541,15 @@
         }
     },
     "builder": {
+        "untitledSection": "(بدون عنوان)",
+        "required": "مطلوب",
+        "noOptionsWarning": "لا توجد خيارات بعد",
+        "optionsCount_zero": "لا خيارات",
+        "optionsCount_one": "خيار واحد",
+        "optionsCount_two": "خياران",
+        "optionsCount_few": "{{count}} خيارات",
+        "optionsCount_many": "{{count}} خيارًا",
+        "optionsCount_other": "{{count}} خيار",
         "publish": "نشر",
         "unpublish": "إلغاء النشر",
         "publishedHint": "متاح للاستخدام أثناء الاستشارات.",

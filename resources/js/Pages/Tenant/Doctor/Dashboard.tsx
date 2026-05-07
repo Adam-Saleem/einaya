@@ -1,8 +1,9 @@
 import { Link, router } from '@inertiajs/react';
-import { Calendar, ClipboardCheck, Stethoscope, Users } from 'lucide-react';
+import { Calendar, ClipboardCheck, Inbox, Stethoscope, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { EmptyState } from '@/Components/domain/EmptyState';
 import { StatusBadge } from '@/Components/domain/StatusBadge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -132,9 +133,10 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
                     </CardHeader>
                     <CardContent>
                         {queue.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">
-                                {t('doctorPanel.dashboard.noQueue')}
-                            </p>
+                            <EmptyState
+                                icon={Inbox}
+                                title={t('doctorPanel.dashboard.noQueue')}
+                            />
                         ) : (
                             <ul className="divide-y">
                                 {queue.map((row) => (

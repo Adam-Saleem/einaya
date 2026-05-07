@@ -30,13 +30,28 @@ class MedicalFormController extends Controller
             abort(403);
         }
 
+        $search = trim((string) $request->query('search', ''));
+        $type = $request->query('type', '');
+
         $forms = MedicalForm::query()
             ->withCount(['sections', 'submissions'])
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when(in_array($type, ['intake', 'follow_up', 'custom'], true), fn ($q) => $q->where('type', $type))
             ->orderByDesc('updated_at')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return Inertia::render('Tenant/Forms/Index', [
             'forms' => MedicalFormResource::collection($forms),
+            'filters' => [
+                'search' => $search,
+                'type' => is_string($type) ? $type : '',
+            ],
         ]);
     }
 

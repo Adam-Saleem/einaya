@@ -398,7 +398,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                         >
                                             <p className="text-sm font-medium">{formatDate(h.ended_at ?? h.started_at)}</p>
                                             {h.chief_complaint && (
-                                                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                                                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                                                     {h.chief_complaint}
                                                 </p>
                                             )}

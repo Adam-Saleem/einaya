@@ -239,6 +239,17 @@
             "description": "Description",
             "type": "Form type"
         },
+        "filters": {
+            "search": "Search",
+            "searchPlaceholder": "Search by title or description",
+            "type": "Type",
+            "allTypes": "All types"
+        },
+        "types": {
+            "intake": "Intake",
+            "follow_up": "Follow-up",
+            "custom": "Custom"
+        },
         "confirmDelete": "Archive this form?",
         "confirmDeleteBody": "If any submissions reference it, the form is kept and only deactivated."
     },
@@ -269,7 +280,12 @@
         "search": "Search by name, phone, ID, or code",
         "filters": {
             "allGenders": "All genders",
-            "anyInsurance": "Any insurance"
+            "anyInsurance": "Any insurance",
+            "male": "Male",
+            "female": "Female",
+            "other": "Other",
+            "hasInsurance": "Has insurance",
+            "noInsurance": "No insurance"
         },
         "columns": {
             "code": "Code",
@@ -333,7 +349,14 @@
         "noPayments": "No payments yet.",
         "noVisits": "No appointments or consultations yet.",
         "uploadFile": "Upload file",
-        "fileCategory": "Category",
+        "fileCategory": {
+            "id_scan": "ID scan",
+            "insurance_card": "Insurance card",
+            "report": "Prior report",
+            "prescription": "Prescription",
+            "other": "Other"
+        },
+        "notesOptional": "Notes (optional)",
         "addPayment": "Add payment",
         "bookAppointment": "Book appointment"
     },
@@ -373,6 +396,15 @@
         "title": "Payments",
         "subtitle": "All recorded payments",
         "create": "Add payment",
+        "filters": {
+            "allMethods": "All methods"
+        },
+        "method": {
+            "cash": "Cash",
+            "card": "Card",
+            "insurance": "Insurance",
+            "mixed": "Mixed"
+        },
         "columns": {
             "receipt": "Receipt",
             "patient": "Patient",
@@ -509,6 +541,11 @@
         }
     },
     "builder": {
+        "untitledSection": "(untitled)",
+        "required": "required",
+        "noOptionsWarning": "no options yet",
+        "optionsCount_one": "{{count}} option",
+        "optionsCount_other": "{{count}} options",
         "publish": "Publish",
         "unpublish": "Unpublish",
         "publishedHint": "Available for use during consultations.",

@@ -12,17 +12,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { initialsFor, isArabicText } from '@/lib/initials';
 import type { PageProps } from '@/types';
-
-function initialsFor(name: string): string {
-    return name
-        .split(/\s+/)
-        .map((part) => part.charAt(0))
-        .filter(Boolean)
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
-}
 
 export function UserMenu() {
     const { t } = useTranslation('common');
@@ -31,13 +22,20 @@ export function UserMenu() {
 
     if (!user) return null;
 
+    const initials = initialsFor(user.name);
+    const isArabic = isArabicText(initials);
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-11 px-2 gap-2" aria-label={t('topbar.user')}>
                     <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                            {initialsFor(user.name)}
+                        <AvatarFallback
+                            className="bg-primary text-primary-foreground text-xs font-semibold"
+                            dir={isArabic ? 'rtl' : undefined}
+                            style={isArabic ? { fontFamily: 'var(--font-arabic)' } : undefined}
+                        >
+                            {initials}
                         </AvatarFallback>
                     </Avatar>
                     <span className="hidden md:inline-block text-sm font-medium max-w-[140px] truncate">

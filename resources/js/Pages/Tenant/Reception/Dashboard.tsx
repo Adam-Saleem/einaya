@@ -1,9 +1,10 @@
 import { Link, router } from '@inertiajs/react';
-import { Calendar, CreditCard, UserPlus, Users } from 'lucide-react';
+import { Calendar, CalendarOff, CreditCard, UserPlus, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from '@/Components/domain/ConfirmDialog';
+import { EmptyState } from '@/Components/domain/EmptyState';
 import { PatientRegistrationForm } from '@/Components/domain/PatientRegistrationForm';
 import { StatusBadge } from '@/Components/domain/StatusBadge';
 import { Button } from '@/Components/ui/button';
@@ -144,7 +145,13 @@ export default function ReceptionDashboard({ stats, queue, insuranceProviders }:
                 <CardHeader>
                     <CardTitle>{t('reception.queue')}</CardTitle>
                 </CardHeader>
-                <CardContent className="p-0">
+                <CardContent className={queue.length === 0 ? 'p-6' : 'p-0'}>
+                    {queue.length === 0 ? (
+                        <EmptyState
+                            icon={CalendarOff}
+                            title={t('reception.noAppointments')}
+                        />
+                    ) : (
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -158,14 +165,7 @@ export default function ReceptionDashboard({ stats, queue, insuranceProviders }:
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {queue.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                        {t('reception.noAppointments')}
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                queue.map((row) => (
+                            {queue.map((row) => (
                                     <TableRow key={row.id}>
                                         <TableCell className="font-mono text-sm">
                                             {row.queue_number ?? '—'}
@@ -223,10 +223,10 @@ export default function ReceptionDashboard({ stats, queue, insuranceProviders }:
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
+                                ))}
                         </TableBody>
                     </Table>
+                    )}
                 </CardContent>
             </Card>
 

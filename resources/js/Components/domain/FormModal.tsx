@@ -43,13 +43,13 @@ export function FormModal({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent>
-                <form onSubmit={onSubmit} className="flex flex-col gap-6">
+            <DialogContent className="max-h-[85vh] overflow-hidden flex flex-col">
+                <form onSubmit={onSubmit} className="flex flex-col gap-6 overflow-hidden">
                     <DialogHeader>
                         <DialogTitle>{title}</DialogTitle>
                         {description && <DialogDescription>{description}</DialogDescription>}
                     </DialogHeader>
-                    <div className="flex flex-col gap-4">{children}</div>
+                    <div className="flex flex-col gap-4 overflow-y-auto pr-1">{children}</div>
                     <DialogFooter>
                         <Button
                             type="button"

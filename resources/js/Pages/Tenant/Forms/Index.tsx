@@ -32,15 +32,18 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { Textarea } from '@/Components/ui/textarea';
+import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import { formatDate } from '@/lib/dates';
 import type { MedicalForm, Paginated } from '@/types/tenant';
 
-type Props = { forms: Paginated<MedicalForm> };
+type Filters = { search: string; type: string };
 
-export default function FormsIndex({ forms }: Props) {
+type Props = { forms: Paginated<MedicalForm>; filters: Filters };
+
+export default function FormsIndex({ forms, filters }: Props) {
     const { t } = useTranslation('tenant');
     const { t: tc } = useTranslation('common');
     useFlashToasts();
@@ -49,6 +52,18 @@ export default function FormsIndex({ forms }: Props) {
     const [deleting, setDeleting] = useState<MedicalForm | null>(null);
     const [duplicatingId, setDuplicatingId] = useState<number | null>(null);
     const [deleteBusy, runDelete] = usePending();
+
+    const apply = (next: Partial<Filters>) => {
+        router.get(
+            '/forms',
+            { ...filters, ...next },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
+
+    const [search, setSearch] = useDebouncedFilter(filters.search, (v) =>
+        apply({ search: v }),
+    );
 
     const form = useForm({
         title: '',
@@ -73,6 +88,39 @@ export default function FormsIndex({ forms }: Props) {
                 </Button>
             }
         >
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex flex-wrap items-end gap-3">
+                        <div className="flex-1 min-w-[220px] space-y-1">
+                            <Label htmlFor="forms-search">{t('forms.filters.search')}</Label>
+                            <Input
+                                id="forms-search"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder={t('forms.filters.searchPlaceholder')}
+                            />
+                        </div>
+                        <div className="w-44 space-y-1">
+                            <Label>{t('forms.filters.type')}</Label>
+                            <Select
+                                value={filters.type || 'all'}
+                                onValueChange={(v) => apply({ type: v === 'all' ? '' : v })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">{t('forms.filters.allTypes')}</SelectItem>
+                                    <SelectItem value="intake">{t('forms.types.intake')}</SelectItem>
+                                    <SelectItem value="follow_up">{t('forms.types.follow_up')}</SelectItem>
+                                    <SelectItem value="custom">{t('forms.types.custom')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -224,9 +272,9 @@ export default function FormsIndex({ forms }: Props) {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="intake">Intake</SelectItem>
-                                <SelectItem value="follow_up">Follow-up</SelectItem>
-                                <SelectItem value="custom">Custom</SelectItem>
+                                <SelectItem value="intake">{t('forms.types.intake')}</SelectItem>
+                                <SelectItem value="follow_up">{t('forms.types.follow_up')}</SelectItem>
+                                <SelectItem value="custom">{t('forms.types.custom')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

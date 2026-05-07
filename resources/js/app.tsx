@@ -24,7 +24,7 @@ createInertiaApp({
         root.render(
             <TooltipProvider delayDuration={150}>
                 <App {...props} />
-                <Toaster richColors closeButton position="top-right" />
+                <Toaster richColors closeButton />
             </TooltipProvider>,
         );
     },

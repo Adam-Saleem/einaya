@@ -295,7 +295,7 @@ export default function Builder({ form: initialForm }: Props) {
                 {formData.is_active ? t('builder.publishedHint') : t('builder.draftHint')}
             </p>
 
-            <div className="grid gap-4 md:grid-cols-[320px_1fr]">
+            <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-h4">{t('builder.sectionsTitle')}</CardTitle>
@@ -482,6 +482,7 @@ function SectionItem({
     onSelect: () => void;
     onDelete: () => void;
 }) {
+    const { t } = useTranslation('tenant');
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: section.id,
     });
@@ -513,9 +514,12 @@ function SectionItem({
             <button
                 type="button"
                 onClick={onSelect}
-                className="flex-1 truncate text-start text-sm font-medium"
+                className={cn(
+                    'flex-1 truncate text-start text-sm font-medium',
+                    !section.title && 'italic text-muted-foreground',
+                )}
             >
-                {section.title || '(untitled)'}
+                {section.title || t('builder.untitledSection')}
             </button>
             <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Delete">
                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -657,6 +661,7 @@ function QuestionItem({
     onEdit: () => void;
     onDelete: () => void;
 }) {
+    const { t } = useTranslation('tenant');
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: question.id,
     });
@@ -683,16 +688,23 @@ function QuestionItem({
             </button>
             <div className="flex-1">
                 <div className="flex items-center gap-2">
-                    <p className="font-medium">{question.label}</p>
+                    <p className="text-sm font-medium">{question.label}</p>
                     {question.is_required && (
                         <Badge variant="outline" className="text-xs">
-                            required
+                            {t('builder.required')}
+                        </Badge>
+                    )}
+                    {question.has_options && question.options.length === 0 && (
+                        <Badge variant="destructive" className="text-xs">
+                            {t('builder.noOptionsWarning')}
                         </Badge>
                     )}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                     <span className="font-mono">{question.key}</span> · {question.type_label}
-                    {question.has_options && ` · ${question.options.length} options`}
+                    {question.has_options &&
+                        question.options.length > 0 &&
+                        ` · ${t('builder.optionsCount', { count: question.options.length })}`}
                 </p>
             </div>
             <Button variant="ghost" size="icon" onClick={onEdit}>

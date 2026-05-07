@@ -102,11 +102,11 @@ export default function PaymentsIndex({ payments, totals, filters }: Props) {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All methods</SelectItem>
-                                <SelectItem value="cash">Cash</SelectItem>
-                                <SelectItem value="card">Card</SelectItem>
-                                <SelectItem value="insurance">Insurance</SelectItem>
-                                <SelectItem value="mixed">Mixed</SelectItem>
+                                <SelectItem value="all">{t('payments.filters.allMethods')}</SelectItem>
+                                <SelectItem value="cash">{t('payments.method.cash')}</SelectItem>
+                                <SelectItem value="card">{t('payments.method.card')}</SelectItem>
+                                <SelectItem value="insurance">{t('payments.method.insurance')}</SelectItem>
+                                <SelectItem value="mixed">{t('payments.method.mixed')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

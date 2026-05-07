@@ -93,9 +93,9 @@ export default function PatientsIndex({ patients, filters, insuranceProviders }:
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">{t('patients.filters.allGenders')}</SelectItem>
-                                <SelectItem value="male">Male</SelectItem>
-                                <SelectItem value="female">Female</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="male">{t('patients.filters.male')}</SelectItem>
+                                <SelectItem value="female">{t('patients.filters.female')}</SelectItem>
+                                <SelectItem value="other">{t('patients.filters.other')}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select
@@ -107,8 +107,8 @@ export default function PatientsIndex({ patients, filters, insuranceProviders }:
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="any">{t('patients.filters.anyInsurance')}</SelectItem>
-                                <SelectItem value="1">Has insurance</SelectItem>
-                                <SelectItem value="0">No insurance</SelectItem>
+                                <SelectItem value="1">{t('patients.filters.hasInsurance')}</SelectItem>
+                                <SelectItem value="0">{t('patients.filters.noInsurance')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
