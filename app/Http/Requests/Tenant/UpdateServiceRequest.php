@@ -30,7 +30,7 @@ class UpdateServiceRequest extends FormRequest
                 Rule::unique('clinic_services', 'code')->ignore($serviceId),
             ],
             'description' => ['nullable', 'string', 'max:500'],
-            'price' => ['sometimes', 'required', 'numeric', 'min:0', 'max:99999999.99'],
+            'price' => ['sometimes', 'required', 'integer', 'min:0', 'max:99999999'],
             'is_active' => ['sometimes', 'boolean'],
             'display_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ];

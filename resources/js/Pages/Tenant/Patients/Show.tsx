@@ -408,7 +408,7 @@ export default function PatientShow({ patient, appointments, payments, files, do
                                             <span className="font-semibold">
                                                 {p.amount.toLocaleString(undefined, {
                                                     style: 'currency',
-                                                    currency: 'USD',
+                                                    currency: 'USD', maximumFractionDigits: 0,
                                                 })}
                                             </span>
                                         </li>

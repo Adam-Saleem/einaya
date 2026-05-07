@@ -82,7 +82,7 @@ const formatPrice = (n: number) =>
     new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
     }).format(n);
 
 export default function ReceptionDashboard({

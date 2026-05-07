@@ -120,7 +120,7 @@ export function PaymentForm({
                             <Input
                                 id="amount"
                                 type="number"
-                                step="0.01"
+                                step="1"
                                 value={form.data.amount}
                                 onChange={(e) => form.setData('amount', e.target.value)}
                             />
@@ -153,7 +153,7 @@ export function PaymentForm({
                                 <Label>{t('payments.form.cashAmount')}</Label>
                                 <Input
                                     type="number"
-                                    step="0.01"
+                                    step="1"
                                     value={form.data.cash_amount}
                                     onChange={(e) => form.setData('cash_amount', e.target.value)}
                                 />
@@ -162,7 +162,7 @@ export function PaymentForm({
                                 <Label>{t('payments.form.cardAmount')}</Label>
                                 <Input
                                     type="number"
-                                    step="0.01"
+                                    step="1"
                                     value={form.data.card_amount}
                                     onChange={(e) => form.setData('card_amount', e.target.value)}
                                 />
@@ -171,7 +171,7 @@ export function PaymentForm({
                                 <Label>{t('payments.form.insuranceAmount')}</Label>
                                 <Input
                                     type="number"
-                                    step="0.01"
+                                    step="1"
                                     value={form.data.insurance_amount}
                                     onChange={(e) =>
                                         form.setData('insurance_amount', e.target.value)

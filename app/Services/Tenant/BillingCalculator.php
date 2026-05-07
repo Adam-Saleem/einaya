@@ -16,10 +16,10 @@ class BillingCalculator
      *
      * @return array{
      *   visit_type: ?string,
-     *   base_price: float,
-     *   services: array<int, array{id:int, name:string, price:float, quantity:int, line_total:float}>,
-     *   services_total: float,
-     *   total: float,
+     *   base_price: int,
+     *   services: array<int, array{id:int, name:string, price:int, quantity:int, line_total:int}>,
+     *   services_total: int,
+     *   total: int,
      * }
      */
     public function summary(Consultation $consultation): array
@@ -31,19 +31,19 @@ class BillingCalculator
         $base = match ($consultation->visit_type) {
             'first' => $firstPrice,
             'review' => $reviewPrice,
-            default => 0.0,
+            default => 0,
         };
 
         $services = $consultation->services->map(fn ($row) => [
             'id' => $row->id,
             'service_id' => $row->service_id,
             'name' => $row->service_name_snapshot,
-            'price' => (float) $row->price_at_time,
+            'price' => (int) $row->price_at_time,
             'quantity' => (int) $row->quantity,
-            'line_total' => (float) $row->price_at_time * (int) $row->quantity,
+            'line_total' => (int) $row->price_at_time * (int) $row->quantity,
         ])->all();
 
-        $servicesTotal = array_sum(array_column($services, 'line_total'));
+        $servicesTotal = (int) array_sum(array_column($services, 'line_total'));
 
         return [
             'visit_type' => $consultation->visit_type,
@@ -59,7 +59,7 @@ class BillingCalculator
      * so a clinic that hasn't configured pricing yet gets a sensible
      * total (just the services).
      *
-     * @return array{0: float, 1: float}
+     * @return array{0: int, 1: int}
      */
     private function visitPrices(): array
     {
@@ -67,8 +67,8 @@ class BillingCalculator
         $value = $row?->value ?? [];
 
         return [
-            (float) ($value['first_visit_price'] ?? 0),
-            (float) ($value['review_visit_price'] ?? 0),
+            (int) ($value['first_visit_price'] ?? 0),
+            (int) ($value['review_visit_price'] ?? 0),
         ];
     }
 }

@@ -22,11 +22,11 @@ class StorePaymentRequest extends FormRequest
             'patient_id' => ['required', 'integer', 'exists:patients,id'],
             'appointment_id' => ['nullable', 'integer', 'exists:appointments,id'],
             'consultation_id' => ['nullable', 'integer', 'exists:consultations,id'],
-            'amount' => ['required', 'numeric', 'min:0.01'],
+            'amount' => ['required', 'integer', 'min:1'],
             'method' => ['required', new Enum(PaymentMethod::class)],
-            'cash_amount' => ['nullable', 'numeric', 'min:0'],
-            'card_amount' => ['nullable', 'numeric', 'min:0'],
-            'insurance_amount' => ['nullable', 'numeric', 'min:0'],
+            'cash_amount' => ['nullable', 'integer', 'min:0'],
+            'card_amount' => ['nullable', 'integer', 'min:0'],
+            'insurance_amount' => ['nullable', 'integer', 'min:0'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

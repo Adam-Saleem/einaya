@@ -20,7 +20,7 @@ class ConsultationService extends Model
     ];
 
     protected $casts = [
-        'price_at_time' => 'decimal:2',
+        'price_at_time' => 'integer',
         'quantity' => 'integer',
     ];
 

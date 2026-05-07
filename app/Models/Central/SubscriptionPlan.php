@@ -31,8 +31,8 @@ class SubscriptionPlan extends Model
     ];
 
     protected $casts = [
-        'price_monthly' => 'decimal:2',
-        'price_yearly' => 'decimal:2',
+        'price_monthly' => 'integer',
+        'price_yearly' => 'integer',
         'max_patients' => 'integer',
         'max_staff' => 'integer',
         'features' => 'array',

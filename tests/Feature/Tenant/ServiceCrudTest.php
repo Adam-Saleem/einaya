@@ -40,7 +40,7 @@ it('lets a clinic admin create + edit + archive a service', function () {
         expect($service)->not->toBeNull();
         expect($service->name)->toBe('X-Ray Chest');
         expect($service->code)->toBe('x-ray-chest');
-        expect((float) $service->price)->toBe(60.0);
+        expect((int) $service->price)->toBe(60);
 
         // update
         test()
@@ -52,7 +52,7 @@ it('lets a clinic admin create + edit + archive a service', function () {
             ->assertRedirect();
 
         $service->refresh();
-        expect((float) $service->price)->toBe(75.0);
+        expect((int) $service->price)->toBe(75);
         expect($service->is_active)->toBeFalse();
 
         // soft-delete

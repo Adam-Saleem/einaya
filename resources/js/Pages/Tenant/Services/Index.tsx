@@ -70,7 +70,7 @@ const formatPrice = (n: number) =>
     new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
     }).format(n);
 
 export default function ServicesIndex({ services }: Props) {
@@ -315,7 +315,7 @@ function Fields({ form, t }: FieldsProps) {
                     <Input
                         id="price"
                         type="number"
-                        step="0.01"
+                        step="1"
                         min={0}
                         value={form.data.price}
                         onChange={(e) => form.setData('price', Number(e.target.value))}

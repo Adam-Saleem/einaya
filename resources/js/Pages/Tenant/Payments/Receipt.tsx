@@ -59,7 +59,7 @@ export default function Receipt({ payment, clinic, patient }: Props) {
     const fmtCurrency = (n: number) =>
         n.toLocaleString(lang === 'ar' ? 'ar' : 'en', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'USD', maximumFractionDigits: 0,
         });
     const fmtDate = (iso: string | null) =>
         iso ? new Date(iso).toLocaleString(lang === 'ar' ? 'ar' : 'en') : '—';

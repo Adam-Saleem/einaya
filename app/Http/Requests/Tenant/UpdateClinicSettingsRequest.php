@@ -34,8 +34,8 @@ class UpdateClinicSettingsRequest extends FormRequest
 
             'notifications.appointment_reminders' => ['nullable', 'boolean'],
 
-            'pricing.first_visit_price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
-            'pricing.review_visit_price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'pricing.first_visit_price' => ['nullable', 'integer', 'min:0', 'max:99999999'],
+            'pricing.review_visit_price' => ['nullable', 'integer', 'min:0', 'max:99999999'],
         ];
     }
 }

@@ -127,7 +127,7 @@ export default function ReportsIndex({ range, appointments, revenue, patients, d
                                 {t('reports.revenue.total', {
                                     amount: Number(revenue.totals.amount ?? 0).toLocaleString(undefined, {
                                         style: 'currency',
-                                        currency: 'USD',
+                                        currency: 'USD', maximumFractionDigits: 0,
                                     }),
                                 })}
                             </p>
@@ -147,7 +147,7 @@ export default function ReportsIndex({ range, appointments, revenue, patients, d
                                             <TableCell>
                                                 {Number(row.amount).toLocaleString(undefined, {
                                                     style: 'currency',
-                                                    currency: 'USD',
+                                                    currency: 'USD', maximumFractionDigits: 0,
                                                 })}
                                             </TableCell>
                                         </TableRow>

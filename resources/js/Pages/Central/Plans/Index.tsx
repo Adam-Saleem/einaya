@@ -247,7 +247,7 @@ export default function PlansIndex({ plans }: Props) {
                         <Input
                             id="plan-monthly"
                             type="number"
-                            step="0.01"
+                            step="1"
                             value={form.data.price_monthly}
                             onChange={(event) =>
                                 form.setData('price_monthly', event.target.value)
@@ -259,7 +259,7 @@ export default function PlansIndex({ plans }: Props) {
                         <Input
                             id="plan-yearly"
                             type="number"
-                            step="0.01"
+                            step="1"
                             value={form.data.price_yearly}
                             onChange={(event) =>
                                 form.setData('price_yearly', event.target.value)

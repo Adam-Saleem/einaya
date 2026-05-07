@@ -51,11 +51,15 @@ class ReceptionDashboardController extends Controller
         }
 
         $completedIds = collect($completedAppts)->pluck('id')->all();
+        // "Paid" for reception purposes means a fully-settled or partially
+        // collected payment row exists. The PaymentStatus enum carries:
+        // Pending | Paid | Partial | Refunded — Pending and Refunded both
+        // imply the visit still owes money.
         $paidIds = $completedIds === []
             ? []
             : Payment::query()
                 ->whereIn('appointment_id', $completedIds)
-                ->where('status', PaymentStatus::Succeeded)
+                ->whereIn('status', [PaymentStatus::Paid, PaymentStatus::Partial])
                 ->pluck('appointment_id')
                 ->all();
 

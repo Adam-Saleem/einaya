@@ -32,10 +32,10 @@ class Payment extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
-        'insurance_amount' => 'decimal:2',
-        'cash_amount' => 'decimal:2',
-        'card_amount' => 'decimal:2',
+        'amount' => 'integer',
+        'insurance_amount' => 'integer',
+        'cash_amount' => 'integer',
+        'card_amount' => 'integer',
         'method' => PaymentMethod::class,
         'status' => PaymentStatus::class,
         'paid_at' => 'datetime',

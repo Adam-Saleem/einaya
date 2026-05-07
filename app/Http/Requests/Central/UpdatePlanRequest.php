@@ -20,8 +20,8 @@ class UpdatePlanRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:80'],
-            'price_monthly' => ['required', 'numeric', 'min:0'],
-            'price_yearly' => ['required', 'numeric', 'min:0'],
+            'price_monthly' => ['required', 'integer', 'min:0'],
+            'price_yearly' => ['required', 'integer', 'min:0'],
             'max_patients' => ['required', 'integer', 'min:0'],
             'max_staff' => ['required', 'integer', 'min:0'],
             'features' => ['nullable', 'array'],

@@ -117,7 +117,7 @@ export default function PaymentsIndex({ payments, totals, filters }: Props) {
                 {t('payments.totals.amount', {
                     amount: totals.amount.toLocaleString(undefined, {
                         style: 'currency',
-                        currency: 'USD',
+                        currency: 'USD', maximumFractionDigits: 0,
                     }),
                 })}{' '}
                 · {t('payments.totals.count', { count: totals.count })}
@@ -162,7 +162,7 @@ export default function PaymentsIndex({ payments, totals, filters }: Props) {
                                     <TableCell>
                                         {p.amount.toLocaleString(undefined, {
                                             style: 'currency',
-                                            currency: 'USD',
+                                            currency: 'USD', maximumFractionDigits: 0,
                                         })}
                                     </TableCell>
                                     <TableCell>{p.method_label}</TableCell>

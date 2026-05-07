@@ -67,13 +67,13 @@ it('snapshots service prices into the pivot when completing', function () {
 
         $rows = $consultation->services()->orderBy('id')->get();
         expect($rows->first()->service_name_snapshot)->toBe('X-Ray');
-        expect((float) $rows->first()->price_at_time)->toBe(60.0);
+        expect((int) $rows->first()->price_at_time)->toBe(60);
 
         // Edit the catalogue — snapshot stays.
         $svcA->update(['name' => 'X-Ray (revised)', 'price' => 999]);
         $rows = $consultation->fresh()->services()->orderBy('id')->get();
         expect($rows->first()->service_name_snapshot)->toBe('X-Ray');
-        expect((float) $rows->first()->price_at_time)->toBe(60.0);
+        expect((int) $rows->first()->price_at_time)->toBe(60);
     });
 });
 
@@ -91,8 +91,8 @@ it('computes the bill base + services correctly', function () {
         ]);
 
         $summary = app(BillingCalculator::class)->summary($consultation->refresh());
-        expect($summary['base_price'])->toBe(50.0);
-        expect($summary['services_total'])->toBe(25.0);
-        expect($summary['total'])->toBe(75.0);
+        expect($summary['base_price'])->toBe(50);
+        expect($summary['services_total'])->toBe(25);
+        expect($summary['total'])->toBe(75);
     });
 });

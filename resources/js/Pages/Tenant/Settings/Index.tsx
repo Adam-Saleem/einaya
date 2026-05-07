@@ -266,7 +266,7 @@ export default function SettingsPage({ settings }: Props) {
                                     <Input
                                         id="first_visit_price"
                                         type="number"
-                                        step="0.01"
+                                        step="1"
                                         min={0}
                                         value={form.data.pricing.first_visit_price}
                                         onChange={(e) =>
@@ -281,7 +281,7 @@ export default function SettingsPage({ settings }: Props) {
                                     <Input
                                         id="review_visit_price"
                                         type="number"
-                                        step="0.01"
+                                        step="1"
                                         min={0}
                                         value={form.data.pricing.review_visit_price}
                                         onChange={(e) =>

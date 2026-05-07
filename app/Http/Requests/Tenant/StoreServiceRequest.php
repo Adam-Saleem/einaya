@@ -27,7 +27,7 @@ class StoreServiceRequest extends FormRequest
                 Rule::unique('clinic_services', 'code'),
             ],
             'description' => ['nullable', 'string', 'max:500'],
-            'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'price' => ['required', 'integer', 'min:0', 'max:99999999'],
             'is_active' => ['sometimes', 'boolean'],
             'display_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ];
