@@ -1,54 +1,32 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import {
-    ArrowRight,
-    CalendarClock,
-    ClipboardList,
-    ShieldCheck,
-    Stethoscope,
-} from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { DemoRequestDialog } from '@/Components/domain/DemoRequestDialog';
-import { LanguageSwitcher } from '@/Components/domain/layout/LanguageSwitcher';
-import { ThemeToggle } from '@/Components/domain/layout/ThemeToggle';
+import {
+    ConsultationsIllustration,
+    RecordsIllustration,
+    SchedulingIllustration,
+} from '@/Components/marketing/FeatureIllustrations';
+import { HeroDashboard } from '@/Components/marketing/HeroDashboard';
 import { Button } from '@/Components/ui/button';
+import MarketingLayout, { useDemoDialog } from '@/Layouts/MarketingLayout';
 
 const FEATURES = [
-    { icon: CalendarClock, key: 'features.scheduling' },
-    { icon: ClipboardList, key: 'features.records' },
-    { icon: Stethoscope, key: 'features.consultations' },
-] as const;
+    { illustration: SchedulingIllustration, key: 'scheduling' as const },
+    { illustration: RecordsIllustration, key: 'records' as const },
+    { illustration: ConsultationsIllustration, key: 'consultations' as const },
+];
 
 export default function Welcome() {
     const { t } = useTranslation('common');
-    const [dialog, setDialog] = useState<{ open: boolean; intent: 'demo' | 'register' }>(
-        { open: false, intent: 'demo' },
-    );
-
-    const openDialog = (intent: 'demo' | 'register') =>
-        setDialog({ open: true, intent });
+    const { open } = useDemoDialog();
 
     return (
         <>
             <Head title="Einaya — clinic management" />
 
-            <div className="min-h-screen bg-background">
-                <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 lg:px-10">
-                    <Link href="/" className="flex items-center">
-                        <ApplicationLogo className="h-9 w-auto text-foreground" />
-                    </Link>
-                    <div className="flex items-center gap-1">
-                        <LanguageSwitcher />
-                        <ThemeToggle />
-                        <Button asChild variant="outline" size="sm" className="ms-2">
-                            <Link href="/login">{t('actions.signIn')}</Link>
-                        </Button>
-                    </div>
-                </header>
-
+            <MarketingLayout active="home">
                 <section className="relative isolate overflow-hidden">
                     <div
                         aria-hidden="true"
@@ -63,12 +41,12 @@ export default function Welcome() {
                         />
                     </div>
 
-                    <div className="mx-auto max-w-6xl px-6 pb-20 pt-12 lg:px-10 lg:pb-32 lg:pt-20">
+                    <div className="mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:px-10 lg:pb-32 lg:pt-20">
                         <motion.div
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, ease: 'easeOut' }}
-                            className="max-w-3xl space-y-6"
+                            className="space-y-6"
                         >
                             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                                 <ShieldCheck className="h-3.5 w-3.5" />
@@ -81,28 +59,35 @@ export default function Welcome() {
                                 {t('landing.subhead')}
                             </p>
                             <div className="flex flex-wrap items-center gap-3 pt-2">
-                                <Button size="lg" onClick={() => openDialog('demo')}>
+                                <Button size="lg" onClick={() => open('demo')}>
                                     {t('landing.ctaPrimary')}
                                     <ArrowRight className="ms-2 h-4 w-4 rtl:scale-x-[-1]" />
                                 </Button>
                                 <Button
                                     size="lg"
                                     variant="ghost"
-                                    onClick={() => openDialog('register')}
+                                    onClick={() => open('register')}
                                 >
                                     {t('landing.ctaSecondary')}
                                 </Button>
-                                <Button asChild size="lg" variant="link">
-                                    <Link href="/login">{t('actions.signIn')}</Link>
-                                </Button>
                             </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.96 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+                            className="relative"
+                        >
+                            <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-tr from-primary/15 to-success/10 blur-2xl" />
+                            <HeroDashboard className="w-full drop-shadow-xl" />
                         </motion.div>
                     </div>
                 </section>
 
                 <section className="border-t bg-muted/40">
                     <div className="mx-auto grid max-w-6xl gap-6 px-6 py-16 sm:grid-cols-2 lg:grid-cols-3 lg:px-10">
-                        {FEATURES.map(({ icon: Icon, key }, index) => (
+                        {FEATURES.map(({ illustration: Illustration, key }, index) => (
                             <motion.div
                                 key={key}
                                 initial={{ opacity: 0, y: 8 }}
@@ -113,17 +98,17 @@ export default function Welcome() {
                                     delay: index * 0.08,
                                     ease: 'easeOut',
                                 }}
-                                className="rounded-2xl border bg-card p-6 shadow-sm"
+                                className="overflow-hidden rounded-2xl border bg-card shadow-sm"
                             >
-                                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-                                    <Icon className="h-5 w-5" />
-                                </span>
-                                <h3 className="mt-5 text-h4 text-foreground">
-                                    {t(`landing.${key}.title`)}
-                                </h3>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    {t(`landing.${key}.body`)}
-                                </p>
+                                <Illustration />
+                                <div className="space-y-2 p-6">
+                                    <h3 className="text-h4 text-foreground">
+                                        {t(`landing.features.${key}.title`)}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        {t(`landing.features.${key}.body`)}
+                                    </p>
+                                </div>
                             </motion.div>
                         ))}
                     </div>
@@ -150,7 +135,7 @@ export default function Welcome() {
                                 size="lg"
                                 variant="secondary"
                                 className="w-fit"
-                                onClick={() => openDialog('register')}
+                                onClick={() => open('register')}
                             >
                                 {t('landing.cta.button')}
                                 <ArrowRight className="ms-2 h-4 w-4 rtl:scale-x-[-1]" />
@@ -158,39 +143,7 @@ export default function Welcome() {
                         </div>
                     </div>
                 </section>
-
-                <footer className="border-t">
-                    <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center lg:px-10">
-                        <div className="flex items-center gap-3">
-                            <ApplicationLogo
-                                showWordmark={false}
-                                className="h-7 w-7"
-                            />
-                            <span>
-                                © {new Date().getFullYear()} Einaya · {t('landing.footer.tagline')}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <button
-                                type="button"
-                                onClick={() => openDialog('demo')}
-                                className="hover:text-primary"
-                            >
-                                {t('demoRequest.title')}
-                            </button>
-                            <Link href="/login" className="hover:text-primary">
-                                {t('actions.signIn')}
-                            </Link>
-                        </div>
-                    </div>
-                </footer>
-            </div>
-
-            <DemoRequestDialog
-                open={dialog.open}
-                onOpenChange={(open) => setDialog((d) => ({ ...d, open }))}
-                initialIntent={dialog.intent}
-            />
+            </MarketingLayout>
         </>
     );
 }

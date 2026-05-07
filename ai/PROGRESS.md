@@ -7,12 +7,31 @@
 
 ## Current Status
 
-**Active phase:** Phase 17 — demo-request funnel shipped. Public form on einaya.test landing with E.164 phone input, admin index at app.einaya.test/demo-requests for manual handling (WhatsApp + email deep-links), 6 new Pest tests pass, full suite at 89/89.
+**Active phase:** Phase 18 — marketing site expansion shipped. Apex (einaya.test) now has /, /about, /pricing pages on a shared MarketingLayout; theme + language toggles work on the apex; landing has a hero dashboard SVG mockup + 3 feature illustrations + curated Unsplash photos on About; pricing pulls plans from the central DB.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### 🌐 Phase 18 — Marketing site expansion (2026-05-07)
+
+Public-facing einaya.test domain grew from a one-page hero to a small marketing site (Home / About / Pricing) with the theme + language toggles wired and a hero dashboard mockup that adapts to the active palette.
+
+- **18.1 Apex preference routes.** The theme + language dropdowns POST to `/api/preferences/{theme,language}`. Those routes existed only inside the central + tenant groups, so toggling them from `einaya.test` 404'd. Added public copies inside the apex domain block in `routes/web.php`. `PreferenceController` already handles guest vs authed gracefully (the user-pref write is conditional on `$request->user()`), so no controller changes needed.
+- **18.2 MarketingLayout.** New `Layouts/MarketingLayout.tsx` is the shared chrome for Home / About / Pricing — sticky topbar with logo, About / Pricing nav, language + theme toggles, and a single primary "Talk to us" CTA. Footer carries About / Pricing / Talk-to-us. Sign-in link dropped from the marketing surface entirely (existing customers still reach login via tenant subdomain or app.einaya.test). The layout owns the `DemoRequestDialog` and exposes a `useDemoDialog()` context so any descendant can call `open('demo' | 'register')` without lifting state.
+- **18.3 About page.** `Pages/About.tsx` at `/about` — eyebrow + headline + subhead, four-photo masonry grid (curated Unsplash IDs, lazy-loaded), "Our story" two-column block, four "what we believe" value cards (lucide icons + i18n copy), gradient CTA to demo dialog. ~120 lines of new EN + AR copy under `common.about.*`.
+- **18.4 Pricing page.** `Pages/Pricing.tsx` at `/pricing` — billing toggle (monthly / yearly with -17% hint), three plan cards pulled live from `subscription_plans` (cheapest first; the middle plan gets a "Most popular" pin), each card lists max-patient + max-staff caps and the plan's `features[]` translated via `pricing.features.*` keys. FAQ section with shadcn Accordion. Same gradient CTA. Plans are loaded inside the apex `routes/web.php` closure (`SubscriptionPlan::where('is_active', true)`) and passed as page props. `description` column doesn't exist on the plans table — page-level descriptions live in i18n (`pricing.descriptions.{starter,pro,enterprise}`) instead.
+- **18.5 Hero dashboard SVG.** `Components/marketing/HeroDashboard.tsx` is a self-contained SVG that renders a stylised browser window showing the Einaya dashboard — sidebar (cyan-900), 3 stat cards, sparkline chart, queue card with rank pills. Every fill uses `rgb(var(--…))` tokens so the mockup re-skins automatically when the user toggles theme. No external image dependency.
+- **18.6 Feature SVG vignettes.** `Components/marketing/FeatureIllustrations.tsx` exports three components (`SchedulingIllustration`, `RecordsIllustration`, `ConsultationsIllustration`) — small token-driven SVGs that head each landing feature card. Replace the previous lucide-only icon treatment with something visually meaningful per feature.
+- **Welcome.tsx rebuild.** Old all-text hero is now a 2-column layout (text + dashboard mockup), feature cards each carry their own illustration on top of the title + body, gradient banner CTA preserved. Topbar / footer move into MarketingLayout.
+- **Photos.** About page uses 4 curated Unsplash photos (clinic reception, doctor + patient, stethoscope on desk, calendar/tablet) with proper alt text + lazy loading. Photo credit line: "Photography from Unsplash. Used under the Unsplash license." (per Unsplash license terms).
+
+**i18n.** New keys: `nav.marketing.{about,pricing}`, `about.*` (eyebrow, headline, story, values, photo credit, CTA), `pricing.*` (eyebrow, billing toggle, popular badge, descriptions per slug, features per slug, choose-plan, FAQ, CTA). EN + AR mirrored. AR carries explicit plural rules for `maxPatients_*` / `maxStaff_*`.
+
+**Verification.** `pnpm exec tsc --noEmit` clean, `pnpm build` green (Welcome 209 kB / 52 kB gz, MarketingLayout 207 kB / 51 kB gz — both bundle the phone-input from the demo dialog). Smoke: `einaya.test/`, `/about`, `/pricing` all 200; POST `/api/preferences/{theme,language}` returns 302 (success); `storage/logs/laravel.log` empty. Authed surfaces (/, /reception, /patients, /forms, /payments, /doctor, /settings) still 200.
+
+**Known leftover.** The marketing topbar shows About / Pricing on lg+ and a single "Talk to us" button on every viewport. There's no sign-in link on the marketing surface; existing customers should bookmark their tenant subdomain (`<clinic>.einaya.test/login`).
 
 ### 📨 Phase 17 — Demo-request funnel (2026-05-07)
 

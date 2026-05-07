@@ -58,6 +58,105 @@
         "badge": "Clinic workspace",
         "title": "Welcome back to your clinic"
     },
+    "about": {
+        "metaTitle": "About Einaya",
+        "eyebrow": "Who we are",
+        "headline": "Software for the next generation of small clinics.",
+        "subhead": "Einaya is a clinic management platform built by people who grew up watching their families run independent practices. We make the small-clinic workflow feel calm again.",
+        "photoCredit": "Photography from Unsplash. Used under the Unsplash license.",
+        "story": {
+            "eyebrow": "Our story",
+            "title": "Built around how a clinic actually runs.",
+            "p1": "We've spent years sitting next to receptionists, doctors, and clinic owners — watching how the day really flows. Walk-ins arrive while a patient is mid-consult. A phone call interrupts a payment. The schedule changes three times before noon.",
+            "p2": "Most software pretends those moments don't happen. Einaya is built for them. Every screen is one click away from the next thing you need, every form snapshot is preserved so old visits stay accurate, and every translation respects the bilingual reality of clinics across the region.",
+            "p3": "We're a small team that ships continuously and listens to every clinic on the platform. If there's a workflow we haven't covered yet, tell us — we'll make it right."
+        },
+        "values": {
+            "title": "What we believe.",
+            "body": "Four principles guide every decision we make about Einaya.",
+            "patientFirst": {
+                "title": "Patient outcomes first",
+                "body": "If a feature doesn't help a doctor make a better clinical decision or a patient feel more cared for, we don't ship it."
+            },
+            "privacy": {
+                "title": "Privacy by default",
+                "body": "Per-clinic data isolation, audit trails, redacted logs, and 2FA-ready accounts — built in, not bolted on."
+            },
+            "clinical": {
+                "title": "Designed with doctors",
+                "body": "Every consultation flow, prescription template, and form field has been pressure-tested in a real clinic before it shipped."
+            },
+            "bilingual": {
+                "title": "Bilingual, not bolted-on",
+                "body": "Every surface is fully translated EN ↔ AR with proper RTL, Arabic typography, and locale-aware date formatting."
+            }
+        },
+        "cta": {
+            "title": "Want to see it in your clinic?",
+            "body": "We'll walk you through Einaya on a 30-minute call and answer any question."
+        }
+    },
+    "pricing": {
+        "metaTitle": "Pricing — Einaya",
+        "eyebrow": "Plans",
+        "headline": "Simple pricing, scaled to your clinic.",
+        "subhead": "Pick a plan, register your clinic, and onboard within an hour. No setup fees. Cancel any time.",
+        "billing": {
+            "monthly": "Monthly",
+            "yearly": "Yearly",
+            "yearlyHint": "Save ~17%"
+        },
+        "popular": "Most popular",
+        "month": "month",
+        "descriptions": {
+            "starter": "For solo doctors and clinics getting their first system in place.",
+            "pro": "For growing clinics that need form-builder and reporting muscle.",
+            "enterprise": "For multi-location groups and clinics that need API access."
+        },
+        "billedYearly": "Billed {{amount}} yearly",
+        "unlimitedPatients": "Unlimited patients",
+        "unlimitedStaff": "Unlimited staff",
+        "maxPatients_one": "Up to {{count}} patient",
+        "maxPatients_other": "Up to {{count}} patients",
+        "maxStaff_one": "Up to {{count}} staff member",
+        "maxStaff_other": "Up to {{count}} staff members",
+        "features": {
+            "form_builder": "Custom form builder",
+            "appointments": "Appointment calendar with conflict detection",
+            "reports": "Reports & CSV export",
+            "sms": "SMS reminders (when wired)",
+            "insurance_management": "Insurance providers & coverage tracking",
+            "file_uploads": "Patient file uploads",
+            "priority_support": "Priority support",
+            "custom_branding": "Custom branding",
+            "api_access": "API access"
+        },
+        "choosePlan": "Choose {{plan}}",
+        "faq": {
+            "title": "Frequently asked",
+            "body": "If you don't see your question here, request a demo and we'll answer in person.",
+            "changePlan": {
+                "q": "Can I change my plan later?",
+                "a": "Yes. You can move up or down between plans any time. We pro-rate the difference, so you only pay for what you used."
+            },
+            "discount": {
+                "q": "Do you offer discounts for non-profits or longer commitments?",
+                "a": "We offer a 17% discount on yearly billing automatically. For non-profit clinics or multi-location groups, get in touch — we'll work something out."
+            },
+            "data": {
+                "q": "What happens to my data if I cancel?",
+                "a": "You can export every patient, appointment, and consultation as CSV at any time. After cancellation, your tenant database is retained for 90 days then permanently deleted."
+            },
+            "support": {
+                "q": "What kind of support is included?",
+                "a": "All plans include email support with a 1-business-day SLA. Pro and Enterprise add WhatsApp support and faster response times."
+            }
+        },
+        "cta": {
+            "title": "Not sure which plan fits?",
+            "body": "Tell us about your clinic and we'll recommend the right one on the call."
+        }
+    },
     "demoRequest": {
         "title": "Talk to us",
         "subtitle": "Tell us a bit about your clinic and we'll reach out within one business day.",
@@ -95,6 +194,10 @@
         "info": "Info"
     },
     "nav": {
+        "marketing": {
+            "about": "About",
+            "pricing": "Pricing"
+        },
         "main": "Main",
         "dashboard": "Dashboard",
         "reception": "Reception",
