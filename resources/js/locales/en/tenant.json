@@ -418,6 +418,11 @@
         "noPayments": "No payments yet.",
         "noVisits": "No appointments or consultations yet.",
         "uploadFile": "Upload file",
+        "delete": "Archive patient",
+        "confirmDelete": {
+            "title": "Archive this patient?",
+            "body": "The patient is soft-deleted: appointment history and consultations are preserved, but they no longer appear in lists or search."
+        },
         "fileCategory": {
             "id_scan": "ID scan",
             "insurance_card": "Insurance card",

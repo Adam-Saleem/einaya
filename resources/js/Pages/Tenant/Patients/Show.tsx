@@ -1,8 +1,10 @@
 import { router, useForm } from '@inertiajs/react';
-import { Calendar, CreditCard, FileText, Phone, Upload } from 'lucide-react';
+import { Calendar, CreditCard, FileText, Phone, Trash2, Upload } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Can } from '@/Components/domain/Can';
+import { ConfirmDialog } from '@/Components/domain/ConfirmDialog';
 import { StatusBadge } from '@/Components/domain/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Badge } from '@/Components/ui/badge';
@@ -92,6 +94,17 @@ export default function PatientShow({ patient, appointments, payments, files }: 
     const initials = initialsFor(patient.name);
     const initialsArabic = isArabicText(initials);
 
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleteBusy, setDeleteBusy] = useState(false);
+
+    const performDelete = () => {
+        setDeleteBusy(true);
+        router.delete(`/patients/${patient.id}`, {
+            preserveScroll: false,
+            onFinish: () => setDeleteBusy(false),
+        });
+    };
+
     const fileForm = useForm({
         file: null as File | null,
         category: 'id_scan',
@@ -126,6 +139,16 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                         <Calendar className="me-2 h-4 w-4" />
                         {t('patients.bookAppointment')}
                     </Button>
+                    <Can permission="patients.delete">
+                        <Button
+                            variant="outline"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDeleteOpen(true)}
+                        >
+                            <Trash2 className="me-2 h-4 w-4" />
+                            {t('patients.delete')}
+                        </Button>
+                    </Can>
                 </div>
             }
         >
@@ -386,6 +409,15 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <ConfirmDialog
+                open={deleteOpen}
+                onOpenChange={(open) => !deleteBusy && setDeleteOpen(open)}
+                title={t('patients.confirmDelete.title')}
+                description={t('patients.confirmDelete.body')}
+                busy={deleteBusy}
+                onConfirm={performDelete}
+            />
         </AppLayout>
     );
 }
