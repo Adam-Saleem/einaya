@@ -294,16 +294,31 @@
     },
     "reception": {
         "title": "الاستقبال",
-        "subtitle": "طابور اليوم وحالات الحضور المباشر",
-        "stats": {
-            "todayTotal": "مواعيد اليوم",
-            "walkIns": "حضور مباشر اليوم",
-            "pendingPayments": "مدفوعات معلّقة",
-            "completedToday": "مكتملة اليوم"
-        },
+        "subtitle": "طابور اليوم",
+        "summary": "{{done}} من {{total}} مكتملة",
         "queue": "طابور اليوم",
         "noAppointments": "لا توجد مواعيد لهذا اليوم.",
+        "confirmCancel": {
+            "title": "إلغاء هذا الموعد؟",
+            "body": "لن يُسجَّل حضور المريض. يمكنك إعادة الحجز لاحقًا."
+        },
+        "newAppointment": {
+            "title": "موعد جديد",
+            "step1Subtitle": "اختر مريضًا موجودًا أو سجّل مريضًا جديدًا.",
+            "step2Subtitle": "اختر وقت الموعد.",
+            "stepPatient": "المريض",
+            "stepAppointment": "الموعد",
+            "modeExisting": "مريض موجود",
+            "modeNew": "مريض جديد",
+            "choosePatient": "ابحث بالاسم أو الهاتف",
+            "patient": "المريض",
+            "reserve": "حجز",
+            "success": "تم حجز الموعد.",
+            "warningHeading": "تحذيرات — راجِع قبل التأكيد",
+            "forceConfirm": "حجز رغم التحذير"
+        },
         "actions": {
+            "newAppointment": "موعد جديد",
             "addWalkIn": "إضافة حضور مباشر",
             "searchPatient": "بحث عن مريض",
             "bookAppointment": "حجز موعد",
@@ -317,6 +332,25 @@
         "subtitle": "المرضى المسجّلون مع بياناتهم وملخّصهم السريري",
         "create": "تسجيل مريض",
         "search": "ابحث بالاسم أو الهاتف أو الهوية أو الرمز",
+        "simple": {
+            "fullName": "الاسم الكامل",
+            "nationalId": "رقم الهوية",
+            "phone": "الهاتف",
+            "gender": "الجنس",
+            "maritalStatus": "الحالة الاجتماعية",
+            "city": "المدينة",
+            "cityPlaceholder": "اختر مدينة",
+            "village": "القرية",
+            "villagePlaceholder": "اختر قرية",
+            "villageDisabled": "اختر المدينة أولًا",
+            "dateOfBirth": "تاريخ الميلاد",
+            "maritalOptions": {
+                "single": "أعزب",
+                "married": "متزوج",
+                "divorced": "مطلّق",
+                "widowed": "أرمل"
+            }
+        },
         "filters": {
             "allGenders": "كل الأجناس",
             "anyInsurance": "أي تأمين",

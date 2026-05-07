@@ -20,10 +20,17 @@ class StorePatientRequest extends FormRequest
     /** @return array<string, mixed> */
     public function rules(): array
     {
+        // Phase 21 — the simplified reception flow posts a single
+        // `full_name`. The detailed Patients/Index form still posts
+        // first_name + last_name. Either path is accepted here; the
+        // RegisterPatientAction splits full_name when present.
+        $hasFullName = $this->filled('full_name');
+
         return [
-            'first_name' => ['required', 'string', 'max:120'],
-            'last_name' => ['required', 'string', 'max:120'],
-            'phone' => ['required', 'string', 'max:30'],
+            'full_name' => ['nullable', 'string', 'max:240'],
+            'first_name' => [$hasFullName ? 'nullable' : 'required', 'string', 'max:120'],
+            'last_name' => [$hasFullName ? 'nullable' : 'required', 'string', 'max:120'],
+            'phone' => ['nullable', 'string', 'max:30'],
             'phone_alt' => ['nullable', 'string', 'max:30'],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
             'gender' => ['nullable', new Enum(PatientGender::class)],
@@ -34,6 +41,7 @@ class StorePatientRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:191'],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
+            'village' => ['nullable', 'string', 'max:100'],
             'emergency_name' => ['nullable', 'string', 'max:120'],
             'emergency_phone' => ['nullable', 'string', 'max:30'],
             'emergency_relation' => ['nullable', 'string', 'max:60'],

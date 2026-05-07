@@ -1,14 +1,14 @@
 import { Link, router } from '@inertiajs/react';
-import { Calendar, CalendarOff, CreditCard, UserPlus, Users } from 'lucide-react';
+import { CalendarOff, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from '@/Components/domain/ConfirmDialog';
 import { EmptyState } from '@/Components/domain/EmptyState';
-import { PatientRegistrationForm } from '@/Components/domain/PatientRegistrationForm';
+import { NewAppointmentDialog } from '@/Components/domain/NewAppointmentDialog';
 import { StatusBadge } from '@/Components/domain/StatusBadge';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardContent } from '@/Components/ui/card';
 import {
     Table,
     TableBody,
@@ -31,15 +31,16 @@ type QueueRow = {
     doctor: { id: number; name: string | null } | null;
 };
 
+type Doctor = {
+    id: number;
+    name: string | null;
+    consultation_duration_minutes: number;
+};
+
 type Props = {
-    stats: {
-        today_total: number;
-        by_status: Record<string, number>;
-        walk_ins_today: number;
-        pending_payments: number;
-    };
+    summary: { total: number; done: number; pending: number };
     queue: QueueRow[];
-    insuranceProviders: { id: number; name: string }[];
+    doctors: Doctor[];
 };
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
@@ -52,120 +53,68 @@ const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' |
     no_show: 'danger',
 };
 
-export default function ReceptionDashboard({ stats, queue, insuranceProviders }: Props) {
+export default function ReceptionDashboard({ summary, queue, doctors }: Props) {
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
-    const [walkInOpen, setWalkInOpen] = useState(false);
+    const [newApptOpen, setNewApptOpen] = useState(false);
     const [confirm, setConfirm] = useState<
         { kind: 'cancel' | 'no_show'; appointment: QueueRow } | null
     >(null);
 
-    const stat = (label: string, value: number | string, sub?: string, Icon = Calendar) => (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {label}
-                </CardTitle>
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                    <Icon className="h-4 w-4" />
-                </span>
-            </CardHeader>
-            <CardContent>
-                <p className="text-h2">{value}</p>
-                {sub && <p className="mt-1 text-xs text-muted-foreground">{sub}</p>}
-            </CardContent>
-        </Card>
-    );
-
-    const markArrived = (id: number) => {
-        router.post(`/appointments/${id}/arrive`, {}, { preserveScroll: true });
-    };
-
     const performConfirm = () => {
         if (!confirm) return;
-        if (confirm.kind === 'cancel') {
-            router.post(
-                `/appointments/${confirm.appointment.id}/cancel`,
-                {},
-                { preserveScroll: true, onFinish: () => setConfirm(null) },
-            );
-        }
-        if (confirm.kind === 'no_show') {
-            router.post(
-                `/appointments/${confirm.appointment.id}/no-show`,
-                {},
-                { preserveScroll: true, onFinish: () => setConfirm(null) },
-            );
-        }
+        const url =
+            confirm.kind === 'cancel'
+                ? `/appointments/${confirm.appointment.id}/cancel`
+                : `/appointments/${confirm.appointment.id}/no-show`;
+        router.post(url, {}, { preserveScroll: true });
+        setConfirm(null);
     };
 
     return (
         <AppLayout
             title={t('reception.title')}
             pageTitle={t('reception.title')}
-            description={t('reception.subtitle')}
+            description={t('reception.summary', {
+                done: summary.done,
+                total: summary.total,
+            })}
             actions={
-                <div className="flex flex-wrap gap-2">
-                    <Button onClick={() => setWalkInOpen(true)}>
-                        <UserPlus className="me-2 h-4 w-4" />
-                        {t('reception.actions.addWalkIn')}
-                    </Button>
-                    <Button asChild variant="outline">
-                        <Link href="/appointments">
-                            <Calendar className="me-2 h-4 w-4" />
-                            {t('reception.actions.bookAppointment')}
-                        </Link>
-                    </Button>
-                </div>
+                <Button size="lg" onClick={() => setNewApptOpen(true)}>
+                    <Plus className="me-2 h-4 w-4" />
+                    {t('reception.actions.newAppointment')}
+                </Button>
             }
         >
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {stat(
-                    t('reception.stats.todayTotal'),
-                    stats.today_total,
-                    `${stats.by_status.arrived ?? 0} arrived · ${stats.by_status.completed ?? 0} done`,
-                )}
-                {stat(t('reception.stats.walkIns'), stats.walk_ins_today, undefined, Users)}
-                {stat(
-                    t('reception.stats.pendingPayments'),
-                    stats.pending_payments,
-                    undefined,
-                    CreditCard,
-                )}
-                {stat(
-                    t('reception.stats.completedToday'),
-                    stats.by_status.completed ?? 0,
-                    `${stats.by_status.no_show ?? 0} no-show`,
-                    Calendar,
-                )}
-            </div>
-
             <Card>
-                <CardHeader>
-                    <CardTitle>{t('reception.queue')}</CardTitle>
-                </CardHeader>
                 <CardContent className={queue.length === 0 ? 'p-6' : 'p-0'}>
                     {queue.length === 0 ? (
                         <EmptyState
                             icon={CalendarOff}
                             title={t('reception.noAppointments')}
+                            action={
+                                <Button onClick={() => setNewApptOpen(true)}>
+                                    <Plus className="me-2 h-4 w-4" />
+                                    {t('reception.actions.newAppointment')}
+                                </Button>
+                            }
                         />
                     ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>{t('appointments.queue.columns.queue')}</TableHead>
-                                <TableHead>{t('appointments.queue.columns.patient')}</TableHead>
-                                <TableHead>{t('appointments.queue.columns.scheduled')}</TableHead>
-                                <TableHead>{t('appointments.queue.columns.status')}</TableHead>
-                                <TableHead className="text-end">
-                                    {t('appointments.queue.columns.actions')}
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {queue.map((row) => (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>{t('appointments.queue.columns.queue')}</TableHead>
+                                    <TableHead>{t('appointments.queue.columns.patient')}</TableHead>
+                                    <TableHead>{t('appointments.queue.columns.scheduled')}</TableHead>
+                                    <TableHead>{t('appointments.queue.columns.status')}</TableHead>
+                                    <TableHead className="text-end">
+                                        {t('appointments.queue.columns.actions')}
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {queue.map((row) => (
                                     <TableRow key={row.id}>
                                         <TableCell className="font-mono text-sm">
                                             {row.queue_number ?? '—'}
@@ -182,65 +131,70 @@ export default function ReceptionDashboard({ stats, queue, insuranceProviders }:
                                                 '—'
                                             )}
                                             <p className="text-xs text-muted-foreground">
-                                                {row.patient?.patient_code} · {row.patient?.phone}
+                                                {row.patient?.phone ?? '—'}
                                             </p>
                                         </TableCell>
-                                        <TableCell>{formatTime(row.scheduled_for)}</TableCell>
+                                        <TableCell className="text-sm">
+                                            {formatTime(row.scheduled_for)}
+                                        </TableCell>
                                         <TableCell>
                                             <StatusBadge variant={STATUS_VARIANT[row.status] ?? 'neutral'}>
                                                 {row.status_label}
                                             </StatusBadge>
                                         </TableCell>
                                         <TableCell className="text-end">
-                                            <div className="flex flex-wrap justify-end gap-1">
-                                                {row.status !== 'arrived' &&
-                                                    row.status !== 'completed' &&
-                                                    row.status !== 'cancelled' &&
-                                                    row.status !== 'no_show' && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            onClick={() => markArrived(row.id)}
-                                                        >
-                                                            {t('reception.actions.markArrived')}
-                                                        </Button>
-                                                    )}
-                                                {row.status !== 'cancelled' &&
-                                                    row.status !== 'completed' && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            onClick={() =>
-                                                                setConfirm({
-                                                                    kind: 'cancel',
-                                                                    appointment: row,
-                                                                })
-                                                            }
-                                                        >
-                                                            {t('reception.actions.cancel')}
-                                                        </Button>
-                                                    )}
+                                            <div className="flex items-center justify-end gap-1">
+                                                {row.status === 'pending' && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            router.post(
+                                                                `/appointments/${row.id}/arrive`,
+                                                                {},
+                                                                { preserveScroll: true },
+                                                            )
+                                                        }
+                                                    >
+                                                        {t('reception.actions.markArrived')}
+                                                    </Button>
+                                                )}
+                                                {(row.status === 'pending' ||
+                                                    row.status === 'arrived') && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() =>
+                                                            setConfirm({
+                                                                kind: 'cancel',
+                                                                appointment: row,
+                                                            })
+                                                        }
+                                                    >
+                                                        {t('reception.actions.cancel')}
+                                                    </Button>
+                                                )}
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                        </TableBody>
-                    </Table>
+                            </TableBody>
+                        </Table>
                     )}
                 </CardContent>
             </Card>
 
-            <PatientRegistrationForm
-                open={walkInOpen}
-                onOpenChange={setWalkInOpen}
-                insuranceProviders={insuranceProviders}
+            <NewAppointmentDialog
+                open={newApptOpen}
+                onOpenChange={setNewApptOpen}
+                doctors={doctors}
             />
 
             <ConfirmDialog
                 open={confirm !== null}
                 onOpenChange={(open) => !open && setConfirm(null)}
-                title="Cancel this appointment?"
-                description="The patient won't be marked arrived. You can re-book later."
+                title={t('reception.confirmCancel.title')}
+                description={t('reception.confirmCancel.body')}
                 onConfirm={performConfirm}
             />
         </AppLayout>

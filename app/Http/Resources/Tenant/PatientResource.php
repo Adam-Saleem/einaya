@@ -33,6 +33,7 @@ class PatientResource extends JsonResource
             'email' => $this->email,
             'address' => $this->address,
             'city' => $this->city,
+            'village' => $this->village,
             'emergency_name' => $this->emergency_name,
             'emergency_phone' => $this->emergency_phone,
             'emergency_relation' => $this->emergency_relation,

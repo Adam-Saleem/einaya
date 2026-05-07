@@ -24,6 +24,23 @@ class RegisterPatientAction
      */
     public function execute(array $data, array $files, ?TenantUser $actor): Patient
     {
+        // Phase 21: callers can pass a single `full_name` instead of
+        // first_name/last_name. Split on the first space — single-word
+        // names duplicate to last_name so the NOT NULL constraint and
+        // the existing `name` accessor still work.
+        if (! empty($data['full_name'])) {
+            $name = trim((string) $data['full_name']);
+            if (str_contains($name, ' ')) {
+                [$first, $last] = explode(' ', $name, 2);
+                $data['first_name'] = trim($first);
+                $data['last_name'] = trim($last);
+            } else {
+                $data['first_name'] = $name;
+                $data['last_name'] = $name;
+            }
+            unset($data['full_name']);
+        }
+
         // "Add new provider" inline support — caller passes
         // `insurance_provider_new` to create on the fly. Auto-toggles
         // has_insurance to true.

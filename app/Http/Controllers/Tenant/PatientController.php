@@ -84,7 +84,7 @@ class PatientController extends Controller
         ]);
     }
 
-    public function store(StorePatientRequest $request, RegisterPatientAction $action): RedirectResponse
+    public function store(StorePatientRequest $request, RegisterPatientAction $action): RedirectResponse|JsonResponse
     {
         $data = $request->validated();
         $files = collect($data['files'] ?? [])->map(fn ($entry) => [
@@ -98,6 +98,14 @@ class PatientController extends Controller
         if (empty($data['force_duplicate_phone']) && ! empty($data['phone'])) {
             $duplicates = $this->searchService->findByPhone($data['phone']);
             if ($duplicates->isNotEmpty()) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => 'Phone duplicate.',
+                        'errors' => ['phone' => ['phone_duplicate']],
+                        'duplicate_phone_matches' => $duplicates->toArray(),
+                    ], 422);
+                }
+
                 return back()
                     ->withInput()
                     ->withErrors([
@@ -109,6 +117,20 @@ class PatientController extends Controller
         unset($data['force_duplicate_phone']);
 
         $patient = $action->execute($data, $files, $request->user());
+
+        // Phase 21: the new-appointment dialog posts via fetch and needs the
+        // freshly created patient's id back; Inertia visits still get the
+        // redirect-with-flash flow.
+        if ($request->expectsJson()) {
+            return response()->json([
+                'patient' => [
+                    'id' => $patient->id,
+                    'patient_code' => $patient->patient_code,
+                    'name' => trim($patient->first_name.' '.$patient->last_name),
+                    'phone' => $patient->phone,
+                ],
+            ], 201);
+        }
 
         return redirect("/patients/{$patient->id}")
             ->with('success', "Patient registered: {$patient->patient_code}");

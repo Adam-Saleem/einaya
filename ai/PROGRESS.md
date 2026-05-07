@@ -7,12 +7,27 @@
 
 ## Current Status
 
-**Active phase:** Phase 20 — coupons & subscription self-service shipped. Super admin CRUD at `app.einaya.test/coupons`; clinic admins on tenant subdomains see `/subscription` with a current-plan card, coupon redemption form, plan catalogue, and redemption history. Pest 100/100.
+**Active phase:** Phase 21 — reception simplification + 2-step appointment flow shipped. Reception dashboard reduced to one queue + one CTA; `<NewAppointmentDialog>` walks the user through patient → time slot in two steps; simple patient form (full_name only required) supports both new and existing patients. Pest 104/104.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### 📋 Phase 21 — Reception simplification + 2-step appointment flow (2026-05-07)
+
+The reception dashboard was a four-stat strip + walk-in form + queue table; the new screen is **one queue table + one "+ New appointment" CTA**. Booking is a two-step dialog: pick / register a patient, then pick a time slot. The patient form was 7 accordion sections; the simple form is 8 fields with **only `full_name` required** — the comprehensive accordion version stays available on `/patients` for editing detailed records (insurance, emergency contacts, medical flags).
+
+- **21.1 Schema.** Tenant migration `2026_05_07_000002_add_village_to_patients` adds `village` (string nullable). `first_name`, `last_name`, `patient_code`, `gender` enum kept as-is — non-destructive. Existing detailed pages still display `patient_code`; the new UI hides it. The `gender` enum still allows `other` for legacy rows but the new form only exposes `male`/`female`.
+- **21.2 Backend.** `RegisterPatientAction::execute()` now also accepts a `full_name` field — splits on the first space (single-word names duplicate to `last_name` so the existing `name` accessor and DB `NOT NULL` still work). `StorePatientRequest` makes `first_name` + `last_name` conditional on `full_name` presence; phone is now nullable; `village` validated. `PatientResource` exposes `village`. `PatientController::store` returns JSON (201 with `{patient: {id, name, …}}`) when `expectsJson()` so the new dialog's axios POST can chain into `/appointments`; the existing Inertia flow (redirect + flash) is preserved for the detailed form.
+- **21.3 Locations.** New `resources/js/data/locations.ts` exports `CITIES: City[]` for the West Bank + Gaza — 12 governorates, ~70 villages, EN + AR labels. Patient stores city/village as language-stable English ids (`hebron`, `halhul`) so cross-clinic reporting stays clean; the UI shows the localised label via `name[locale]`.
+- **21.4 NewAppointmentDialog.** New `Components/domain/NewAppointmentDialog.tsx` (~370 lines). Stepper at top; step 1 toggles between **Existing patient** (`<PatientCombobox>`) and **New patient** (8-field simple form: full_name required, national_id / phone / gender / marital_status / city / village / DOB optional). Step 2 collects doctor, scheduled_for (datetime-local), duration, reason, with the existing soft-warning workflow + force-confirm checkbox. Submit chains `axios POST /patients` (when new) → `router.post /appointments` so a single user action lands both records. 422 on patient creation surfaces inline and reopens step 1. Direction-aware Next/Back arrows for RTL.
+- **21.5 Reception rewrite.** Dropped the four stat cards and the walk-in form. The page header carries an inline summary line ("`{done}` of `{total}` done") and a single primary CTA `+ New appointment` (size lg). Below sits the queue table (or an `<EmptyState>` with a CTA-mirror when nothing is scheduled). `ReceptionDashboardController` simplified accordingly — passes `summary`, `queue`, and the `doctors` list (active doctors + their `consultation_duration_minutes`) so the dialog's step 2 has defaults.
+- **21.6 i18n.** New keys: `tenant.reception.newAppointment.*` (step labels, modes, reserve, warnings, force) and `tenant.reception.confirmCancel.*`, `tenant.patients.simple.*` (8 field labels + 4 marital options + city/village placeholders + dateOfBirth), `tenant.reception.summary` (interpolated). EN ↔ AR mirrored.
+- **21.7 Tests.** New `tests/Feature/Tenant/SimplePatientCreationTest.php` with 4 cases: multi-word full_name splits correctly, single-word duplicates to last_name, JSON-content-type POST returns 201 with the patient envelope, village + city columns persist. Existing `PatientRegistrationTest` and `AppointmentBookingTest` still pass unchanged (the action change is additive). Full Pest suite **104/104** (was 100, +4 net).
+- **Verification.** `pnpm exec tsc --noEmit` clean, `pnpm build` green (main 353 kB / 115 kB gz), smoke 200 across the seven authed routes (`/`, `/reception`, `/patients`, `/forms`, `/payments`, `/doctor`, `/settings`); `storage/logs/laravel.log` empty.
+
+**Out of scope.** No backfill of existing `name` rows into a `full_name` column (the accessor handles display). The Calendar booking dialog at `/appointments` keeps its existing more-detailed form for now — the new simplified flow lives only on Reception. Multi-doctor selection is still v2 (the dialog renders the list but production data is single-doctor).
 
 ### 🎟️ Phase 20 — Coupons & tenant self-service subscription (2026-05-07)
 

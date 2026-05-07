@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Tenant;
 
 use App\Enums\Tenant\AppointmentStatus;
-use App\Enums\Tenant\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Tenant\AppointmentResource;
 use App\Models\Tenant\Appointment;
-use App\Models\Tenant\InsuranceProvider;
-use App\Models\Tenant\Payment;
+use App\Models\Tenant\Doctor;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,37 +27,37 @@ class ReceptionDashboardController extends Controller
             ->orderBy('scheduled_for')
             ->get();
 
-        $byStatus = [];
-        foreach (AppointmentStatus::cases() as $status) {
-            $byStatus[$status->value] = 0;
-        }
+        // Phase 21: simplified dashboard ships a single summary line in the
+        // header — done count, pending count, and the absolute total.
+        $done = 0;
+        $pending = 0;
         foreach ($todays as $a) {
             $key = is_object($a->status) ? $a->status->value : (string) $a->status;
-            $byStatus[$key] = ($byStatus[$key] ?? 0) + 1;
+            if (in_array($key, [AppointmentStatus::Completed->value], true)) {
+                $done++;
+            } elseif (! in_array($key, [AppointmentStatus::Cancelled->value, AppointmentStatus::NoShow->value], true)) {
+                $pending++;
+            }
         }
 
-        // Walk-ins: appointments created today whose scheduled_for is also
-        // today (best-effort proxy until v2 explicitly tags walk-ins).
-        $walkIns = Appointment::query()
-            ->whereDate('created_at', $today)
-            ->whereDate('scheduled_for', $today)
-            ->count();
-
-        $pendingPayments = Payment::query()
-            ->where('status', PaymentStatus::Pending)
-            ->count();
+        $doctors = Doctor::query()
+            ->with('user:id,name')
+            ->where('is_active', true)
+            ->get(['id', 'user_id', 'consultation_duration_minutes'])
+            ->map(fn (Doctor $d) => [
+                'id' => $d->id,
+                'name' => $d->user?->name,
+                'consultation_duration_minutes' => $d->consultation_duration_minutes,
+            ]);
 
         return Inertia::render('Tenant/Reception/Dashboard', [
-            'stats' => [
-                'today_total' => $todays->count(),
-                'by_status' => $byStatus,
-                'walk_ins_today' => $walkIns,
-                'pending_payments' => $pendingPayments,
+            'summary' => [
+                'total' => $todays->count(),
+                'done' => $done,
+                'pending' => $pending,
             ],
             'queue' => AppointmentResource::collection($todays)->resolve(request()),
-            'insuranceProviders' => InsuranceProvider::where('is_active', true)
-                ->orderBy('name')
-                ->get(['id', 'name']),
+            'doctors' => $doctors,
         ]);
     }
 }

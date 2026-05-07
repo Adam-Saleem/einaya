@@ -291,15 +291,30 @@
     "reception": {
         "title": "Reception",
         "subtitle": "Today's queue and walk-ins",
-        "stats": {
-            "todayTotal": "Today's appointments",
-            "walkIns": "Walk-ins today",
-            "pendingPayments": "Pending payments",
-            "completedToday": "Completed today"
-        },
+        "summary": "{{done}} of {{total}} done",
         "queue": "Today's queue",
         "noAppointments": "No appointments today.",
+        "confirmCancel": {
+            "title": "Cancel this appointment?",
+            "body": "The patient won't be marked arrived. You can re-book later."
+        },
+        "newAppointment": {
+            "title": "New appointment",
+            "step1Subtitle": "Pick an existing patient or register a new one.",
+            "step2Subtitle": "Choose a time slot.",
+            "stepPatient": "Patient",
+            "stepAppointment": "Appointment",
+            "modeExisting": "Existing patient",
+            "modeNew": "New patient",
+            "choosePatient": "Search by name or phone",
+            "patient": "Patient",
+            "reserve": "Reserve",
+            "success": "Appointment booked.",
+            "warningHeading": "Soft warnings — review before confirming",
+            "forceConfirm": "Reserve anyway"
+        },
         "actions": {
+            "newAppointment": "New appointment",
             "addWalkIn": "Add walk-in",
             "searchPatient": "Search patient",
             "bookAppointment": "Book appointment",
@@ -312,6 +327,25 @@
         "title": "Patients",
         "subtitle": "Registered patients with their contact and clinical summary",
         "create": "Register patient",
+        "simple": {
+            "fullName": "Full name",
+            "nationalId": "National ID",
+            "phone": "Phone",
+            "gender": "Gender",
+            "maritalStatus": "Marital status",
+            "city": "City",
+            "cityPlaceholder": "Choose a city",
+            "village": "Village",
+            "villagePlaceholder": "Choose a village",
+            "villageDisabled": "Pick a city first",
+            "dateOfBirth": "Date of birth",
+            "maritalOptions": {
+                "single": "Single",
+                "married": "Married",
+                "divorced": "Divorced",
+                "widowed": "Widowed"
+            }
+        },
         "search": "Search by name, phone, ID, or code",
         "filters": {
             "allGenders": "All genders",
