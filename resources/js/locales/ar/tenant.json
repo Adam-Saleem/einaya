@@ -303,6 +303,21 @@
         "subtitle": "طابور اليوم",
         "summary": "{{done}} من {{total}} مكتملة",
         "summary3": "{{scheduled}} بالانتظار · {{in_progress}} قيد الكشف · {{pending_payment}} بانتظار الدفع",
+        "summaryAll": "{{count}} مواعيد اليوم",
+        "dateLabel": "التاريخ",
+        "emptyForDate": "لا توجد مواعيد في هذا التاريخ.",
+        "column": {
+            "action": "الإجراء"
+        },
+        "filters": {
+            "scheduled": "مجدولة",
+            "waiting": "بانتظار",
+            "engaged": "قيد الكشف",
+            "checkout": "بانتظار الدفع",
+            "cancelled": "ملغاة",
+            "reset": "إعادة",
+            "viewAll": "عرض الكل"
+        },
         "sections": {
             "scheduled": {
                 "title": "بالانتظار",
@@ -356,8 +371,23 @@
             "bookAppointment": "حجز موعد",
             "markArrived": "تأكيد الحضور",
             "cancel": "إلغاء",
-            "noShow": "لم يحضر"
+            "noShow": "لم يحضر",
+            "waitingForDoctor": "بانتظار الطبيب",
+            "recordPayment": "تسجيل دفعة",
+            "receipt": "الفاتورة"
         }
+    },
+    "patientDetails": {
+        "title": "بيانات المريض",
+        "subtitle": "اعرض، عدّل، أو تصفّح سجل المريض",
+        "tabs": {
+            "info": "بيانات المريض",
+            "history": "السجل الطبي"
+        },
+        "loadError": "تعذّر تحميل بيانات المريض.",
+        "saveError": "تعذّر حفظ التعديلات.",
+        "savedToast": "تم تحديث بيانات المريض.",
+        "noHistory": "لا توجد زيارات سابقة."
     },
     "patients": {
         "title": "المرضى",
@@ -618,20 +648,24 @@
     "doctorPanel": {
         "dashboard": {
             "title": "الطبيب",
-            "subtitle": "طابور اليوم والنشاط الأخير",
-            "stats": {
-                "todayTotal": "مواعيد اليوم",
-                "patientsSeenToday": "مرضى اليوم",
-                "pendingFollowups": "متابعات معلّقة",
-                "monthConsultations": "هذا الشهر"
-            },
-            "nowServing": "الجلسة الحالية",
-            "resume": "استئناف",
-            "queue": "طابور اليوم",
-            "noQueue": "لا يوجد مرضى في الانتظار.",
+            "subtitle": "بانتظار · قيد الكشف · بانتظار الدفع",
+            "waiting": "بانتظار",
+            "inProgress": "قيد الكشف",
+            "checkout": "بانتظار الدفع",
+            "arrived": "حضر في",
+            "openVisit": "فتح الزيارة",
+            "review": "مراجعة",
             "startConsultation": "بدء استشارة",
-            "todaySchedule": "جدول اليوم",
-            "recentPatients": "أحدث المرضى"
+            "empty": {
+                "waiting": "لا يوجد مرضى في الانتظار.",
+                "inProgress": "لا توجد زيارات قيد الكشف.",
+                "checkout": "لا توجد زيارات مكتملة في هذه الفترة."
+            },
+            "window": {
+                "8h": "آخر 8 ساعات",
+                "24h": "آخر 24 ساعة",
+                "3d": "آخر 3 أيام"
+            }
         },
         "queue": {
             "title": "الطابور",

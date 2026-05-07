@@ -180,14 +180,36 @@ class PatientController extends Controller
         ]);
     }
 
-    public function update(UpdatePatientRequest $request, Patient $patient): RedirectResponse
+    public function update(UpdatePatientRequest $request, Patient $patient): RedirectResponse|JsonResponse
     {
+        $data = $request->validated();
+
+        // Mirror RegisterPatientAction's full-name handling so the
+        // PatientDetailsDialog modal can post `full_name` instead of the
+        // first/last pair.
+        if (! empty($data['full_name'])) {
+            $name = trim((string) $data['full_name']);
+            if (str_contains($name, ' ')) {
+                [$first, $last] = explode(' ', $name, 2);
+                $data['first_name'] = trim($first);
+                $data['last_name'] = trim($last);
+            } else {
+                $data['first_name'] = $name;
+                $data['last_name'] = $name;
+            }
+            unset($data['full_name']);
+        }
+
         $original = $patient->only(['first_name', 'last_name', 'phone', 'email', 'has_insurance']);
-        $patient->fill($request->validated())->save();
+        $patient->fill($data)->save();
 
         $this->audit->log($request->user(), 'patient.updated', $patient, $original, $patient->only([
             'first_name', 'last_name', 'phone', 'email', 'has_insurance',
         ]));
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true]);
+        }
 
         return back()->with('success', 'Patient updated.');
     }

@@ -20,10 +20,17 @@ class UpdatePatientRequest extends FormRequest
     /** @return array<string, mixed> */
     public function rules(): array
     {
+        // Phase 25: the PatientDetailsDialog modal posts a `full_name`
+        // as a single field. The PatientController::update applies the
+        // same split-on-first-space rule used by RegisterPatientAction
+        // before reaching this validator, so accept either shape.
+        $hasFullName = $this->filled('full_name');
+
         return [
-            'first_name' => ['sometimes', 'required', 'string', 'max:120'],
-            'last_name' => ['sometimes', 'required', 'string', 'max:120'],
-            'phone' => ['sometimes', 'required', 'string', 'max:30'],
+            'full_name' => ['nullable', 'string', 'max:240'],
+            'first_name' => [$hasFullName ? 'nullable' : 'sometimes', 'string', 'max:120'],
+            'last_name' => [$hasFullName ? 'nullable' : 'sometimes', 'string', 'max:120'],
+            'phone' => ['nullable', 'string', 'max:30'],
             'phone_alt' => ['nullable', 'string', 'max:30'],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
             'gender' => ['nullable', new Enum(PatientGender::class)],
@@ -34,6 +41,7 @@ class UpdatePatientRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:191'],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
+            'village' => ['nullable', 'string', 'max:100'],
             'emergency_name' => ['nullable', 'string', 'max:120'],
             'emergency_phone' => ['nullable', 'string', 'max:30'],
             'emergency_relation' => ['nullable', 'string', 'max:60'],

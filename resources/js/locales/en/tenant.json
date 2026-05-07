@@ -299,6 +299,21 @@
         "subtitle": "Today's queue and walk-ins",
         "summary": "{{done}} of {{total}} done",
         "summary3": "{{scheduled}} scheduled · {{in_progress}} in progress · {{pending_payment}} pending payment",
+        "summaryAll": "{{count}} appointments today",
+        "dateLabel": "Date",
+        "emptyForDate": "No appointments for the selected date.",
+        "column": {
+            "action": "Action"
+        },
+        "filters": {
+            "scheduled": "Scheduled",
+            "waiting": "Waiting",
+            "engaged": "In progress",
+            "checkout": "Checkout",
+            "cancelled": "Cancelled",
+            "reset": "Reset",
+            "viewAll": "View all"
+        },
         "sections": {
             "scheduled": {
                 "title": "Scheduled & waiting",
@@ -352,8 +367,23 @@
             "bookAppointment": "Book appointment",
             "markArrived": "Mark arrived",
             "cancel": "Cancel",
-            "noShow": "No show"
+            "noShow": "No show",
+            "waitingForDoctor": "Waiting for doctor",
+            "recordPayment": "Record payment",
+            "receipt": "Receipt"
         }
+    },
+    "patientDetails": {
+        "title": "Patient details",
+        "subtitle": "View, edit, or browse this patient's history",
+        "tabs": {
+            "info": "Patient info",
+            "history": "Medical history"
+        },
+        "loadError": "Couldn't load patient details.",
+        "saveError": "Couldn't save changes.",
+        "savedToast": "Patient updated.",
+        "noHistory": "No previous visits."
     },
     "patients": {
         "title": "Patients",
@@ -614,20 +644,24 @@
     "doctorPanel": {
         "dashboard": {
             "title": "Doctor",
-            "subtitle": "Today's queue and recent activity",
-            "stats": {
-                "todayTotal": "Today's appointments",
-                "patientsSeenToday": "Patients seen today",
-                "pendingFollowups": "Pending follow-ups",
-                "monthConsultations": "This month"
-            },
-            "nowServing": "Now serving",
-            "resume": "Resume",
-            "queue": "Today's queue",
-            "noQueue": "No arrived patients waiting.",
+            "subtitle": "Waiting · In progress · Checkout",
+            "waiting": "Waiting",
+            "inProgress": "In progress",
+            "checkout": "Checkout",
+            "arrived": "arrived",
+            "openVisit": "Open visit",
+            "review": "Review",
             "startConsultation": "Start consultation",
-            "todaySchedule": "Today's schedule",
-            "recentPatients": "Recent patients"
+            "empty": {
+                "waiting": "No patients waiting.",
+                "inProgress": "No active visits.",
+                "checkout": "No completed visits in this window."
+            },
+            "window": {
+                "8h": "Last 8h",
+                "24h": "Last 24h",
+                "3d": "Last 3d"
+            }
         },
         "queue": {
             "title": "Queue",

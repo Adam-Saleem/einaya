@@ -1,22 +1,26 @@
 import { Link, router } from '@inertiajs/react';
-import { Calendar, ClipboardCheck, Inbox, Stethoscope, Users } from 'lucide-react';
+import { CheckCircle2, Inbox, Play, Stethoscope } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/Components/domain/EmptyState';
-import { StatusBadge } from '@/Components/domain/StatusBadge';
+import { PatientDetailsDialog } from '@/Components/domain/PatientDetailsDialog';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
+import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
 import { formatTime } from '@/lib/dates';
 
-type QueueRow = {
+type Window = '8h' | '24h' | '3d';
+
+type Appointment = {
     id: number;
-    queue_number: number | null;
     scheduled_for: string | null;
+    arrived_at?: string | null;
     status: string;
     status_label: string;
+    queue_number: number | null;
     patient: {
         id: number;
         patient_code: string;
@@ -28,227 +32,289 @@ type QueueRow = {
 };
 
 type Props = {
-    stats: {
-        today_total: number;
-        arrived: number;
-        completed: number;
-        patients_seen_today: number;
-        pending_followups: number;
-        month_consultations: number;
-    };
-    inProgress: {
-        id: number;
-        patient_name: string;
-        patient_code: string;
-        started_at: string | null;
-    } | null;
-    queue: QueueRow[];
-    todaySchedule: QueueRow[];
-    recentPatients: {
-        consultation_id: number;
-        patient_id: number;
-        patient_name: string;
-        patient_code: string;
-        ended_at: string | null;
-    }[];
+    window: Window;
+    waiting: Appointment[];
+    inProgress: Appointment[];
+    checkout: Appointment[];
 };
 
-const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
-    pending: 'warning',
-    confirmed: 'info',
-    arrived: 'info',
-    in_progress: 'info',
-    completed: 'success',
-    cancelled: 'danger',
-    no_show: 'danger',
-};
+const WINDOWS: Window[] = ['8h', '24h', '3d'];
 
-export default function DoctorDashboard({ stats, inProgress, queue, todaySchedule, recentPatients }: Props) {
+export default function DoctorDashboard({
+    window,
+    waiting,
+    inProgress,
+    checkout,
+}: Props) {
     const { t } = useTranslation('tenant');
     useFlashToasts();
 
     const [startingId, setStartingId] = useState<number | null>(null);
+    const [, runStart] = usePending();
+    const [detailsId, setDetailsId] = useState<number | null>(null);
+
     const startConsultation = (patientId: number, appointmentId: number) => {
         if (startingId !== null) return;
         setStartingId(appointmentId);
-        router.post(
-            '/consultations',
-            {
-                patient_id: patientId,
-                appointment_id: appointmentId,
-            },
+        runStart(
+            (opts) =>
+                router.post(
+                    '/consultations',
+                    { patient_id: patientId, appointment_id: appointmentId },
+                    opts,
+                ),
             { onFinish: () => setStartingId(null) },
         );
     };
 
-    const stat = (label: string, value: number, Icon = Calendar, sub?: string) => (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                    <Icon className="h-4 w-4" />
-                </span>
-            </CardHeader>
-            <CardContent>
-                <p className="text-h2">{value}</p>
-                {sub && <p className="mt-1 text-xs text-muted-foreground">{sub}</p>}
-            </CardContent>
-        </Card>
-    );
+    const setWindow = (w: Window) =>
+        router.get('/doctor', { window: w }, { preserveState: true, preserveScroll: true });
 
     return (
         <AppLayout
             title={t('doctorPanel.dashboard.title')}
             pageTitle={t('doctorPanel.dashboard.title')}
             description={t('doctorPanel.dashboard.subtitle')}
+            actions={
+                <div className="inline-flex rounded-md border bg-background p-1">
+                    {WINDOWS.map((w) => (
+                        <button
+                            key={w}
+                            type="button"
+                            onClick={() => setWindow(w)}
+                            className={
+                                window === w
+                                    ? 'rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground'
+                                    : 'rounded-sm px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground'
+                            }
+                        >
+                            {t(`doctorPanel.dashboard.window.${w}`)}
+                        </button>
+                    ))}
+                </div>
+            }
         >
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {stat(
-                    t('doctorPanel.dashboard.stats.todayTotal'),
-                    stats.today_total,
-                    Calendar,
-                    `${stats.arrived} arrived · ${stats.completed} completed`,
-                )}
-                {stat(t('doctorPanel.dashboard.stats.patientsSeenToday'), stats.patients_seen_today, Users)}
-                {stat(t('doctorPanel.dashboard.stats.pendingFollowups'), stats.pending_followups, ClipboardCheck)}
-                {stat(t('doctorPanel.dashboard.stats.monthConsultations'), stats.month_consultations, Stethoscope)}
-            </div>
-
-            {inProgress && (
-                <Card className="border-primary/40">
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle>{t('doctorPanel.dashboard.nowServing')}</CardTitle>
-                        <Button asChild>
-                            <Link href={`/consultations/${inProgress.id}`}>
-                                {t('doctorPanel.dashboard.resume')}
-                            </Link>
-                        </Button>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-h3">{inProgress.patient_name}</p>
-                        <p className="text-sm text-muted-foreground">
-                            started {formatTime(inProgress.started_at)}
-                        </p>
-                    </CardContent>
-                </Card>
-            )}
-
             <div className="grid gap-4 lg:grid-cols-3">
-                <Card className="lg:col-span-2">
-                    <CardHeader>
-                        <CardTitle>{t('doctorPanel.dashboard.queue')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {queue.length === 0 ? (
-                            <EmptyState
-                                icon={Inbox}
-                                title={t('doctorPanel.dashboard.noQueue')}
-                            />
-                        ) : (
-                            <ul className="divide-y">
-                                {queue.map((row) => (
-                                    <li key={row.id} className="flex items-center justify-between py-3">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent font-mono text-accent-foreground">
-                                                {row.queue_number ?? '?'}
-                                            </span>
-                                            <div>
-                                                <p className="flex items-center gap-2 font-medium">
-                                                    {row.patient?.name ?? '—'}
-                                                    {row.patient?.has_allergies && (
-                                                        <span
-                                                            title={t('visit.flags.allergies')}
-                                                            className="inline-block h-2 w-2 rounded-full bg-destructive"
-                                                            aria-label={t('visit.flags.allergies')}
-                                                        />
-                                                    )}
-                                                    {row.patient?.has_chronic && (
-                                                        <span
-                                                            title={t('visit.flags.chronic')}
-                                                            className="inline-block h-2 w-2 rounded-full bg-warning"
-                                                            aria-label={t('visit.flags.chronic')}
-                                                        />
-                                                    )}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {formatTime(row.scheduled_for)}
-                                                    {row.patient?.phone && ` · ${row.patient.phone}`}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <Button
-                                            size="sm"
-                                            disabled={startingId !== null}
-                                            onClick={() =>
-                                                row.patient &&
-                                                startConsultation(row.patient.id, row.id)
-                                            }
-                                        >
-                                            {t('doctorPanel.dashboard.startConsultation')}
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>{t('doctorPanel.dashboard.recentPatients')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {recentPatients.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">—</p>
-                        ) : (
-                            <ul className="divide-y">
-                                {recentPatients.map((p) => (
-                                    <li
-                                        key={p.consultation_id}
-                                        className="flex items-center justify-between py-2"
-                                    >
-                                        <Link
-                                            href={`/patients/${p.patient_id}`}
-                                            className="font-medium hover:text-primary"
-                                        >
-                                            {p.patient_name}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t('doctorPanel.dashboard.todaySchedule')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {todaySchedule.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">—</p>
+                {/* Waiting */}
+                <BucketCard
+                    tone="warning"
+                    title={t('doctorPanel.dashboard.waiting')}
+                    icon={Inbox}
+                    count={waiting.length}
+                >
+                    {waiting.length === 0 ? (
+                        <EmptyState
+                            icon={Inbox}
+                            title={t('doctorPanel.dashboard.empty.waiting')}
+                        />
                     ) : (
-                        <ul className="divide-y">
-                            {todaySchedule.map((row) => (
-                                <li key={row.id} className="flex items-center justify-between py-2">
-                                    <div className="flex items-center gap-3">
-                                        <span className="font-mono text-sm">
-                                            {formatTime(row.scheduled_for)}
-                                        </span>
-                                        <span className="font-medium">
-                                            {row.patient?.name ?? '—'}
-                                        </span>
-                                    </div>
-                                    <StatusBadge variant={STATUS_VARIANT[row.status] ?? 'neutral'}>
-                                        {row.status_label}
-                                    </StatusBadge>
+                        <ul className="space-y-2">
+                            {waiting.map((row) => (
+                                <li
+                                    key={row.id}
+                                    className="rounded-md border border-warning/30 bg-warning/10 p-3"
+                                >
+                                    <PatientLine row={row} t={t} onDetails={() => row.patient && setDetailsId(row.patient.id)} />
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        {formatTime(row.scheduled_for)}
+                                        {row.arrived_at && (
+                                            <>
+                                                {' · '}
+                                                {t('doctorPanel.dashboard.arrived')}{' '}
+                                                {formatTime(row.arrived_at)}
+                                            </>
+                                        )}
+                                    </p>
+                                    <Button
+                                        size="sm"
+                                        className="mt-2 w-full"
+                                        disabled={startingId !== null}
+                                        onClick={() =>
+                                            row.patient &&
+                                            startConsultation(row.patient.id, row.id)
+                                        }
+                                    >
+                                        <Play className="me-1.5 h-3.5 w-3.5" />
+                                        {t('doctorPanel.dashboard.startConsultation')}
+                                    </Button>
                                 </li>
                             ))}
                         </ul>
                     )}
-                </CardContent>
-            </Card>
+                </BucketCard>
+
+                {/* In progress */}
+                <BucketCard
+                    tone="success"
+                    title={t('doctorPanel.dashboard.inProgress')}
+                    icon={Stethoscope}
+                    count={inProgress.length}
+                >
+                    {inProgress.length === 0 ? (
+                        <EmptyState
+                            icon={Stethoscope}
+                            title={t('doctorPanel.dashboard.empty.inProgress')}
+                        />
+                    ) : (
+                        <ul className="space-y-2">
+                            {inProgress.map((row) => (
+                                <li
+                                    key={row.id}
+                                    className="rounded-md border border-success/30 bg-success/10 p-3"
+                                >
+                                    <PatientLine row={row} t={t} onDetails={() => row.patient && setDetailsId(row.patient.id)} />
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        {formatTime(row.scheduled_for)}
+                                    </p>
+                                    <Button
+                                        asChild
+                                        size="sm"
+                                        variant="outline"
+                                        className="mt-2 w-full"
+                                    >
+                                        <Link href={`/consultations/${row.id}`}>
+                                            {t('doctorPanel.dashboard.openVisit')}
+                                        </Link>
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </BucketCard>
+
+                {/* Checkout */}
+                <BucketCard
+                    tone="secondary"
+                    title={t('doctorPanel.dashboard.checkout')}
+                    icon={CheckCircle2}
+                    count={checkout.length}
+                >
+                    {checkout.length === 0 ? (
+                        <EmptyState
+                            icon={CheckCircle2}
+                            title={t('doctorPanel.dashboard.empty.checkout')}
+                        />
+                    ) : (
+                        <ul className="space-y-2">
+                            {checkout.map((row) => (
+                                <li
+                                    key={row.id}
+                                    className="rounded-md border bg-secondary/30 p-3"
+                                >
+                                    <PatientLine row={row} t={t} onDetails={() => row.patient && setDetailsId(row.patient.id)} />
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        {formatTime(row.scheduled_for)}
+                                    </p>
+                                    <Button
+                                        asChild
+                                        size="sm"
+                                        variant="ghost"
+                                        className="mt-2 w-full"
+                                    >
+                                        <Link href={`/consultations/${row.id}`}>
+                                            {t('doctorPanel.dashboard.review')}
+                                        </Link>
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </BucketCard>
+            </div>
+
+            <PatientDetailsDialog
+                open={detailsId !== null}
+                onOpenChange={(o) => !o && setDetailsId(null)}
+                patientId={detailsId}
+            />
         </AppLayout>
+    );
+}
+
+function BucketCard({
+    tone,
+    title,
+    icon: Icon,
+    count,
+    children,
+}: {
+    tone: 'warning' | 'success' | 'secondary';
+    title: string;
+    icon: typeof Inbox;
+    count: number;
+    children: React.ReactNode;
+}) {
+    const headerTone = {
+        warning: 'border-warning/30 bg-warning/15 text-warning',
+        success: 'border-success/30 bg-success/15 text-success',
+        secondary: 'border-secondary bg-secondary text-secondary-foreground',
+    }[tone];
+
+    return (
+        <Card className="overflow-hidden">
+            <CardHeader className={`flex flex-row items-center justify-between gap-2 border-b ${headerTone}`}>
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+                    <Icon className="h-4 w-4" />
+                    {title}
+                </CardTitle>
+                <span className="rounded-full bg-background/40 px-2 text-sm font-bold">
+                    {count}
+                </span>
+            </CardHeader>
+            <CardContent className="max-h-[480px] overflow-y-auto p-3">
+                {children}
+            </CardContent>
+        </Card>
+    );
+}
+
+function PatientLine({
+    row,
+    t,
+    onDetails,
+}: {
+    row: Appointment;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    t: any;
+    onDetails: () => void;
+}) {
+    return (
+        <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-2 text-sm font-medium">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-mono text-xs text-primary">
+                        #{row.queue_number ?? '?'}
+                    </span>
+                    <span className="truncate">{row.patient?.name ?? '—'}</span>
+                    {row.patient?.has_allergies && (
+                        <span
+                            className="inline-block h-2 w-2 shrink-0 rounded-full bg-destructive"
+                            title={t('visit.flags.allergies')}
+                        />
+                    )}
+                    {row.patient?.has_chronic && (
+                        <span
+                            className="inline-block h-2 w-2 shrink-0 rounded-full bg-warning"
+                            title={t('visit.flags.chronic')}
+                        />
+                    )}
+                </p>
+                {row.patient?.phone && (
+                    <p className="text-xs text-muted-foreground" dir="ltr">
+                        {row.patient.phone}
+                    </p>
+                )}
+            </div>
+            <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label={t('patientDetails.title')}
+                className="h-7 w-7"
+                onClick={onDetails}
+            >
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+            </Button>
+        </div>
     );
 }

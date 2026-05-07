@@ -31,6 +31,7 @@ use App\Http\Controllers\Tenant\InsuranceProviderController;
 use App\Http\Controllers\Tenant\MedicalFormController;
 use App\Http\Controllers\Tenant\PatientController;
 use App\Http\Controllers\Tenant\PatientFileController;
+use App\Http\Controllers\Tenant\PatientProfileController;
 use App\Http\Controllers\Tenant\PaymentController;
 use App\Http\Controllers\Tenant\ReceptionDashboardController;
 use App\Http\Controllers\Tenant\ReportController;
@@ -242,6 +243,8 @@ Route::middleware([
             ->name('tenant.patients.update');
         Route::patch('/patients/{patient}/medical-flags', [PatientController::class, 'updateMedicalFlags'])
             ->name('tenant.patients.medical-flags');
+        Route::get('/patients/{patient}/profile', [PatientProfileController::class, 'show'])
+            ->name('tenant.patients.profile');
         Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])
             ->name('tenant.patients.destroy');
         Route::post('/patients/{patient}/files', [PatientFileController::class, 'store'])
