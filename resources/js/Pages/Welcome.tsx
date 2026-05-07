@@ -1,6 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import {
+    ArrowRight,
+    Database,
+    KeyRound,
+    ScrollText,
+    ShieldCheck,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -9,6 +15,7 @@ import {
     SchedulingIllustration,
 } from '@/Components/marketing/FeatureIllustrations';
 import { HeroDashboard } from '@/Components/marketing/HeroDashboard';
+import { SecurityDiagram } from '@/Components/marketing/SecurityDiagram';
 import { Button } from '@/Components/ui/button';
 import MarketingLayout, { useDemoDialog } from '@/Layouts/MarketingLayout';
 
@@ -16,6 +23,13 @@ const FEATURES = [
     { illustration: SchedulingIllustration, key: 'scheduling' as const },
     { illustration: RecordsIllustration, key: 'records' as const },
     { illustration: ConsultationsIllustration, key: 'consultations' as const },
+];
+
+const SECURITY_PILLARS = [
+    { icon: Database, key: 'isolation' as const },
+    { icon: KeyRound, key: 'auth' as const },
+    { icon: ScrollText, key: 'audit' as const },
+    { icon: ShieldCheck, key: 'redaction' as const },
 ];
 
 export default function Welcome() {
@@ -115,6 +129,58 @@ export default function Welcome() {
                 </section>
 
                 <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+                    <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '-50px' }}
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                            className="space-y-5"
+                        >
+                            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+                                <ShieldCheck className="h-3.5 w-3.5" />
+                                {t('landing.security.eyebrow')}
+                            </span>
+                            <h2 className="text-h2 leading-tight text-foreground">
+                                {t('landing.security.title')}
+                            </h2>
+                            <p className="max-w-xl text-base text-muted-foreground">
+                                {t('landing.security.body')}
+                            </p>
+                            <ul className="grid gap-3 pt-2 sm:grid-cols-2">
+                                {SECURITY_PILLARS.map(({ icon: Icon, key }) => (
+                                    <li
+                                        key={key}
+                                        className="flex items-start gap-3 rounded-xl border bg-card p-3"
+                                    >
+                                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+                                            <Icon className="h-4 w-4" />
+                                        </span>
+                                        <div>
+                                            <p className="text-sm font-semibold text-foreground">
+                                                {t(`landing.security.pillars.${key}.title`)}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {t(`landing.security.pillars.${key}.body`)}
+                                            </p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.96 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true, margin: '-50px' }}
+                            transition={{ duration: 0.45, ease: 'easeOut' }}
+                        >
+                            <SecurityDiagram className="w-full" />
+                        </motion.div>
+                    </div>
+                </section>
+
+                <section className="mx-auto max-w-6xl px-6 pb-20 lg:px-10">
                     <div
                         className="overflow-hidden rounded-3xl px-8 py-12 text-white sm:px-12 lg:py-16"
                         style={{

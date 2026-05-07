@@ -29,8 +29,9 @@ class StoreDemoRequest extends FormRequest
             // E.164: starts with "+", 8–15 digits total. libphonenumber
             // is the source of truth for whether the number is callable.
             'phone' => ['required', 'string', 'min:6', 'max:32', $this->phoneRule()],
-            'country' => ['nullable', 'string', 'size:2'],
+            'country' => ['required', 'string', 'size:2'],
             'intent' => ['required', 'in:demo,register'],
+            // Only optional field on the form — everything else is required.
             'message' => ['nullable', 'string', 'max:2000'],
             // Honeypot. Real users never see this; bots fill it.
             'website' => ['nullable', 'string', 'max:0'],

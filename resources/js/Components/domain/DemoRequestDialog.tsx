@@ -44,11 +44,21 @@ const EMPTY: FormShape = {
     contact_name: '',
     email: '',
     phone: '',
-    country: '',
+    // Matches PhoneInput's defaultCountry below so server-side `required`
+    // on country passes when the user only types a phone number.
+    country: 'PS',
     intent: 'demo',
     message: '',
     website: '',
 };
+
+function RequiredMark() {
+    return (
+        <span aria-hidden="true" className="ms-0.5 text-destructive">
+            *
+        </span>
+    );
+}
 
 export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }: Props) {
     const { t } = useTranslation('common');
@@ -122,6 +132,7 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                                 <div className="space-y-2">
                                     <Label htmlFor="clinic_name">
                                         {t('demoRequest.fields.clinicName')}
+                                        <RequiredMark />
                                     </Label>
                                     <Input
                                         id="clinic_name"
@@ -130,6 +141,7 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                                         onChange={(e) => form.setData('clinic_name', e.target.value)}
                                         aria-invalid={!!form.errors.clinic_name || undefined}
                                         aria-required="true"
+                                        required
                                     />
                                     {form.errors.clinic_name && (
                                         <p className="text-sm text-destructive">
@@ -140,6 +152,7 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                                 <div className="space-y-2">
                                     <Label htmlFor="contact_name">
                                         {t('demoRequest.fields.contactName')}
+                                        <RequiredMark />
                                     </Label>
                                     <Input
                                         id="contact_name"
@@ -149,6 +162,7 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                                         }
                                         aria-invalid={!!form.errors.contact_name || undefined}
                                         aria-required="true"
+                                        required
                                     />
                                     {form.errors.contact_name && (
                                         <p className="text-sm text-destructive">
@@ -159,7 +173,10 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="email">{t('demoRequest.fields.email')}</Label>
+                                <Label htmlFor="email">
+                                    {t('demoRequest.fields.email')}
+                                    <RequiredMark />
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -168,6 +185,7 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                                     onChange={(e) => form.setData('email', e.target.value)}
                                     aria-invalid={!!form.errors.email || undefined}
                                     aria-required="true"
+                                    required
                                 />
                                 {form.errors.email && (
                                     <p className="text-sm text-destructive">
@@ -177,13 +195,22 @@ export function DemoRequestDialog({ open, onOpenChange, initialIntent = 'demo' }
                             </div>
 
                             <div className="space-y-2">
-                                <Label>{t('demoRequest.fields.phone')}</Label>
+                                <Label htmlFor="phone-input">
+                                    {t('demoRequest.fields.phone')}
+                                    <RequiredMark />
+                                </Label>
                                 <PhoneInput
+                                    id="phone-input"
                                     international
                                     defaultCountry="PS"
                                     value={form.data.phone || undefined}
                                     onChange={(v) => form.setData('phone', v ?? '')}
                                     onCountryChange={(c) => c && form.setData('country', c)}
+                                    numberInputProps={{
+                                        'aria-required': 'true',
+                                        required: true,
+                                        'aria-invalid': form.errors.phone ? 'true' : undefined,
+                                    }}
                                     className="phone-input flex h-11 items-center gap-2 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
                                 />
                                 {form.errors.phone && (

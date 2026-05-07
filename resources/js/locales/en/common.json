@@ -45,6 +45,29 @@
                 "body": "Live diagnoses, prescriptions with autocomplete, and bilingual print-ready receipts."
             }
         },
+        "security": {
+            "eyebrow": "Privacy by design",
+            "title": "Your patients' data lives in your clinic only.",
+            "body": "Einaya is built on a separate database per clinic. Your records are physically isolated from every other clinic on the platform — no shared tables, no shared rows, no way to query across.",
+            "pillars": {
+                "isolation": {
+                    "title": "Per-clinic database",
+                    "body": "Each clinic gets its own MySQL database. Other clinics literally cannot see your data."
+                },
+                "auth": {
+                    "title": "2FA-ready accounts",
+                    "body": "Authenticator-app two-factor and recovery codes ship enabled. Doctor + secretary roles enforced server-side."
+                },
+                "audit": {
+                    "title": "Full audit trail",
+                    "body": "Every create, update, and delete is logged with the actor, IP, and old/new values for forensic review."
+                },
+                "redaction": {
+                    "title": "Sensitive fields redacted",
+                    "body": "Passwords, recovery codes, and 2FA secrets never reach logs or the audit trail — scrubbed at write time."
+                }
+            }
+        },
         "cta": {
             "title": "Ready to streamline your clinic?",
             "body": "Open Einaya and pick up where the day left you.",
