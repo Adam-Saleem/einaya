@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Globe, HeartHandshake, Microscope, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { AboutScene } from '@/Components/marketing/AboutScene';
 import { Button } from '@/Components/ui/button';
 import MarketingLayout, { useDemoDialog } from '@/Layouts/MarketingLayout';
 
@@ -12,27 +13,6 @@ const VALUES = [
     { icon: Microscope, key: 'clinical' },
     { icon: Globe, key: 'bilingual' },
 ] as const;
-
-const PHOTOS = [
-    {
-        src: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80',
-        alt: 'Clinic reception desk with calm, organized layout',
-        wide: true,
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1631815587646-b85a1bb027e1?auto=format&fit=crop&w=600&q=80',
-        alt: 'Doctor reviewing notes with a patient',
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80',
-        alt: 'Stethoscope and laptop on a wooden desk',
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?auto=format&fit=crop&w=900&q=80',
-        alt: 'Calendar and tablet showing scheduled appointments',
-        wide: true,
-    },
-];
 
 export default function About() {
     const { t } = useTranslation('common');
@@ -63,32 +43,14 @@ export default function About() {
                 </section>
 
                 <section className="mx-auto max-w-6xl px-6 pb-16 lg:px-10">
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        {PHOTOS.map((photo) => (
-                            <motion.figure
-                                key={photo.src}
-                                initial={{ opacity: 0, y: 8 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: '-40px' }}
-                                transition={{ duration: 0.4, ease: 'easeOut' }}
-                                className={
-                                    photo.wide
-                                        ? 'col-span-2 aspect-[4/3] overflow-hidden rounded-2xl bg-muted'
-                                        : 'col-span-1 aspect-square overflow-hidden rounded-2xl bg-muted'
-                                }
-                            >
-                                <img
-                                    src={photo.src}
-                                    alt={photo.alt}
-                                    loading="lazy"
-                                    className="h-full w-full object-cover"
-                                />
-                            </motion.figure>
-                        ))}
-                    </div>
-                    <p className="mt-3 text-xs text-muted-foreground">
-                        {t('about.photoCredit')}
-                    </p>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.97 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true, margin: '-40px' }}
+                        transition={{ duration: 0.45, ease: 'easeOut' }}
+                    >
+                        <AboutScene className="w-full" />
+                    </motion.div>
                 </section>
 
                 <section className="border-y bg-muted/40">
