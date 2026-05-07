@@ -3,6 +3,7 @@ import { ChevronLeft, Printer } from 'lucide-react';
 import { useEffect } from 'react';
 
 import { Button } from '@/Components/ui/button';
+import i18n from '@/i18n';
 
 type Props = {
     prescription: {
@@ -40,33 +41,6 @@ type Props = {
     };
 };
 
-const STRINGS = {
-    en: {
-        title: 'Prescription',
-        date: 'Date',
-        patient: 'Patient',
-        diagnoses: 'Diagnoses',
-        medications: 'Medications',
-        signature: 'Doctor signature',
-        license: 'License',
-        print: 'Print',
-        back: 'Back',
-        none: '—',
-    },
-    ar: {
-        title: 'وصفة طبية',
-        date: 'التاريخ',
-        patient: 'المريض',
-        diagnoses: 'التشخيصات',
-        medications: 'الأدوية',
-        signature: 'توقيع الطبيب',
-        license: 'الترخيص',
-        print: 'طباعة',
-        back: 'رجوع',
-        none: '—',
-    },
-} as const;
-
 export default function PrescriptionPrint({
     prescription,
     consultation,
@@ -74,21 +48,28 @@ export default function PrescriptionPrint({
     doctor,
     clinic,
 }: Props) {
-    const lang = (patient?.preferred_language ?? 'ar') as 'en' | 'ar';
+    const lang = (patient?.preferred_language === 'ar' ? 'ar' : 'en') as 'en' | 'ar';
     const dir = lang === 'ar' ? 'rtl' : 'ltr';
-    const s = STRINGS[lang];
+    const t = (key: string) =>
+        i18n.t(key, { lng: lang, ns: 'tenant', defaultValue: key }) as string;
 
     useEffect(() => {
-        const prev = document.documentElement.dir;
+        const prevDir = document.documentElement.dir;
+        const prevLang = document.documentElement.lang;
         document.documentElement.dir = dir;
+        document.documentElement.lang = lang;
         return () => {
-            document.documentElement.dir = prev;
+            document.documentElement.dir = prevDir;
+            document.documentElement.lang = prevLang;
         };
-    }, [dir]);
+    }, [dir, lang]);
+
+    const fmtDate = (iso: string) =>
+        new Date(iso).toLocaleString(lang === 'ar' ? 'ar' : 'en');
 
     return (
         <>
-            <Head title={`${s.title} #${prescription.id}`} />
+            <Head title={`${t('doctorPanel.print.title')} #${prescription.id}`} />
             <style>{`
                 @media print {
                     body { background: white !important; }
@@ -102,18 +83,19 @@ export default function PrescriptionPrint({
                     <Button asChild variant="ghost">
                         <Link href={`/consultations/${consultation.id}`}>
                             <ChevronLeft className="me-2 h-4 w-4" />
-                            {s.back}
+                            {t('doctorPanel.print.back')}
                         </Link>
                     </Button>
                     <Button onClick={() => window.print()}>
                         <Printer className="me-2 h-4 w-4" />
-                        {s.print}
+                        {t('doctorPanel.print.doPrint')}
                     </Button>
                 </div>
 
                 <div
                     className="rx-page mx-auto max-w-2xl rounded-md border bg-card p-8 shadow-sm"
                     dir={dir}
+                    lang={lang}
                 >
                     <header className="flex items-start gap-3 border-b pb-4">
                         {clinic.branding?.logo_url && (
@@ -137,17 +119,22 @@ export default function PrescriptionPrint({
                             )}
                         </div>
                         <div className="text-end">
-                            <h2 className="text-h3">{s.title}</h2>
+                            <h2 className="text-h3">{t('doctorPanel.print.title')}</h2>
                             <p className="text-sm text-muted-foreground">
-                                #{prescription.id} · {prescription.printed_at ? new Date(prescription.printed_at).toLocaleString() : new Date().toLocaleString()}
+                                #{prescription.id} ·{' '}
+                                {fmtDate(prescription.printed_at ?? new Date().toISOString())}
                             </p>
                         </div>
                     </header>
 
                     <section className="my-6 grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <p className="text-xs uppercase text-muted-foreground">{s.patient}</p>
-                            <p className="font-medium">{patient?.name ?? s.none}</p>
+                            <p className="text-xs uppercase text-muted-foreground">
+                                {t('doctorPanel.print.patient')}
+                            </p>
+                            <p className="font-medium">
+                                {patient?.name ?? t('doctorPanel.print.none')}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                                 {patient?.patient_code}
                                 {patient?.age !== null && ` · ${patient?.age}y`}
@@ -155,12 +142,16 @@ export default function PrescriptionPrint({
                             </p>
                         </div>
                         <div className="text-end">
-                            <p className="text-xs uppercase text-muted-foreground">Doctor</p>
-                            <p className="font-medium">Dr. {doctor.name ?? s.none}</p>
+                            <p className="text-xs uppercase text-muted-foreground">
+                                {t('doctorPanel.print.doctor')}
+                            </p>
+                            <p className="font-medium">
+                                Dr. {doctor.name ?? t('doctorPanel.print.none')}
+                            </p>
                             <p className="text-xs text-muted-foreground">{doctor.specialty}</p>
                             {doctor.license_number && (
                                 <p className="text-xs text-muted-foreground">
-                                    {s.license}: {doctor.license_number}
+                                    {t('doctorPanel.print.license')}: {doctor.license_number}
                                 </p>
                             )}
                         </div>
@@ -169,7 +160,7 @@ export default function PrescriptionPrint({
                     {(consultation.diagnoses?.length ?? 0) > 0 && (
                         <section className="border-t pt-4">
                             <p className="mb-2 text-xs uppercase text-muted-foreground">
-                                {s.diagnoses}
+                                {t('doctorPanel.print.diagnoses')}
                             </p>
                             <ul className="ms-5 list-disc text-sm">
                                 {consultation.diagnoses!.map((d, i) => (
@@ -188,7 +179,7 @@ export default function PrescriptionPrint({
 
                     <section className="border-t pt-4">
                         <p className="mb-3 text-xs uppercase text-muted-foreground">
-                            {s.medications}
+                            {t('doctorPanel.print.medications')}
                         </p>
                         <table className="w-full text-sm">
                             <tbody>
@@ -202,7 +193,9 @@ export default function PrescriptionPrint({
                                                     .join(' · ')}
                                             </p>
                                             {item.instructions && (
-                                                <p className="mt-1 text-xs">{item.instructions}</p>
+                                                <p className="mt-1 text-xs">
+                                                    {item.instructions}
+                                                </p>
                                             )}
                                         </td>
                                     </tr>
@@ -214,7 +207,7 @@ export default function PrescriptionPrint({
                     <section className="mt-12 flex items-end justify-between">
                         <div className="w-1/2">
                             <p className="border-t pt-2 text-xs text-muted-foreground">
-                                {s.signature}
+                                {t('doctorPanel.print.signature')}
                             </p>
                         </div>
                     </section>

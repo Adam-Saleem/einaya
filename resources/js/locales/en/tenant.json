@@ -408,12 +408,19 @@
         "receipt": {
             "title": "Receipt",
             "print": "Print",
+            "back": "Back",
+            "receiptNumber": "Receipt #",
+            "date": "Date",
             "patient": "Patient",
             "amount": "Amount",
             "method": "Method",
             "paidAt": "Paid at",
             "collectedBy": "Collected by",
-            "thankYou": "Thank you"
+            "cash": "Cash",
+            "card": "Card",
+            "insurance": "Insurance",
+            "total": "Total",
+            "thankYou": "Thank you for visiting."
         }
     },
     "doctorPanel": {
@@ -490,11 +497,15 @@
         "print": {
             "title": "Prescription",
             "patient": "Patient",
+            "doctor": "Doctor",
+            "date": "Date",
             "diagnoses": "Diagnoses",
             "medications": "Medications",
             "signature": "Doctor signature",
+            "license": "License",
             "back": "Back",
-            "doPrint": "Print"
+            "doPrint": "Print",
+            "none": "—"
         }
     },
     "builder": {

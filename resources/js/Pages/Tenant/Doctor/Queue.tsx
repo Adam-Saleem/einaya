@@ -14,6 +14,7 @@ import {
 } from '@/Components/ui/table';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatTime } from '@/lib/dates';
 import { cn } from '@/lib/utils';
 
 type QueueRow = {
@@ -31,11 +32,6 @@ type QueueRow = {
 };
 
 type Props = { queue: QueueRow[] };
-
-function fmtTime(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
 function waitMinutes(arrivedIso: string | null): number | null {
     if (!arrivedIso) return null;
@@ -115,8 +111,8 @@ export default function Queue({ queue }: Props) {
                                                     {row.patient?.patient_code} · {row.patient?.phone}
                                                 </p>
                                             </TableCell>
-                                            <TableCell>{fmtTime(row.scheduled_for)}</TableCell>
-                                            <TableCell>{fmtTime(row.arrived_at)}</TableCell>
+                                            <TableCell>{formatTime(row.scheduled_for)}</TableCell>
+                                            <TableCell>{formatTime(row.arrived_at)}</TableCell>
                                             <TableCell className={cn('font-mono', waitColor(wait))}>
                                                 {wait !== null ? `${wait}m` : '—'}
                                             </TableCell>

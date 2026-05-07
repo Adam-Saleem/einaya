@@ -13,17 +13,13 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { FormSubmission, Paginated } from '@/types/tenant';
 
 type Props = {
     form: { id: number; title: string };
     submissions: Paginated<FormSubmission>;
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function FormSubmissions({ form, submissions }: Props) {
     const { t } = useTranslation('tenant');
@@ -85,7 +81,7 @@ export default function FormSubmissions({ form, submissions }: Props) {
                                             {s.doctor?.name ?? '—'}
                                         </TableCell>
                                         <TableCell className="text-sm">
-                                            {formatDate(s.submitted_at)}
+                                            {formatDateTime(s.submitted_at)}
                                         </TableCell>
                                         <TableCell className="text-end">
                                             <Button asChild variant="outline" size="sm">

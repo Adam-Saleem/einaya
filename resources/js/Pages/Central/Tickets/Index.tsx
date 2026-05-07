@@ -23,6 +23,7 @@ import {
 import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import CentralLayout from '@/Layouts/CentralLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { Paginated, Ticket, TicketStatus } from '@/types/central';
 
 type Props = {
@@ -36,11 +37,6 @@ const STATUS_VARIANT: Record<TicketStatus, StatusVariant> = {
     pending: 'info',
     closed: 'success',
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function TicketsIndex({ tickets, filters, statuses }: Props) {
     const { t } = useTranslation('central');
@@ -142,7 +138,7 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
                                             </StatusBadge>
                                         </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">
-                                            {formatDate(ticket.created_at)}
+                                            {formatDateTime(ticket.created_at)}
                                         </TableCell>
                                     </TableRow>
                                 ))

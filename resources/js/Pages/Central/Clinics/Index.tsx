@@ -35,6 +35,7 @@ import {
 import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import CentralLayout from '@/Layouts/CentralLayout';
+import { formatDate } from '@/lib/dates';
 import type {
     ClinicStatus,
     ClinicSummary,
@@ -220,9 +221,7 @@ export default function ClinicsIndex({ clinics, plans, statuses, filters }: Prop
                                             </StatusBadge>
                                         </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">
-                                            {clinic.created_at
-                                                ? new Date(clinic.created_at).toLocaleDateString()
-                                                : '—'}
+                                            {formatDate(clinic.created_at)}
                                         </TableCell>
                                         <TableCell className="text-end">
                                             <DropdownMenu>

@@ -25,6 +25,7 @@ import {
 } from '@/Components/ui/table';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { Paginated } from '@/types/central';
 
 type PaymentRow = {
@@ -45,10 +46,6 @@ type Props = {
     filters: { from: string; to: string; method: string };
 };
 
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function PaymentsIndex({ payments, totals, filters }: Props) {
     const { t } = useTranslation('tenant');
@@ -170,7 +167,7 @@ export default function PaymentsIndex({ payments, totals, filters }: Props) {
                                     </TableCell>
                                     <TableCell>{p.method_label}</TableCell>
                                     <TableCell className="text-sm">
-                                        {formatDate(p.paid_at)}
+                                        {formatDateTime(p.paid_at)}
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground">
                                         {p.collector?.name ?? '—'}

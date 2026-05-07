@@ -13,6 +13,7 @@ import { Label } from '@/Components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDateTime } from '@/lib/dates';
 
 type Patient = {
     id: number;
@@ -82,11 +83,6 @@ const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' |
     cancelled: 'danger',
     no_show: 'danger',
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function PatientShow({ patient, appointments, payments, files }: Props) {
     const { t } = useTranslation('tenant');
@@ -276,7 +272,7 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                                         <li key={a.id} className="flex items-center justify-between p-4">
                                             <div>
                                                 <p className="text-sm font-medium">
-                                                    {formatDate(a.scheduled_for)}
+                                                    {formatDateTime(a.scheduled_for)}
                                                 </p>
                                                 {a.reason && (
                                                     <p className="text-xs text-muted-foreground">
@@ -372,7 +368,7 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                                             <div>
                                                 <p className="font-mono text-xs">{p.receipt_number}</p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {formatDate(p.paid_at)} · {p.method}
+                                                    {formatDateTime(p.paid_at)} · {p.method}
                                                 </p>
                                             </div>
                                             <span className="font-semibold">

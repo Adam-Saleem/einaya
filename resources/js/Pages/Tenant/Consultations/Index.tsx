@@ -23,6 +23,7 @@ import {
 } from '@/Components/ui/table';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { Paginated } from '@/types/central';
 
 type ConsultationRow = {
@@ -39,11 +40,6 @@ type Props = {
     consultations: Paginated<ConsultationRow>;
     filters: { status: string; from: string; to: string; search: string };
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function ConsultationsIndex({ consultations, filters }: Props) {
     const { t } = useTranslation('tenant');
@@ -139,7 +135,7 @@ export default function ConsultationsIndex({ consultations, filters }: Props) {
                                 consultations.data.map((c) => (
                                     <TableRow key={c.id}>
                                         <TableCell className="text-sm">
-                                            {formatDate(c.started_at)}
+                                            {formatDateTime(c.started_at)}
                                         </TableCell>
                                         <TableCell>
                                             {c.patient ? (

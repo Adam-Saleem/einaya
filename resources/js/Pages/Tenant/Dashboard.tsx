@@ -12,18 +12,9 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDate, formatTime } from '@/lib/dates';
 import type { PageProps } from '@/types';
 import type { DashboardProps } from '@/types/tenant';
-
-function formatTime(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString();
-}
 
 export default function Dashboard(props: DashboardProps) {
     const { t } = useTranslation('tenant');

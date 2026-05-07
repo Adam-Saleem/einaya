@@ -7,12 +7,30 @@
 
 ## Current Status
 
-**Active phase:** None — Phase 11 (post-v1 triage) shipped. v1 surface is shippable + cleaner.
+**Active phase:** Phase 12 (UX & visual polish) — first batch (12.0–12.5) shipped in eae1612; second batch (12.6+) underway.
 **Last session date:** 2026-05-07
 
 ---
 
 ## Completed Phases
+
+### 🚧 Phase 12 — UX & Visual Polish (in progress, 2026-05-07)
+
+#### Batch 1 — Foundations (eae1612, 12.0–12.5)
+
+Foundational pre-pass: defaults to light theme + en locale; warm-cream + slate-blue palette with white card layering and a strong dark sidebar; shadcn Input/Label/Textarea typography bumped; required asterisks switched to muted; all four lifecycle status badges remapped to the new soft-pill tokens.
+
+UX hooks: `useDebouncedFilter` for live list-page search; `usePending` for single-flight mutation guards; `ConfirmDialog` gains a busy state; long-form dialogs (`PatientRegistrationForm`, Builder `QuestionDialog`) prompt before discarding unsaved changes; mixed-payment shows a live split / total runner.
+
+Profile + auth refresh: `Profile/Edit` gets a card-grid layout with i18n; account self-deletion removed (route + controller); `GuestLayout` rebuilt on `bg-background` with a branded card; all auth pages ported to shadcn primitives + tokens + i18n; legacy Breeze components and `AuthenticatedLayout` deleted.
+
+#### Batch 2 — 12.5 print i18n + 12.6 date helpers
+
+- **12.5 Print pages bilingual via `tenant` namespace.** `Receipt.tsx` and `PrescriptionPrint.tsx` no longer carry inline `STRINGS = { en, ar }` objects; they read from `tenant.payment.receipt.*` / `tenant.doctorPanel.print.*` via `i18n.getFixedT(locale, 'tenant')` so translators can adjust copy without touching code. New keys mirrored in EN + AR. The pages still pick the locale from the patient (not the user session) per print spec.
+
+- **12.6 Locale-aware date formatting.** Created `resources/js/lib/dates.ts` with `formatDate / formatTime / formatDateTime` reading locale from i18next (Inertia-shared `preferences.locale`). Replaced 21 ad-hoc `toLocale*` call-sites (kept currency `.toLocaleString` calls untouched, and the print pages — `Receipt.tsx`, `PrescriptionPrint.tsx` — which intentionally pass an explicit patient-locale). Local `formatDate` / `formatTime` / `fmtTime` helpers were dropped from each page in favor of the shared module.
+
+  Files migrated (Tenant): `Patients/{Index,Show}`, `Dashboard`, `Reception/Dashboard`, `Doctor/{Dashboard,Queue,PatientHistory,Consultation}`, `Payments/Index`, `Forms/{Index,Submissions,Submission}`, `Appointments/Today`, `Audit/Index`, `Consultations/Index`, `Staff/Index`. Files migrated (Central): `Tickets/Index`, `Subscriptions/Index`, `Audit/Index`, `Clinics/{Show,Index}`. Datetime call-sites mapped to `formatDateTime`, date-only call-sites to `formatDate`.
 
 ### ✅ Phase 11 — Post-v1 Triage (2026-05-07)
 

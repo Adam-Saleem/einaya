@@ -15,6 +15,7 @@ import {
 } from '@/Components/ui/table';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatTime } from '@/lib/dates';
 
 type Appointment = {
     id: number;
@@ -36,11 +37,6 @@ const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'info' | 'danger' |
     cancelled: 'danger',
     no_show: 'danger',
 };
-
-function formatTime(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
 export default function TodayPage({ appointments }: Props) {
     const { t } = useTranslation('tenant');

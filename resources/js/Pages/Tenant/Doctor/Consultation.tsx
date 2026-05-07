@@ -36,6 +36,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDate, formatDateTime } from '@/lib/dates';
 import type { FormSnapshot } from '@/types/tenant';
 
 type Diagnosis = {
@@ -114,11 +115,6 @@ type Props = {
     history: HistoryEntry[];
     forms: { id: number; title: string; type: string }[];
 };
-
-function fmtDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString();
-}
 
 export default function ConsultationPage({ consultation, history, forms }: Props) {
     const { t } = useTranslation('tenant');
@@ -400,7 +396,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                             href={`/consultations/${h.id}`}
                                             className="block rounded-md border p-2 hover:bg-accent"
                                         >
-                                            <p className="text-sm font-medium">{fmtDate(h.ended_at ?? h.started_at)}</p>
+                                            <p className="text-sm font-medium">{formatDate(h.ended_at ?? h.started_at)}</p>
                                             {h.chief_complaint && (
                                                 <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                                                     {h.chief_complaint}
@@ -561,9 +557,7 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                                                             {sub.form_snapshot.title}
                                                         </p>
                                                         <p className="text-xs text-muted-foreground">
-                                                            {sub.submitted_at
-                                                                ? new Date(sub.submitted_at).toLocaleString()
-                                                                : '—'}
+                                                            {formatDateTime(sub.submitted_at)}
                                                         </p>
                                                     </div>
                                                     <Button asChild size="sm" variant="outline">

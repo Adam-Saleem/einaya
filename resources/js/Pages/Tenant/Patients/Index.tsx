@@ -25,6 +25,7 @@ import {
 import { useDebouncedFilter } from '@/Hooks/useDebouncedFilter';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDate } from '@/lib/dates';
 import type { Paginated } from '@/types/central';
 
 type PatientRow = {
@@ -43,11 +44,6 @@ type Props = {
     filters: { search: string; gender: string; has_insurance: string };
     insuranceProviders: { id: number; name: string }[];
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString();
-}
 
 export default function PatientsIndex({ patients, filters, insuranceProviders }: Props) {
     const { t } = useTranslation('tenant');

@@ -337,6 +337,23 @@
             "mixedSumWarning": "مجموع النقد والبطاقة والتأمين يجب أن يساوي المبلغ.",
             "mixedSumRunning": "التقسيم: {{sum}} / {{total}}",
             "submit": "تسجيل الدفعة"
+        },
+        "receipt": {
+            "title": "إيصال",
+            "print": "طباعة",
+            "back": "رجوع",
+            "receiptNumber": "رقم الإيصال",
+            "date": "التاريخ",
+            "patient": "المريض",
+            "amount": "المبلغ",
+            "method": "طريقة الدفع",
+            "paidAt": "تاريخ الدفع",
+            "collectedBy": "حصّلها",
+            "cash": "نقدًا",
+            "card": "بطاقة",
+            "insurance": "تأمين",
+            "total": "الإجمالي",
+            "thankYou": "شكرًا لزيارتكم."
         }
     },
     "doctorPanel": {
@@ -407,11 +424,16 @@
         },
         "print": {
             "title": "وصفة طبية",
+            "patient": "المريض",
+            "doctor": "الطبيب",
+            "date": "التاريخ",
             "diagnoses": "التشخيصات",
             "medications": "الأدوية",
             "signature": "توقيع الطبيب",
+            "license": "الترخيص",
             "back": "رجوع",
-            "doPrint": "طباعة"
+            "doPrint": "طباعة",
+            "none": "—"
         }
     },
     "builder": {

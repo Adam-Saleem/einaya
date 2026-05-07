@@ -20,6 +20,7 @@ import {
 import { Textarea } from '@/Components/ui/textarea';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import CentralLayout from '@/Layouts/CentralLayout';
+import { formatDate } from '@/lib/dates';
 import type { Paginated, SubscriptionRow, SubscriptionStatus } from '@/types/central';
 
 type Props = {
@@ -32,11 +33,6 @@ const STATUS_VARIANT: Record<SubscriptionStatus, StatusVariant> = {
     past_due: 'danger',
     cancelled: 'neutral',
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString();
-}
 
 export default function SubscriptionsIndex({ subscriptions }: Props) {
     const { t } = useTranslation('central');

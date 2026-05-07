@@ -6,6 +6,7 @@ import { FormRenderer } from '@/Components/domain/forms/FormRenderer';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { FormSubmission } from '@/types/tenant';
 
 type Props = { submission: FormSubmission };
@@ -45,10 +46,7 @@ export default function SubmissionShow({ submission }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-h4 text-muted-foreground">
-                        Submitted{' '}
-                        {submission.submitted_at
-                            ? new Date(submission.submitted_at).toLocaleString()
-                            : '—'}
+                        Submitted {formatDateTime(submission.submitted_at)}
                         {' · '}
                         {submission.doctor?.name && `Dr. ${submission.doctor.name}`}
                     </CardTitle>

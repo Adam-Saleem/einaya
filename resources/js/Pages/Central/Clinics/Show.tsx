@@ -19,6 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import CentralLayout from '@/Layouts/CentralLayout';
+import { formatDateTime } from '@/lib/dates';
 import type {
     AuditLog,
     ClinicStatus,
@@ -40,11 +41,6 @@ const STATUS_VARIANT: Record<ClinicStatus, StatusVariant> = {
     suspended: 'danger',
     cancelled: 'neutral',
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function ClinicShow({ clinic, plans, usage, auditLogs }: Props) {
     const { t } = useTranslation('central');
@@ -226,20 +222,20 @@ export default function ClinicShow({ clinic, plans, usage, auditLogs }: Props) {
                                     <dt className="text-muted-foreground">
                                         {t('clinics.show.subscription.starts')}
                                     </dt>
-                                    <dd>{formatDate(clinic.subscription?.starts_at ?? null)}</dd>
+                                    <dd>{formatDateTime(clinic.subscription?.starts_at ?? null)}</dd>
                                 </div>
                                 <div>
                                     <dt className="text-muted-foreground">
                                         {t('clinics.show.subscription.ends')}
                                     </dt>
-                                    <dd>{formatDate(clinic.subscription?.ends_at ?? null)}</dd>
+                                    <dd>{formatDateTime(clinic.subscription?.ends_at ?? null)}</dd>
                                 </div>
                                 <div>
                                     <dt className="text-muted-foreground">
                                         {t('clinics.show.subscription.trialEnds')}
                                     </dt>
                                     <dd>
-                                        {formatDate(clinic.subscription?.trial_ends_at ?? null)}
+                                        {formatDateTime(clinic.subscription?.trial_ends_at ?? null)}
                                     </dd>
                                 </div>
                             </dl>
@@ -331,7 +327,7 @@ export default function ClinicShow({ clinic, plans, usage, auditLogs }: Props) {
                                                 </p>
                                             </div>
                                             <span className="shrink-0 text-xs text-muted-foreground">
-                                                {formatDate(log.created_at)}
+                                                {formatDateTime(log.created_at)}
                                             </span>
                                         </li>
                                     ))}

@@ -35,6 +35,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/Components/ui/tooltip';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { Paginated, StaffRow } from '@/types/tenant';
 
 type Props = {
@@ -50,11 +51,6 @@ type CreateForm = {
 };
 
 type EditForm = Pick<StaffRow, 'name' | 'email' | 'phone' | 'is_active'>;
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function StaffIndex({ staff }: Props) {
     const { t } = useTranslation('tenant');
@@ -163,7 +159,7 @@ export default function StaffIndex({ staff }: Props) {
                                         {row.roles?.join(', ') ?? '—'}
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground">
-                                        {formatDate(row.last_login_at)}
+                                        {formatDateTime(row.last_login_at)}
                                     </TableCell>
                                     <TableCell>
                                         <StatusBadge variant={row.is_active ? 'success' : 'neutral'}>

@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from '@/Components/ui/dialog';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDate } from '@/lib/dates';
 import type { FormSnapshot } from '@/types/tenant';
 
 type Submission = {
@@ -63,11 +64,6 @@ type Props = {
     consultations: Consultation[];
 };
 
-function fmtDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString();
-}
-
 export default function PatientHistory({ patient, consultations }: Props) {
     const { t } = useTranslation('tenant');
     const [submissionPreview, setSubmissionPreview] = useState<Submission | null>(null);
@@ -103,7 +99,7 @@ export default function PatientHistory({ patient, consultations }: Props) {
                         <CardContent className="p-6">
                             <div className="flex flex-wrap items-baseline justify-between gap-2">
                                 <div>
-                                    <h3 className="text-h3">{fmtDate(c.ended_at ?? c.started_at)}</h3>
+                                    <h3 className="text-h3">{formatDate(c.ended_at ?? c.started_at)}</h3>
                                     <p className="text-sm text-muted-foreground">
                                         {c.doctor?.name ? `Dr. ${c.doctor.name}` : '—'}
                                         {c.chief_complaint && ` · ${c.chief_complaint}`}

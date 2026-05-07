@@ -35,6 +35,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { useFlashToasts } from '@/Hooks/useFlashToasts';
 import { usePending } from '@/Hooks/usePending';
 import AppLayout from '@/Layouts/AppLayout';
+import { formatDate } from '@/lib/dates';
 import type { MedicalForm, Paginated } from '@/types/tenant';
 
 type Props = { forms: Paginated<MedicalForm> };
@@ -58,11 +59,6 @@ export default function FormsIndex({ forms }: Props) {
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         form.post('/forms', { preserveScroll: true });
-    };
-
-    const formatDate = (iso: string | null): string => {
-        if (!iso) return '—';
-        return new Date(iso).toLocaleDateString();
     };
 
     return (

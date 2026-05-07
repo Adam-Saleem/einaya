@@ -3,6 +3,7 @@ import { ChevronLeft, Printer } from 'lucide-react';
 import { useEffect } from 'react';
 
 import { Button } from '@/Components/ui/button';
+import i18n from '@/i18n';
 
 type Props = {
     payment: {
@@ -31,63 +32,41 @@ type Props = {
     } | null;
 };
 
-const STRINGS = {
-    en: {
-        title: 'Receipt',
-        receiptNumber: 'Receipt #',
-        date: 'Date',
-        patient: 'Patient',
-        method: 'Method',
-        amount: 'Amount',
-        cash: 'Cash',
-        card: 'Card',
-        insurance: 'Insurance',
-        total: 'Total',
-        thankYou: 'Thank you for visiting.',
-        print: 'Print',
-        back: 'Back',
-    },
-    ar: {
-        title: 'إيصال',
-        receiptNumber: 'رقم الإيصال',
-        date: 'التاريخ',
-        patient: 'المريض',
-        method: 'طريقة الدفع',
-        amount: 'المبلغ',
-        cash: 'نقدًا',
-        card: 'بطاقة',
-        insurance: 'تأمين',
-        total: 'الإجمالي',
-        thankYou: 'شكرًا لزيارتكم.',
-        print: 'طباعة',
-        back: 'رجوع',
-    },
-} as const;
-
+/**
+ * Print uses the patient's preferred language: it's the document the patient
+ * walks out with. Looked-up via `i18n.t(..., { lng })` so the rest of the
+ * app stays in the user's session locale while only this page renders in
+ * the patient's tongue. Sets html[lang] + dir so the body font rule in
+ * app.css swaps Manrope ⇄ IBM Plex Sans Arabic.
+ */
 export default function Receipt({ payment, clinic, patient }: Props) {
-    const lang = (patient?.preferred_language ?? 'ar') as 'en' | 'ar';
+    const lang = (patient?.preferred_language === 'ar' ? 'ar' : 'en') as 'en' | 'ar';
     const dir = lang === 'ar' ? 'rtl' : 'ltr';
-    const s = STRINGS[lang];
+    const t = (key: string) =>
+        i18n.t(key, { lng: lang, ns: 'tenant', defaultValue: key }) as string;
 
     useEffect(() => {
-        // Force document direction for the receipt itself even when the
-        // logged-in user is in the other language.
-        const prev = document.documentElement.dir;
+        const prevDir = document.documentElement.dir;
+        const prevLang = document.documentElement.lang;
         document.documentElement.dir = dir;
+        document.documentElement.lang = lang;
         return () => {
-            document.documentElement.dir = prev;
+            document.documentElement.dir = prevDir;
+            document.documentElement.lang = prevLang;
         };
-    }, [dir]);
+    }, [dir, lang]);
 
-    const fmt = (n: number) =>
+    const fmtCurrency = (n: number) =>
         n.toLocaleString(lang === 'ar' ? 'ar' : 'en', {
             style: 'currency',
             currency: 'USD',
         });
+    const fmtDate = (iso: string | null) =>
+        iso ? new Date(iso).toLocaleString(lang === 'ar' ? 'ar' : 'en') : '—';
 
     return (
         <>
-            <Head title={`${s.title} ${payment.receipt_number}`} />
+            <Head title={`${t('payments.receipt.title')} ${payment.receipt_number}`} />
             <style>{`
                 @media print {
                     body { background: white !important; }
@@ -101,18 +80,19 @@ export default function Receipt({ payment, clinic, patient }: Props) {
                     <Button asChild variant="ghost">
                         <Link href="/payments">
                             <ChevronLeft className="me-2 h-4 w-4" />
-                            {s.back}
+                            {t('payments.receipt.back')}
                         </Link>
                     </Button>
                     <Button onClick={() => window.print()}>
                         <Printer className="me-2 h-4 w-4" />
-                        {s.print}
+                        {t('payments.receipt.print')}
                     </Button>
                 </div>
 
                 <div
                     className="receipt-page mx-auto max-w-2xl rounded-md border bg-card p-8 shadow-sm"
                     dir={dir}
+                    lang={lang}
                 >
                     <header className="flex items-center gap-3 border-b pb-4">
                         {clinic.receipt?.show_logo !== false && clinic.branding?.logo_url && (
@@ -146,16 +126,20 @@ export default function Receipt({ payment, clinic, patient }: Props) {
                     <section className="my-6 grid grid-cols-2 gap-4 text-sm">
                         <div>
                             <p className="text-xs uppercase text-muted-foreground">
-                                {s.receiptNumber}
+                                {t('payments.receipt.receiptNumber')}
                             </p>
                             <p className="font-mono font-semibold">{payment.receipt_number}</p>
                         </div>
                         <div className="text-end">
-                            <p className="text-xs uppercase text-muted-foreground">{s.date}</p>
-                            <p>{payment.paid_at ? new Date(payment.paid_at).toLocaleString() : '—'}</p>
+                            <p className="text-xs uppercase text-muted-foreground">
+                                {t('payments.receipt.date')}
+                            </p>
+                            <p>{fmtDate(payment.paid_at)}</p>
                         </div>
                         <div className="col-span-2">
-                            <p className="text-xs uppercase text-muted-foreground">{s.patient}</p>
+                            <p className="text-xs uppercase text-muted-foreground">
+                                {t('payments.receipt.patient')}
+                            </p>
                             <p className="font-medium">{patient?.name ?? '—'}</p>
                             <p className="text-xs text-muted-foreground">
                                 {patient?.patient_code} · {patient?.phone}
@@ -168,32 +152,38 @@ export default function Receipt({ payment, clinic, patient }: Props) {
                             <tbody>
                                 {payment.cash_amount > 0 && (
                                     <tr>
-                                        <td className="py-1 text-sm">{s.cash}</td>
+                                        <td className="py-1 text-sm">
+                                            {t('payments.receipt.cash')}
+                                        </td>
                                         <td className="py-1 text-end font-mono">
-                                            {fmt(payment.cash_amount)}
+                                            {fmtCurrency(payment.cash_amount)}
                                         </td>
                                     </tr>
                                 )}
                                 {payment.card_amount > 0 && (
                                     <tr>
-                                        <td className="py-1 text-sm">{s.card}</td>
+                                        <td className="py-1 text-sm">
+                                            {t('payments.receipt.card')}
+                                        </td>
                                         <td className="py-1 text-end font-mono">
-                                            {fmt(payment.card_amount)}
+                                            {fmtCurrency(payment.card_amount)}
                                         </td>
                                     </tr>
                                 )}
                                 {payment.insurance_amount > 0 && (
                                     <tr>
-                                        <td className="py-1 text-sm">{s.insurance}</td>
+                                        <td className="py-1 text-sm">
+                                            {t('payments.receipt.insurance')}
+                                        </td>
                                         <td className="py-1 text-end font-mono">
-                                            {fmt(payment.insurance_amount)}
+                                            {fmtCurrency(payment.insurance_amount)}
                                         </td>
                                     </tr>
                                 )}
                                 <tr className="border-t font-semibold">
-                                    <td className="py-2">{s.total}</td>
+                                    <td className="py-2">{t('payments.receipt.total')}</td>
                                     <td className="py-2 text-end font-mono text-h3">
-                                        {fmt(payment.amount)}
+                                        {fmtCurrency(payment.amount)}
                                     </td>
                                 </tr>
                             </tbody>
@@ -206,7 +196,9 @@ export default function Receipt({ payment, clinic, patient }: Props) {
                         </p>
                     )}
 
-                    <p className="mt-2 text-center text-xs text-muted-foreground">{s.thankYou}</p>
+                    <p className="mt-2 text-center text-xs text-muted-foreground">
+                        {t('payments.receipt.thankYou')}
+                    </p>
                 </div>
             </div>
         </>

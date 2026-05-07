@@ -30,6 +30,7 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import CentralLayout from '@/Layouts/CentralLayout';
+import { formatDateTime } from '@/lib/dates';
 import type { AuditLog, Paginated } from '@/types/central';
 
 type Props = {
@@ -44,11 +45,6 @@ type Props = {
     users: { id: number; name: string; email: string }[];
     actions: string[];
 };
-
-function formatDate(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString();
-}
 
 export default function AuditIndex({ logs, filters, users, actions }: Props) {
     const { t } = useTranslation('central');
@@ -191,7 +187,7 @@ export default function AuditIndex({ logs, filters, users, actions }: Props) {
                                 logs.data.map((log) => (
                                     <TableRow key={log.id}>
                                         <TableCell className="text-sm">
-                                            {formatDate(log.created_at)}
+                                            {formatDateTime(log.created_at)}
                                         </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">
                                             {log.user?.email ?? 'system'}
@@ -260,7 +256,7 @@ export default function AuditIndex({ logs, filters, users, actions }: Props) {
                     <DialogHeader>
                         <DialogTitle>{t('audit.diff.title')}</DialogTitle>
                         <DialogDescription>
-                            {selected?.action} · {formatDate(selected?.created_at ?? null)}
+                            {selected?.action} · {formatDateTime(selected?.created_at ?? null)}
                         </DialogDescription>
                     </DialogHeader>
                     {selected && (
