@@ -120,7 +120,6 @@ export default function PatientsIndex({ patients, filters, insuranceProviders }:
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>{t('patients.columns.code')}</TableHead>
                                 <TableHead>{t('patients.columns.name')}</TableHead>
                                 <TableHead>{t('patients.columns.phone')}</TableHead>
                                 <TableHead>{t('patients.columns.age')}</TableHead>
@@ -131,21 +130,13 @@ export default function PatientsIndex({ patients, filters, insuranceProviders }:
                         <TableBody>
                             {patients.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                                         {t('patients.noResults')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 patients.data.map((p) => (
                                     <TableRow key={p.id}>
-                                        <TableCell className="font-mono text-xs">
-                                            <Link
-                                                href={`/patients/${p.id}`}
-                                                className="hover:text-primary"
-                                            >
-                                                {p.patient_code}
-                                            </Link>
-                                        </TableCell>
                                         <TableCell>
                                             <Link
                                                 href={`/patients/${p.id}`}

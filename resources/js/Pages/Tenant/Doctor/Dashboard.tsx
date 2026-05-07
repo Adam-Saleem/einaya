@@ -120,7 +120,7 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
                     <CardContent>
                         <p className="text-h3">{inProgress.patient_name}</p>
                         <p className="text-sm text-muted-foreground">
-                            {inProgress.patient_code} · started {formatTime(inProgress.started_at)}
+                            started {formatTime(inProgress.started_at)}
                         </p>
                     </CardContent>
                 </Card>
@@ -148,8 +148,8 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
                                             <div>
                                                 <p className="font-medium">{row.patient?.name ?? '—'}</p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {row.patient?.patient_code} ·{' '}
                                                     {formatTime(row.scheduled_for)}
+                                                    {row.patient?.phone && ` · ${row.patient.phone}`}
                                                 </p>
                                             </div>
                                         </div>
@@ -190,9 +190,6 @@ export default function DoctorDashboard({ stats, inProgress, queue, todaySchedul
                                         >
                                             {p.patient_name}
                                         </Link>
-                                        <span className="text-xs text-muted-foreground">
-                                            {p.patient_code}
-                                        </span>
                                     </li>
                                 ))}
                             </ul>

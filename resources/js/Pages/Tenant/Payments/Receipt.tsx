@@ -141,8 +141,8 @@ export default function Receipt({ payment, clinic, patient }: Props) {
                                 {t('payments.receipt.patient')}
                             </p>
                             <p className="font-medium">{patient?.name ?? '—'}</p>
-                            <p className="text-xs text-muted-foreground">
-                                {patient?.patient_code} · {patient?.phone}
+                            <p className="text-xs text-muted-foreground" dir="ltr">
+                                {patient?.phone}
                             </p>
                         </div>
                     </section>

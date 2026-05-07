@@ -73,9 +73,6 @@ export default function FormSubmissions({ form, submissions }: Props) {
                                             >
                                                 {s.patient?.name ?? '—'}
                                             </Link>
-                                            <span className="ms-2 text-xs text-muted-foreground">
-                                                {s.patient?.patient_code}
-                                            </span>
                                         </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">
                                             {s.doctor?.name ?? '—'}

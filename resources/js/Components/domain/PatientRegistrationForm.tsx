@@ -186,8 +186,7 @@ export function PatientRegistrationForm({
                                     {duplicates.map((d) => (
                                         <li key={d.id} className="flex items-center justify-between">
                                             <span className="text-sm">
-                                                {d.first_name} {d.last_name} · {d.patient_code} ·{' '}
-                                                {d.phone}
+                                                {d.first_name} {d.last_name} · {d.phone}
                                             </span>
                                             <Button
                                                 type="button"

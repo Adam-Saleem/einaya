@@ -344,11 +344,11 @@ export default function ConsultationPage({ consultation, history, forms }: Props
                     <div className="flex-1">
                         <h2 className="text-h2">{consultation.patient.name}</h2>
                         <p className="text-sm text-muted-foreground">
-                            <span className="font-mono">{consultation.patient.patient_code}</span>
+                            {consultation.patient.phone && (
+                                <span dir="ltr">{consultation.patient.phone}</span>
+                            )}
                             {consultation.patient.age !== null && ` · ${consultation.patient.age}y`}
                             {consultation.patient.gender_label && ` · ${consultation.patient.gender_label}`}
-                            {' · '}
-                            {consultation.patient.phone}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
                             {consultation.patient.allergies_summary && (

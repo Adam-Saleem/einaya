@@ -136,9 +136,8 @@ export default function PrescriptionPrint({
                                 {patient?.name ?? t('doctorPanel.print.none')}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                {patient?.patient_code}
-                                {patient?.age !== null && ` · ${patient?.age}y`}
-                                {patient?.gender_label && ` · ${patient.gender_label}`}
+                                {patient?.age !== null && `${patient?.age}y`}
+                                {patient?.gender_label && (patient?.age !== null ? ` · ${patient.gender_label}` : patient.gender_label)}
                             </p>
                         </div>
                         <div className="text-end">

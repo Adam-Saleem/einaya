@@ -133,7 +133,7 @@ class PatientController extends Controller
         }
 
         return redirect("/patients/{$patient->id}")
-            ->with('success', "Patient registered: {$patient->patient_code}");
+            ->with('success', __('Patient registered.'));
     }
 
     public function show(Request $request, Patient $patient): Response

@@ -72,7 +72,7 @@ export default function PatientHistory({ patient, consultations }: Props) {
         <AppLayout
             title={`${patient.name} — history`}
             pageTitle={t('doctorPanel.history.title')}
-            description={`${patient.name} · ${patient.patient_code}`}
+            description={patient.name}
             breadcrumbs={[
                 { label: 'Patients', href: '/patients' },
                 { label: patient.name, href: `/patients/${patient.id}` },

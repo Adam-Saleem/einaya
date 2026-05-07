@@ -120,7 +120,7 @@ export function PatientSearch({ onCreateNew }: Props) {
                                 >
                                     <span className="font-medium">{r.name}</span>
                                     <span className="ms-2 text-xs text-muted-foreground">
-                                        {r.patient_code} · {r.phone}
+                                        {r.phone}
                                         {r.age !== null && ` · ${r.age}y`}
                                     </span>
                                 </CommandItem>

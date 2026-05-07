@@ -109,8 +109,8 @@ export default function Queue({ queue }: Props) {
                                             </TableCell>
                                             <TableCell>
                                                 <p className="font-medium">{row.patient?.name ?? '—'}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {row.patient?.patient_code} · {row.patient?.phone}
+                                                <p className="text-xs text-muted-foreground" dir="ltr">
+                                                    {row.patient?.phone ?? '—'}
                                                 </p>
                                             </TableCell>
                                             <TableCell>{formatTime(row.scheduled_for)}</TableCell>

@@ -146,7 +146,7 @@ export default function PatientShow({ patient, appointments, payments, files }: 
                     <div className="flex-1">
                         <h2 className="text-h2">{patient.name}</h2>
                         <p className="text-sm text-muted-foreground">
-                            <span className="font-mono">{patient.patient_code}</span>
+                            {patient.phone && <span dir="ltr">{patient.phone}</span>}
                             {patient.age !== null && ` · ${patient.age}y`}
                             {patient.gender_label && ` · ${patient.gender_label}`}
                         </p>

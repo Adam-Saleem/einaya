@@ -148,8 +148,8 @@ export default function ConsultationsIndex({ consultations, filters }: Props) {
                                             ) : (
                                                 '—'
                                             )}
-                                            <p className="text-xs text-muted-foreground">
-                                                {c.patient?.patient_code}
+                                            <p className="text-xs text-muted-foreground" dir="ltr">
+                                                {c.patient?.phone ?? ''}
                                             </p>
                                         </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">

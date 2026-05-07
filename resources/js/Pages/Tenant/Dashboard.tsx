@@ -115,7 +115,6 @@ export default function Dashboard(props: DashboardProps) {
                                                 {appt.patient?.name ?? '—'}
                                             </p>
                                             <p className="text-xs text-muted-foreground">
-                                                {appt.patient?.patient_code} ·{' '}
                                                 {appt.doctor ?? '—'}
                                             </p>
                                         </div>
@@ -152,9 +151,6 @@ export default function Dashboard(props: DashboardProps) {
                                     >
                                         <div>
                                             <p className="text-sm font-semibold">{p.name}</p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {p.patient_code}
-                                            </p>
                                         </div>
                                         <span className="text-xs text-muted-foreground">
                                             {formatDate(p.created_at)}

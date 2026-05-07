@@ -98,9 +98,11 @@ export function PatientCombobox({ value, onChange, placeholder, className }: Pro
                     {selected ? (
                         <span className="flex items-center gap-2">
                             <span className="font-medium">{selected.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                                {selected.patient_code} · {selected.phone}
-                            </span>
+                            {selected.phone && (
+                                <span className="text-xs text-muted-foreground" dir="ltr">
+                                    {selected.phone}
+                                </span>
+                            )}
                         </span>
                     ) : (
                         <span className="text-muted-foreground">
@@ -156,7 +158,7 @@ export function PatientCombobox({ value, onChange, placeholder, className }: Pro
                                     />
                                     <span className="font-medium">{r.name}</span>
                                     <span className="ms-2 text-xs text-muted-foreground">
-                                        {r.patient_code} · {r.phone}
+                                        {r.phone}
                                         {r.age !== null && ` · ${r.age}y`}
                                     </span>
                                 </CommandItem>
