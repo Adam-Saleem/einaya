@@ -238,5 +238,51 @@
         "confirmDeleteBody": "Marks the clinic cancelled and soft-deletes the central record.",
         "confirmPlanDelete": "Archive this plan?",
         "confirmPlanDeleteBody": "Plan disappears from selection lists. Existing subscriptions keep their plan reference."
+    },
+    "demoRequests": {
+        "title": "Demo requests",
+        "subtitle_one": "{{count}} unhandled lead",
+        "subtitle_other": "{{count}} unhandled leads",
+        "empty": "No requests match your filters.",
+        "intents": {
+            "demo": "Demo",
+            "register": "Register"
+        },
+        "status": {
+            "pending": "Pending",
+            "handled": "Handled"
+        },
+        "filters": {
+            "searchPlaceholder": "Clinic, contact, email, or phone",
+            "handled": "Status",
+            "unhandled": "Unhandled",
+            "handledOnly": "Handled",
+            "all": "All",
+            "intent": "Intent",
+            "allIntents": "All intents"
+        },
+        "columns": {
+            "clinic": "Clinic",
+            "contact": "Contact",
+            "intent": "Intent",
+            "received": "Received",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "actions": {
+            "whatsapp": "Open in WhatsApp",
+            "email": "Send email",
+            "markHandled": "Mark handled",
+            "reopen": "Reopen",
+            "view": "View details"
+        },
+        "detail": {
+            "contact": "Contact",
+            "country": "Country",
+            "email": "Email",
+            "phone": "Phone",
+            "message": "Message",
+            "notes": "Internal notes"
+        }
     }
 }

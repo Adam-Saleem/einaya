@@ -238,5 +238,55 @@
         "confirmDeleteBody": "يُعلَّم الاشتراك ملغى ويُحذف السجل المركزي ناعمًا.",
         "confirmPlanDelete": "أرشفة هذه الخطّة؟",
         "confirmPlanDeleteBody": "ستختفي من قوائم الاختيار. الاشتراكات الحالية تحتفظ بمرجع الخطّة."
+    },
+    "demoRequests": {
+        "title": "طلبات العروض",
+        "subtitle_zero": "لا طلبات بانتظار المعالجة",
+        "subtitle_one": "طلب واحد بانتظار المعالجة",
+        "subtitle_two": "طلبان بانتظار المعالجة",
+        "subtitle_few": "{{count}} طلبات بانتظار المعالجة",
+        "subtitle_many": "{{count}} طلبًا بانتظار المعالجة",
+        "subtitle_other": "{{count}} طلب بانتظار المعالجة",
+        "empty": "لا توجد طلبات مطابقة للفلاتر.",
+        "intents": {
+            "demo": "عرض توضيحي",
+            "register": "تسجيل"
+        },
+        "status": {
+            "pending": "بالانتظار",
+            "handled": "تمت المعالجة"
+        },
+        "filters": {
+            "searchPlaceholder": "العيادة أو جهة الاتصال أو البريد أو الهاتف",
+            "handled": "الحالة",
+            "unhandled": "بالانتظار",
+            "handledOnly": "تمت المعالجة",
+            "all": "الكل",
+            "intent": "النوع",
+            "allIntents": "كل الأنواع"
+        },
+        "columns": {
+            "clinic": "العيادة",
+            "contact": "جهة الاتصال",
+            "intent": "النوع",
+            "received": "تاريخ الاستلام",
+            "status": "الحالة",
+            "actions": "إجراءات"
+        },
+        "actions": {
+            "whatsapp": "فتح في واتساب",
+            "email": "إرسال بريد",
+            "markHandled": "وضع علامة كتمت المعالجة",
+            "reopen": "إعادة فتح",
+            "view": "عرض التفاصيل"
+        },
+        "detail": {
+            "contact": "جهة الاتصال",
+            "country": "الدولة",
+            "email": "البريد",
+            "phone": "الهاتف",
+            "message": "الرسالة",
+            "notes": "ملاحظات داخلية"
+        }
     }
 }

@@ -107,3 +107,23 @@ export type PlatformStats = {
     total_staff: number | null;
     generated_at: string | null;
 };
+
+export type DemoRequestRow = {
+    id: number;
+    clinic_name: string;
+    contact_name: string;
+    email: string;
+    phone: string;
+    country: string | null;
+    intent: 'demo' | 'register';
+    message: string | null;
+    is_handled: boolean;
+    handled_at: string | null;
+    notes: string | null;
+    ip_address: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+    whatsapp_url: string | null;
+    mailto_url: string;
+    handler: { id: number; name: string; email: string } | null;
+};

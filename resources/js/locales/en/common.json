@@ -58,6 +58,33 @@
         "badge": "Clinic workspace",
         "title": "Welcome back to your clinic"
     },
+    "demoRequest": {
+        "title": "Talk to us",
+        "subtitle": "Tell us a bit about your clinic and we'll reach out within one business day.",
+        "intents": {
+            "demo": "Request a demo",
+            "register": "Register a clinic"
+        },
+        "fields": {
+            "clinicName": "Clinic name",
+            "contactName": "Your name",
+            "email": "Email",
+            "phone": "Phone (with country code)",
+            "country": "Country",
+            "message": "Message",
+            "messagePlaceholder": "What problem can we help you solve?"
+        },
+        "submitDemo": "Request demo",
+        "submitRegister": "Register clinic",
+        "submitting": "Sending…",
+        "cancel": "Cancel",
+        "toastSuccess": "Thanks — we'll be in touch.",
+        "success": {
+            "title": "Got it!",
+            "body": "We'll reach out within one business day. Keep an eye on your inbox or WhatsApp.",
+            "close": "Close"
+        }
+    },
     "status": {
         "loading": "Loading…",
         "saving": "Saving…",
@@ -90,6 +117,7 @@
         "clinics": "Clinics",
         "subscriptions": "Subscriptions",
         "operations": "Operations",
+        "demoRequests": "Demo requests",
         "supportTickets": "Support Tickets",
         "auditLogs": "Audit Logs",
         "plans": "Plans",

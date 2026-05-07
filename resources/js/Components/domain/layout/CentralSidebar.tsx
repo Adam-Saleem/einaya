@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import {
     Building2,
     CreditCard,
+    Inbox,
     LayoutDashboard,
     LifeBuoy,
     Package,
@@ -48,6 +49,7 @@ const sections: NavSection[] = [
     {
         labelKey: 'nav.operations',
         items: [
+            { href: '/demo-requests', labelKey: 'nav.demoRequests', icon: Inbox },
             { href: '/support-tickets', labelKey: 'nav.supportTickets', icon: LifeBuoy },
             { href: '/audit-logs', labelKey: 'nav.auditLogs', icon: ScrollText },
         ],

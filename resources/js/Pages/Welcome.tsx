@@ -7,9 +7,11 @@ import {
     ShieldCheck,
     Stethoscope,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { DemoRequestDialog } from '@/Components/domain/DemoRequestDialog';
 import { LanguageSwitcher } from '@/Components/domain/layout/LanguageSwitcher';
 import { ThemeToggle } from '@/Components/domain/layout/ThemeToggle';
 import { Button } from '@/Components/ui/button';
@@ -22,6 +24,12 @@ const FEATURES = [
 
 export default function Welcome() {
     const { t } = useTranslation('common');
+    const [dialog, setDialog] = useState<{ open: boolean; intent: 'demo' | 'register' }>(
+        { open: false, intent: 'demo' },
+    );
+
+    const openDialog = (intent: 'demo' | 'register') =>
+        setDialog({ open: true, intent });
 
     return (
         <>
@@ -73,16 +81,19 @@ export default function Welcome() {
                                 {t('landing.subhead')}
                             </p>
                             <div className="flex flex-wrap items-center gap-3 pt-2">
-                                <Button asChild size="lg">
-                                    <Link href="/login">
-                                        {t('landing.ctaPrimary')}
-                                        <ArrowRight className="ms-2 h-4 w-4 rtl:scale-x-[-1]" />
-                                    </Link>
+                                <Button size="lg" onClick={() => openDialog('demo')}>
+                                    {t('landing.ctaPrimary')}
+                                    <ArrowRight className="ms-2 h-4 w-4 rtl:scale-x-[-1]" />
                                 </Button>
-                                <Button asChild size="lg" variant="ghost">
-                                    <a href="mailto:hello@einaya.io">
-                                        {t('landing.ctaSecondary')}
-                                    </a>
+                                <Button
+                                    size="lg"
+                                    variant="ghost"
+                                    onClick={() => openDialog('register')}
+                                >
+                                    {t('landing.ctaSecondary')}
+                                </Button>
+                                <Button asChild size="lg" variant="link">
+                                    <Link href="/login">{t('actions.signIn')}</Link>
                                 </Button>
                             </div>
                         </motion.div>
@@ -135,11 +146,14 @@ export default function Welcome() {
                                     {t('landing.cta.body')}
                                 </p>
                             </div>
-                            <Button asChild size="lg" variant="secondary" className="w-fit">
-                                <Link href="/login">
-                                    {t('landing.cta.button')}
-                                    <ArrowRight className="ms-2 h-4 w-4 rtl:scale-x-[-1]" />
-                                </Link>
+                            <Button
+                                size="lg"
+                                variant="secondary"
+                                className="w-fit"
+                                onClick={() => openDialog('register')}
+                            >
+                                {t('landing.cta.button')}
+                                <ArrowRight className="ms-2 h-4 w-4 rtl:scale-x-[-1]" />
                             </Button>
                         </div>
                     </div>
@@ -156,12 +170,27 @@ export default function Welcome() {
                                 © {new Date().getFullYear()} Einaya · {t('landing.footer.tagline')}
                             </span>
                         </div>
-                        <Link href="/login" className="hover:text-primary">
-                            {t('actions.signIn')}
-                        </Link>
+                        <div className="flex items-center gap-4">
+                            <button
+                                type="button"
+                                onClick={() => openDialog('demo')}
+                                className="hover:text-primary"
+                            >
+                                {t('demoRequest.title')}
+                            </button>
+                            <Link href="/login" className="hover:text-primary">
+                                {t('actions.signIn')}
+                            </Link>
+                        </div>
                     </div>
                 </footer>
             </div>
+
+            <DemoRequestDialog
+                open={dialog.open}
+                onOpenChange={(open) => setDialog((d) => ({ ...d, open }))}
+                initialIntent={dialog.intent}
+            />
         </>
     );
 }

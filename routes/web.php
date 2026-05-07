@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\DemoRequestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,5 +21,12 @@ foreach (['einaya.ps', 'einaya.test', 'localhost', '127.0.0.1'] as $domain) {
         Route::get('/', function () {
             return Inertia::render('Welcome');
         })->name('marketing.home');
+
+        // Public demo / register-clinic submission. Throttled per IP so a
+        // bot can't fill the leads inbox; honeypot validation in the form
+        // request catches naive scrapers.
+        Route::post('/demo-request', [DemoRequestController::class, 'store'])
+            ->middleware('throttle:5,60')
+            ->name('marketing.demoRequest');
     });
 }

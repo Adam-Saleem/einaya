@@ -5,10 +5,12 @@ declare(strict_types=1);
 use App\Http\Controllers\Central\AuditController;
 use App\Http\Controllers\Central\ClinicController;
 use App\Http\Controllers\Central\DashboardController;
+use App\Http\Controllers\Central\DemoRequestController;
 use App\Http\Controllers\Central\PlanController;
 use App\Http\Controllers\Central\SettingController;
 use App\Http\Controllers\Central\SubscriptionController;
 use App\Http\Controllers\Central\TicketController;
+use App\Http\Controllers\ClientErrorController;
 use App\Http\Controllers\PreferenceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -72,6 +74,10 @@ foreach (['app.einaya.ps', 'app.einaya.test'] as $domain) {
             Route::get('/tickets', [TicketController::class, 'index'])->name('central.tickets.index');
             Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('central.tickets.show');
             Route::patch('/tickets/{ticket}', [TicketController::class, 'update'])->name('central.tickets.update');
+
+            Route::get('/demo-requests', [DemoRequestController::class, 'index'])->name('central.demo-requests.index');
+            Route::patch('/demo-requests/{demoRequest}', [DemoRequestController::class, 'update'])
+                ->name('central.demo-requests.update');
 
             Route::get('/audit', [AuditController::class, 'index'])->name('central.audit.index');
 
