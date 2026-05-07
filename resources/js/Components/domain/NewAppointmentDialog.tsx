@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
-import { type FormEventHandler, useEffect, useMemo, useState } from 'react';
+import { type FormEventHandler, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -116,8 +116,13 @@ export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
     const [submitting, setSubmitting] = useState(false);
     const [warning, setWarning] = useState<string | null>(null);
 
+    // Only reset on the closed→open transition. `defaultDoctor` is the
+    // first item of a prop array — its reference changes on every parent
+    // render, so listing it as a dep would wipe the form whenever any
+    // sibling state updates (including selecting a patient).
+    const wasOpen = useRef(false);
     useEffect(() => {
-        if (open) {
+        if (open && !wasOpen.current) {
             setStep(1);
             setMode('existing');
             setExistingPatient(null);
@@ -134,7 +139,9 @@ export function NewAppointmentDialog({ open, onOpenChange, doctors }: Props) {
             setWarning(null);
             setSubmitting(false);
         }
-    }, [open, defaultDoctor]);
+        wasOpen.current = open;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     const selectedCity = useMemo(() => findCity(patient.city), [patient.city]);
     const villages = selectedCity?.villages ?? [];

@@ -65,7 +65,18 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    /*
+     * Phase 21 — clinics on this deployment all operate in Palestine, so
+     * the framework default flips from UTC to Asia/Hebron. Without this,
+     * a `<input type="datetime-local">` value like "18:30" — sent without
+     * a timezone — was parsed as UTC and stored 3 hours off, which trips
+     * the doctor's working-hours check in AppointmentConflictService and
+     * re-renders the time wrong.
+     *
+     * If a future clinic is in a different region, swap to a per-tenant
+     * setting via `clinic_settings.localization.timezone`.
+     */
+    'timezone' => env('APP_TIMEZONE', 'Asia/Hebron'),
 
     /*
     |--------------------------------------------------------------------------
