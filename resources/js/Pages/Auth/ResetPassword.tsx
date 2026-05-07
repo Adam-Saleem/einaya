@@ -33,7 +33,7 @@ export default function ResetPassword({
         <GuestLayout title={t('resetPassword.title')}>
             <Head title={t('resetPassword.title')} />
 
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-5">
                 <div className="space-y-2">
                     <Label htmlFor="email">{t('resetPassword.email')}</Label>
                     <Input
@@ -45,7 +45,7 @@ export default function ResetPassword({
                         onChange={(e) => setData('email', e.target.value)}
                     />
                     {errors.email && (
-                        <p className="text-xs text-destructive">{errors.email}</p>
+                        <p className="text-sm text-destructive">{errors.email}</p>
                     )}
                 </div>
 
@@ -61,7 +61,7 @@ export default function ResetPassword({
                         onChange={(e) => setData('password', e.target.value)}
                     />
                     {errors.password && (
-                        <p className="text-xs text-destructive">{errors.password}</p>
+                        <p className="text-sm text-destructive">{errors.password}</p>
                     )}
                 </div>
 
@@ -80,13 +80,13 @@ export default function ResetPassword({
                         }
                     />
                     {errors.password_confirmation && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-sm text-destructive">
                             {errors.password_confirmation}
                         </p>
                     )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={processing}>
+                <Button type="submit" className="w-full" size="lg" disabled={processing}>
                     {t('resetPassword.submit')}
                 </Button>
             </form>

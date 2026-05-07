@@ -21,8 +21,42 @@
         "close": "Close",
         "view": "View",
         "open": "Open",
+        "signIn": "Sign in",
         "more": "More",
         "discardChanges": "Discard unsaved changes?"
+    },
+    "landing": {
+        "eyebrow": "HIPAA-aware · Bilingual EN / AR",
+        "headline": "Run your clinic the calm way.",
+        "subhead": "Einaya brings appointments, consultations, prescriptions, and billing into one tidy workspace built for small medical clinics.",
+        "ctaPrimary": "Sign in to your clinic",
+        "ctaSecondary": "Talk to us",
+        "features": {
+            "scheduling": {
+                "title": "Smart scheduling",
+                "body": "Calendar with drag-to-reschedule, conflict detection, and a one-tap walk-in flow."
+            },
+            "records": {
+                "title": "Versioned records",
+                "body": "Patient files, custom intake forms, and consultation snapshots that never lose history."
+            },
+            "consultations": {
+                "title": "Doctor-first consultations",
+                "body": "Live diagnoses, prescriptions with autocomplete, and bilingual print-ready receipts."
+            }
+        },
+        "cta": {
+            "title": "Ready to streamline your clinic?",
+            "body": "Open Einaya and pick up where the day left you.",
+            "button": "Open clinic"
+        },
+        "footer": {
+            "tagline": "Clinic management, the calm way."
+        }
+    },
+    "tenantWelcome": {
+        "badge": "Clinic workspace",
+        "title": "Welcome back to your clinic"
     },
     "status": {
         "loading": "Loading…",

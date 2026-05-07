@@ -34,7 +34,7 @@ export default function TwoFactorChallenge() {
         >
             <Head title={t('twoFactor.title')} />
 
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-5">
                 {!useRecovery ? (
                     <div className="space-y-2">
                         <Label htmlFor="code">{t('twoFactor.code')}</Label>
@@ -49,7 +49,7 @@ export default function TwoFactorChallenge() {
                             onChange={(e) => setData('code', e.target.value)}
                         />
                         {errors.code && (
-                            <p className="text-xs text-destructive">{errors.code}</p>
+                            <p className="text-sm text-destructive">{errors.code}</p>
                         )}
                     </div>
                 ) : (
@@ -68,21 +68,21 @@ export default function TwoFactorChallenge() {
                             }
                         />
                         {errors.recovery_code && (
-                            <p className="text-xs text-destructive">
+                            <p className="text-sm text-destructive">
                                 {errors.recovery_code}
                             </p>
                         )}
                     </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={processing}>
+                <Button type="submit" className="w-full" size="lg" disabled={processing}>
                     {t('twoFactor.submit')}
                 </Button>
 
                 <p className="text-center">
                     <button
                         type="button"
-                        className="text-xs text-primary hover:underline"
+                        className="text-sm font-medium text-primary hover:underline"
                         onClick={() => {
                             setUseRecovery((v) => !v);
                             reset('code', 'recovery_code');

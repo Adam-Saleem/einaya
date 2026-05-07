@@ -20,13 +20,13 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Head title={t('verifyEmail.title')} />
 
             {status === 'verification-link-sent' && (
-                <Alert>
+                <Alert className="mb-5 border-success/30 bg-success/10 text-success-foreground">
                     <AlertDescription>{t('verifyEmail.sent')}</AlertDescription>
                 </Alert>
             )}
 
-            <form onSubmit={submit} className="space-y-4">
-                <Button type="submit" className="w-full" disabled={processing}>
+            <form onSubmit={submit} className="space-y-5">
+                <Button type="submit" className="w-full" size="lg" disabled={processing}>
                     {t('verifyEmail.resend')}
                 </Button>
 
@@ -35,7 +35,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                         href="/logout"
                         method="post"
                         as="button"
-                        className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground hover:underline"
                     >
                         {t('logout')}
                     </Link>

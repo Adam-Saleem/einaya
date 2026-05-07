@@ -35,12 +35,12 @@ export default function Login({
             <Head title={t('login.title')} />
 
             {status && (
-                <Alert>
+                <Alert className="mb-5 border-success/30 bg-success/10 text-success-foreground">
                     <AlertDescription>{status}</AlertDescription>
                 </Alert>
             )}
 
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-5">
                 <div className="space-y-2">
                     <Label htmlFor="email">{t('login.email')}</Label>
                     <Input
@@ -51,9 +51,10 @@ export default function Login({
                         autoComplete="username"
                         autoFocus
                         onChange={(e) => setData('email', e.target.value)}
+                        aria-invalid={!!errors.email || undefined}
                     />
                     {errors.email && (
-                        <p className="text-xs text-destructive">{errors.email}</p>
+                        <p className="text-sm text-destructive">{errors.email}</p>
                     )}
                 </div>
 
@@ -63,7 +64,7 @@ export default function Login({
                         {canResetPassword && (
                             <Link
                                 href="/forgot-password"
-                                className="text-xs text-primary hover:underline"
+                                className="text-sm font-medium text-primary hover:underline"
                             >
                                 {t('login.forgot')}
                             </Link>
@@ -76,9 +77,10 @@ export default function Login({
                         value={data.password}
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
+                        aria-invalid={!!errors.password || undefined}
                     />
                     {errors.password && (
-                        <p className="text-xs text-destructive">{errors.password}</p>
+                        <p className="text-sm text-destructive">{errors.password}</p>
                     )}
                 </div>
 
@@ -92,11 +94,11 @@ export default function Login({
                     </span>
                 </label>
 
-                <Button type="submit" className="w-full" disabled={processing}>
+                <Button type="submit" className="w-full" size="lg" disabled={processing}>
                     {t('login.submit')}
                 </Button>
 
-                <p className="text-center text-xs text-muted-foreground">
+                <p className="text-center text-sm text-muted-foreground">
                     {t('login.noAccount')}
                 </p>
             </form>

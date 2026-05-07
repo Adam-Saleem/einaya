@@ -25,12 +25,12 @@ export default function ForgotPassword({ status }: { status?: string }) {
             <Head title={t('forgotPassword.title')} />
 
             {status && (
-                <Alert>
+                <Alert className="mb-5 border-success/30 bg-success/10 text-success-foreground">
                     <AlertDescription>{status}</AlertDescription>
                 </Alert>
             )}
 
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-5">
                 <div className="space-y-2">
                     <Label htmlFor="email">{t('login.email')}</Label>
                     <Input
@@ -41,20 +41,21 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         autoFocus
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
+                        aria-invalid={!!errors.email || undefined}
                     />
                     {errors.email && (
-                        <p className="text-xs text-destructive">{errors.email}</p>
+                        <p className="text-sm text-destructive">{errors.email}</p>
                     )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={processing}>
+                <Button type="submit" className="w-full" size="lg" disabled={processing}>
                     {t('forgotPassword.submit')}
                 </Button>
 
                 <p className="text-center">
                     <Link
                         href="/login"
-                        className="text-xs text-primary hover:underline"
+                        className="text-sm font-medium text-primary hover:underline"
                     >
                         {t('forgotPassword.back')}
                     </Link>

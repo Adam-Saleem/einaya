@@ -27,7 +27,7 @@ export default function ConfirmPassword() {
         >
             <Head title={t('confirmPassword.title')} />
 
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-5">
                 <div className="space-y-2">
                     <Label htmlFor="password">{t('confirmPassword.password')}</Label>
                     <Input
@@ -40,11 +40,11 @@ export default function ConfirmPassword() {
                         onChange={(e) => setData('password', e.target.value)}
                     />
                     {errors.password && (
-                        <p className="text-xs text-destructive">{errors.password}</p>
+                        <p className="text-sm text-destructive">{errors.password}</p>
                     )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={processing}>
+                <Button type="submit" className="w-full" size="lg" disabled={processing}>
                     {t('confirmPassword.submit')}
                 </Button>
             </form>

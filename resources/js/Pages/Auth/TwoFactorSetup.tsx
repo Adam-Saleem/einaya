@@ -148,7 +148,7 @@ export default function TwoFactorSetup({ enabled, pendingConfirmation }: Props) 
                                         className="text-center font-mono text-lg tracking-widest"
                                     />
                                     {confirm.errors.code && (
-                                        <p className="text-xs text-destructive">
+                                        <p className="text-sm text-destructive">
                                             {confirm.errors.code}
                                         </p>
                                     )}
