@@ -51,7 +51,8 @@ export default function MarketingLayout({
 
     const ctx = useMemo<DemoCtx>(() => ({ open: openDialog }), [openDialog]);
 
-    const navItems: { href: string; key: 'about' | 'pricing'; label: string }[] = [
+    const navItems: { href: string; key: 'home' | 'about' | 'pricing'; label: string }[] = [
+        { href: '/', key: 'home', label: t('nav.marketing.home') },
         { href: '/about', key: 'about', label: t('nav.marketing.about') },
         { href: '/pricing', key: 'pricing', label: t('nav.marketing.pricing') },
     ];

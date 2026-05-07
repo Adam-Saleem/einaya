@@ -195,6 +195,7 @@
     },
     "nav": {
         "marketing": {
+            "home": "Home",
             "about": "About",
             "pricing": "Pricing"
         },
